@@ -5,108 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UPI Payment Page</title>
   <style>
-    /* General body styles */
     body {
       font-family: Arial, sans-serif;
       background-color: #f7f7f7;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
-
-    /* Centering the container */
     .container {
       max-width: 600px;
-      margin: 20px auto;
+      margin: 50px auto;
       padding: 20px;
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
-
     h1 {
       color: #4CAF50;
-      margin-bottom: 20px;
-      font-size: 24px;
     }
-
-    /* QR Code */
     .qr-code {
       margin: 20px 0;
-      width: 100%;
-      max-width: 250px; /* Adjust maximum width for desktop */
-      margin-left: auto;
-      margin-right: auto;
     }
-
-    /* QR Code image will be responsive */
-    .qr-code img {
-      width: 100%;  /* Ensures image scales with the container */
-      height: auto;
-      border-radius: 8px;
-    }
-
-    /* UPI ID link styles */
-    .upi-id-link {
-      font-weight: bold;
-      font-size: 18px;
-      color: #333;
-      text-decoration: none;
-      margin-bottom: 20px;
-    }
-
-    /* Input and button styles */
-    input[type="number"] {
+    #amountInput {
       padding: 10px;
       font-size: 16px;
-      width: 100%;
-      max-width: 300px;
+      width: 200px;
       margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
     }
-
-    button {
-      padding: 12px 20px;
+    #payNowButton {
+      padding: 10px 20px;
       font-size: 16px;
       background-color: #4CAF50;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      width: 100%;
-      max-width: 300px;
     }
-
-    button:hover {
+    #payNowButton:hover {
       background-color: #45a049;
     }
-
-    /* Make the layout responsive for smaller screens */
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 20px;
-      }
-
-      .container {
-        padding: 15px;
-        margin: 10px;
-      }
-
-      .qr-code img {
-        width: 80%; /* Ensure QR Code scales down */
-      }
-
-      .upi-id-link {
-        font-size: 16px;
-      }
-
-      input[type="number"], button {
-        max-width: 100%;
-      }
-    }
-
   </style>
 </head>
 <body>
@@ -116,20 +53,22 @@
 
     <!-- QR Code Section -->
     <div class="qr-code">
-      <img src="https://lh6.googleusercontent.com/MBB8qDIVMbYdGYQhaxjAC7c4Wyh6SrKilmVuaKzy4bT58U9u__QwpcD2MM0K-QADIp42jQUbbLG7vVxLDqzyTgc=w1280" alt="UPI QR Code">
+      <img src="https://lh6.googleusercontent.com/MBB8qDIVMbYdGYQhaxjAC7c4Wyh6SrKilmVuaKzy4bT58U9u__QwpcD2MM0K-QADIp42jQUbbLG7vVxLDqzyTgc=w1280" alt="UPI QR Code" width="250" height="250">
     </div>
 
-    <!-- UPI ID Section -->
-    <a href="upi://pay?pa=qr919820689840-6263@unionbankofindia&pn=YourName&mc=YourMerchantCode&tid=YourTransactionId&cu=INR" class="upi-id-link">
-      qr919820689840-6263@unionbankofindia
-    </a>
-    <br><br>
+    <!-- UPI ID and Pay Now Button -->
+    <div>
+      <a href="upi://pay?pa=qr919820689840-6263@unionbankofindia&pn=YourName&mc=YourMerchantCode&tid=YourTransactionId&cu=INR" style="font-weight: bold; font-size: 20px; text-decoration: none; color: #333;">
+        qr919820689840-6263@unionbankofindia
+      </a>
+      <br><br>
 
-    <!-- Enter Amount Section -->
-    <input type="number" id="amountInput" placeholder="Enter Amount">
-
-    <!-- Pay Now Button -->
-    <button id="payNowButton">Pay Now</button>
+      <!-- Enter Amount -->
+      <input type="number" id="amountInput" placeholder="Enter Amount" style="padding: 10px; font-size: 16px; width: 200px; margin-bottom: 10px;">
+      
+      <!-- Pay Now Button -->
+      <button id="payNowButton" style="padding: 10px 20px; font-size: 16px;">Pay Now</button>
+    </div>
   </div>
 
   <script>
