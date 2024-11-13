@@ -14,24 +14,41 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: white;
+            color: black;
         }
         .container {
             text-align: center;
             max-width: 800px;
-            background-color: #fff;
             padding: 20px;
-            border-radius: 10px;
-            color: #333;
+            color: black;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .logo {
-            width: 150px;
+            width: 80px;
             border-radius: 50%;
+            margin-right: 10px;
         }
         h1 {
-            font-size: 2em;
-            margin-top: 10px;
-            color: #FFA500;
+            font-size: 1.8em;
+            margin: 0;
+        }
+        .social-icons {
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .social-icons img {
+            width: 30px;
+            margin-left: 5px;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        .social-icons img:hover {
+            transform: scale(1.1);
         }
         .menu {
             margin-top: 20px;
@@ -41,8 +58,9 @@
         }
         .dropdown h2 {
             cursor: pointer;
-            color: #FFA500;
+            color: black;
             margin: 10px 0;
+            font-size: 1.3em;
         }
         .dropdown-content {
             display: none;
@@ -52,34 +70,19 @@
         .dropdown-content a {
             display: block;
             text-decoration: none;
-            color: #333;
+            color: blue;
             padding: 5px 0;
             font-size: 1em;
         }
         .dropdown-content a:hover {
-            color: #FFA500;
-        }
-        .link-section {
-            margin: 20px 0;
+            text-decoration: underline;
         }
         .link-section a {
             display: block;
             text-decoration: none;
-            color: #FFA500;
-            font-size: 1.2em;
-            margin: 5px 0;
-        }
-        .social-icons {
-            margin-top: 20px;
-        }
-        .social-icons img {
-            width: 40px;
-            margin: 0 10px;
-            border-radius: 5px;
-            transition: transform 0.3s;
-        }
-        .social-icons img:hover {
-            transform: scale(1.1);
+            color: blue;
+            font-size: 1.3em;
+            margin: 10px 0;
         }
     </style>
     <script>
@@ -95,10 +98,20 @@
 </head>
 <body>
     <div class="container">
-        <!-- Logo and Name Section -->
-        <img src="https://lh6.googleusercontent.com/YbGYsa8og1CmjqcLrQfyjNzBGSzlpZNUGAwgXZ2rkvPDd3X5OQPwGRfIC6kWPY1vTqJAprPWE7f2wHcXCasrl4k=w16383" alt="Site Logo" class="logo">
-        <h1>•|| जकेरियाचा विघ्नहर्ता ||•</h1>
-        
+        <!-- Header Section with Logo, Name, and Icons -->
+        <div class="header">
+            <img src="https://lh6.googleusercontent.com/YbGYsa8og1CmjqcLrQfyjNzBGSzlpZNUGAwgXZ2rkvPDd3X5OQPwGRfIC6kWPY1vTqJAprPWE7f2wHcXCasrl4k=w16383" alt="Site Logo" class="logo">
+            <h1>•|| जकेरियाचा विघ्नहर्ता ||•</h1>
+            <div class="social-icons">
+                <a href="https://www.youtube.com/" target="_blank">
+                    <img src="https://play-lh.googleusercontent.com/6am0i3walYwNLc08QOOhRJttQENNGkhlKajXSERf3JnPVRQczIyxw2w3DxeMRTOSdsY" alt="YouTube Icon">
+                </a>
+                <a href="https://www.website.com/" target="_blank">
+                    <img src="https://img.freepik.com/free-vector/www-internet-globe-grid_78370-2008.jpg?size=338&ext=jpg&ga=GA1.1.386372595.1722384000&semt=ais_hybrid" alt="Website Icon">
+                </a>
+            </div>
+        </div>
+
         <!-- Main Categories with Dropdowns -->
         <div class="menu">
             <div class="dropdown">
@@ -106,7 +119,7 @@
                 <div class="dropdown-content" id="imagesDropdown">
                     <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A8" target="_blank">२०२२</a>
                     <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">आगमन सोहळा - २०२३</a>
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A4" target="_blank">आगमन सोहळा २०२४</a>
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank">आगमन सोहळा २०२४</a>
                 </div>
             </div>
             <div class="dropdown">
@@ -114,7 +127,7 @@
                 <div class="dropdown-content" id="videosDropdown">
                     <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A8" target="_blank">२०२२</a>
                     <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">आगमन सोहळा - २०२३</a>
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A4" target="_blank">आगमन सोहळा २०२४</a>
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank">आगमन सोहळा २०२४</a>
                 </div>
             </div>
         </div>
@@ -123,16 +136,6 @@
         <div class="link-section">
             <a href="https://sites.google.com/view/jakeriachavighnaharta/upi" target="_blank">UPI</a>
             <a href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank">Info</a>
-        </div>
-
-        <!-- Social Icons -->
-        <div class="social-icons">
-            <a href="https://www.youtube.com/" target="_blank">
-                <img src="https://play-lh.googleusercontent.com/6am0i3walYwNLc08QOOhRJttQENNGkhlKajXSERf3JnPVRQczIyxw2w3DxeMRTOSdsY" alt="YouTube Icon">
-            </a>
-            <a href="https://www.website.com/" target="_blank">
-                <img src="https://img.freepik.com/free-vector/www-internet-globe-grid_78370-2008.jpg?size=338&ext=jpg&ga=GA1.1.386372595.1722384000&semt=ais_hybrid" alt="Website Icon">
-            </a>
         </div>
     </div>
 </body>
