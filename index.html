@@ -1,95 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UPI Payment Page</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 50px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-    h1 {
-      color: #4CAF50;
-    }
-    .qr-code {
-      margin: 20px 0;
-    }
-    #amountInput {
-      padding: 10px;
-      font-size: 16px;
-      width: 200px;
-      margin-bottom: 10px;
-    }
-    #payNowButton {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #payNowButton:hover {
-      background-color: #45a049;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>•|| जकेरियाचा विघ्नहर्ता ||•</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFA500;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            color: #333;
+        }
+        .logo {
+            width: 150px;
+            border-radius: 50%;
+        }
+        h1 {
+            font-size: 2em;
+            margin-top: 10px;
+            color: #FFA500;
+        }
+        .menu {
+            margin-top: 20px;
+        }
+        .dropdown {
+            margin: 10px 0;
+        }
+        .dropdown h2 {
+            cursor: pointer;
+            color: #FFA500;
+            margin: 10px 0;
+        }
+        .dropdown-content {
+            display: none;
+            text-align: left;
+            margin-top: 10px;
+        }
+        .dropdown-content a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            padding: 5px 0;
+            font-size: 1em;
+        }
+        .dropdown-content a:hover {
+            color: #FFA500;
+        }
+        .link-section {
+            margin: 20px 0;
+        }
+        .link-section a {
+            display: block;
+            text-decoration: none;
+            color: #FFA500;
+            font-size: 1.2em;
+            margin: 5px 0;
+        }
+        .social-icons {
+            margin-top: 20px;
+        }
+        .social-icons img {
+            width: 40px;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        .social-icons img:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    <script>
+        function toggleDropdown(id) {
+            var content = document.getElementById(id);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+    </script>
 </head>
 <body>
+    <div class="container">
+        <!-- Logo and Name Section -->
+        <img src="https://lh6.googleusercontent.com/YbGYsa8og1CmjqcLrQfyjNzBGSzlpZNUGAwgXZ2rkvPDd3X5OQPwGRfIC6kWPY1vTqJAprPWE7f2wHcXCasrl4k=w16383" alt="Site Logo" class="logo">
+        <h1>•|| जकेरियाचा विघ्नहर्ता ||•</h1>
+        
+        <!-- Main Categories with Dropdowns -->
+        <div class="menu">
+            <div class="dropdown">
+                <h2 onclick="toggleDropdown('imagesDropdown')">Images</h2>
+                <div class="dropdown-content" id="imagesDropdown">
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A8" target="_blank">२०२२</a>
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">आगमन सोहळा - २०२३</a>
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A4" target="_blank">आगमन सोहळा २०२४</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <h2 onclick="toggleDropdown('videosDropdown')">Videos</h2>
+                <div class="dropdown-content" id="videosDropdown">
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A8" target="_blank">२०२२</a>
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">आगमन सोहळा - २०२३</a>
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A4" target="_blank">आगमन सोहळा २०२४</a>
+                </div>
+            </div>
+        </div>
 
-  <div class="container">
-    <h1>UPI Payment</h1>
+        <!-- Additional Links -->
+        <div class="link-section">
+            <a href="https://sites.google.com/view/jakeriachavighnaharta/upi" target="_blank">UPI</a>
+            <a href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank">Info</a>
+        </div>
 
-    <!-- QR Code Section -->
-    <div class="qr-code">
-      <img src="https://lh6.googleusercontent.com/MBB8qDIVMbYdGYQhaxjAC7c4Wyh6SrKilmVuaKzy4bT58U9u__QwpcD2MM0K-QADIp42jQUbbLG7vVxLDqzyTgc=w1280" alt="UPI QR Code" width="250" height="250">
+        <!-- Social Icons -->
+        <div class="social-icons">
+            <a href="https://www.youtube.com/" target="_blank">
+                <img src="https://play-lh.googleusercontent.com/6am0i3walYwNLc08QOOhRJttQENNGkhlKajXSERf3JnPVRQczIyxw2w3DxeMRTOSdsY" alt="YouTube Icon">
+            </a>
+            <a href="https://www.website.com/" target="_blank">
+                <img src="https://img.freepik.com/free-vector/www-internet-globe-grid_78370-2008.jpg?size=338&ext=jpg&ga=GA1.1.386372595.1722384000&semt=ais_hybrid" alt="Website Icon">
+            </a>
+        </div>
     </div>
-
-    <!-- UPI ID and Pay Now Button -->
-    <div>
-      <a href="upi://pay?pa=qr919820689840-6263@unionbankofindia&pn=YourName&mc=YourMerchantCode&tid=YourTransactionId&cu=INR" style="font-weight: bold; font-size: 20px; text-decoration: none; color: #333;">
-        qr919820689840-6263@unionbankofindia
-      </a>
-      <br><br>
-
-      <!-- Enter Amount -->
-      <input type="number" id="amountInput" placeholder="Enter Amount" style="padding: 10px; font-size: 16px; width: 200px; margin-bottom: 10px;">
-      
-      <!-- Pay Now Button -->
-      <button id="payNowButton" style="padding: 10px 20px; font-size: 16px;">Pay Now</button>
-    </div>
-  </div>
-
-  <script>
-    document.getElementById('payNowButton').onclick = function() {
-        const upiId = "qr919820689840-6263@unionbankofindia"; // Your UPI ID
-        const amount = document.getElementById('amountInput').value; // Get amount from input
-        const message = "Payment for QR Code"; // Optional message
-
-        // Validate amount
-        if (!amount || amount <= 0) {
-            alert("Please enter a valid amount.");
-            return;
-        }
-
-        // Construct the UPI payment URI
-        const uri = `upi://pay?pa=${upiId}&pn=YourName&mc=YourMerchantCode&tid=YourTransactionId&am=${amount}&cu=INR&url=${message}`;
-
-        // Redirect the user to the UPI app
-        window.location.href = uri;
-    };
-  </script>
-
 </body>
 </html>
