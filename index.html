@@ -3,132 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>•|| जकेरियाचा विघ्नहर्ता ||•</title>
+    <title>जकेरियाचा विघ्नहर्ता</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap');
+        
         body {
-            font-family: Arial, sans-serif;
-            background-color: #FFA500;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: black;
+            font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif;
+            background-color: #fef6e4;
+            background-image: url('https://transparenttextures.com/patterns/rice-paper.png');
         }
-        .container {
-            text-align: center;
-            max-width: 600px;
-            padding: 20px;
-            color: black;
+        
+        .marquee {
+            animation: marquee 20s linear infinite;
+            white-space: nowrap;
         }
-        .header {
-            margin-bottom: 20px;
+        
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
-        .logo {
-            width: 100px;
-            border-radius: 50%;
-            margin: 0 auto;
+        
+        .rangoli-border {
+            border-image: url('https://www.transparenttextures.com/patterns/indian-rangoli.png') 30 round;
+            border-width: 8px;
+            border-style: solid;
         }
-        .title {
-            font-size: 2em;
-            margin: 10px 0;
+        
+        .ganesha-silhouette {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23f3d2a2" d="M50 10c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40zm0 5c19.3 0 35 15.7 35 35s-15.7 35-35 35-35-15.7-35-35 15.7-35 35-35zm-5 10v10h-5v5h5v5h-5v5h5v5h-5v5h5v5h-5v5h5v5h10v-5h5v-5h-5v-5h5v-5h-5v-5h5v-5h-5v-5h5v-5h-5v-10h-10z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.1;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
-        .menu {
-            margin-top: 20px;
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
         }
-        .dropdown {
-            margin: 15px 0;
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
-        .dropdown h2 {
-            cursor: pointer;
-            color: black;
-            margin: 10px 0;
-            font-size: 1.5em;
+        
+        .glow {
+            text-shadow: 0 0 10px rgba(255,215,0,0.7);
         }
-        .dropdown-content {
-            display: none;
-            text-align: left;
-            margin-top: 10px;
+        
+        .btn-gold {
+            background: linear-gradient(135deg, #f5d742 0%, #f5a742 50%, #f5d742 100%);
+            box-shadow: 0 4px 15px rgba(245, 215, 66, 0.4);
+            transition: all 0.3s ease;
         }
-        .dropdown-content a {
-            display: block;
-            text-decoration: none;
-            color: blue;
-            padding: 5px 0;
-            font-size: 1.2em;
+        
+        .btn-gold:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(245, 215, 66, 0.6);
         }
-        .dropdown-content a:hover {
-            text-decoration: underline;
-        }
-        .link-section a {
-            display: block;
-            text-decoration: none;
-            color: blue;
-            font-size: 1.4em;
-            margin: 15px 0;
-        }
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .social-icon {
-            width: 30px;
-            height: 30px;
+        
+        .countdown-item {
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
     </style>
-    <script>
-        function toggleDropdown(id) {
-            var content = document.getElementById(id);
-            content.style.display = content.style.display === "block" ? "none" : "block";
-        }
-    </script>
 </head>
-<body>
-    <div class="container">
-        <!-- Header Section with Logo and Title -->
-        <div class="header">
-            <img src="https://yt3.googleusercontent.com/l1_ExwNDJxMpj4fgZM4iIVp4ENep7nMPNQ9oeGTNEgA-SwqfntKZ378NwASOb5jjP692xDaN=s160-c-k-c0x00ffffff-no-rj" alt="Site Logo" class="logo">
-            <div class="title">•|| जकेरियाचा विघ्नहर्ता ||•</div>
-        </div>
-
-        <!-- Main Categories with Dropdowns -->
-        <div class="menu">
-            <div class="dropdown">
-                <h2 onclick="toggleDropdown('imagesDropdown')">Images</h2>
-                <div class="dropdown-content" id="imagesDropdown">
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A8" target="_blank">२०२२</a>
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">आगमन सोहळा - २०२३</a>
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank">आगमन सोहळा २०२४</a>
+<body class="min-h-screen">
+    <!-- Ganesha Silhouette Background -->
+    <div class="ganesha-silhouette"></div>
+    
+    <!-- Header with Rangoli Border -->
+    <header class="rangoli-border bg-white bg-opacity-90 shadow-lg">
+        <div class="container mx-auto px-4 py-6 relative">
+            <!-- Marquee with Devotional Message -->
+            <div class="bg-yellow-100 text-orange-800 font-bold py-2 px-4 rounded-full mb-4 overflow-hidden">
+                <div class="marquee">
+                    <i class="fas fa-om mr-2"></i> गणपती बाप्पा मोरया! पुढच्या वर्षी लवकर या! <i class="fas fa-om ml-2"></i>
                 </div>
             </div>
-            <div class="dropdown">
-                <h2 onclick="toggleDropdown('videosDropdown')">Videos</h2>
-                <div class="dropdown-content" id="videosDropdown">
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A8" target="_blank">२०२२</a>
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">आगमन सोहळा - २०२३</a>
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank">आगमन सोहळा २०२४</a>
+            
+            <!-- Main Title -->
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-orange-800 mb-2 glow">
+                    जकेरीया बंदर रोड सार्वजनिक गणेशोत्सव मंडळ
+                </h1>
+                <p class="text-lg text-gray-700 italic">
+                    एक श्रद्धेचा उत्सव — जिथे आठवणी, भक्ती आणि भावनेची सांगड घातलेली आहे
+                </p>
+                
+                <!-- Floating Ganesha Icon -->
+                <div class="flex justify-center mt-6">
+                    <div class="floating bg-yellow-100 p-4 rounded-full shadow-lg">
+                        <i class="fas fa-om text-4xl text-orange-600"></i>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Additional Links -->
-        <div class="link-section">
-            <a href="https://sites.google.com/view/jakeriachavighnaharta/upi" target="_blank">UPI</a>
-            <a href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank">Info</a>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Welcome Section -->
+        <section class="bg-white bg-opacity-90 rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-3xl font-bold text-orange-700 mb-4 text-center">
+                <i class="fas fa-lotus mr-2"></i> स्वागत आहे! <i class="fas fa-lotus ml-2"></i>
+            </h2>
+            <p class="text-gray-700 text-lg mb-4 text-center">
+                Welcome to the official digital home of जकेरियाचा विघ्नहर्ता — a vibrant collection of images, videos, and history from the grand Ganesh Utsav celebrated in Jakeria. Relive the devotion and moments from past and present, all in one place.
+            </p>
+            
+            <!-- Countdown to Next Ganesh Utsav -->
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-orange-600 mb-4 text-center">Next Ganesh Utsav Countdown</h3>
+                <div class="flex justify-center gap-4">
+                    <div class="countdown-item p-3 text-center">
+                        <div class="text-3xl font-bold text-orange-700" id="days">00</div>
+                        <div class="text-sm text-gray-600">Days</div>
+                    </div>
+                    <div class="countdown-item p-3 text-center">
+                        <div class="text-3xl font-bold text-orange-700" id="hours">00</div>
+                        <div class="text-sm text-gray-600">Hours</div>
+                    </div>
+                    <div class="countdown-item p-3 text-center">
+                        <div class="text-3xl font-bold text-orange-700" id="minutes">00</div>
+                        <div class="text-sm text-gray-600">Minutes</div>
+                    </div>
+                    <div class="countdown-item p-3 text-center">
+                        <div class="text-3xl font-bold text-orange-700" id="seconds">00</div>
+                        <div class="text-sm text-gray-600">Seconds</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Gallery Sections -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Images Gallery -->
+            <section class="bg-white bg-opacity-90 rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold text-orange-700 mb-4 flex items-center">
+                    <i class="fas fa-camera-retro mr-2"></i> Images | छायाचित्र संग्रह
+                </h2>
+                
+                <div class="space-y-4">
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/२०२२" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                        <i class="fas fa-images mr-2"></i> २०२२
+                    </a>
+                    
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/आगमन-सोहळा-२०२३" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                        <i class="fas fa-images mr-2"></i> आगमन सोहळा - २०२३
+                    </a>
+                    
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/आगमन-सोहळा-२०२४" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                        <i class="fas fa-images mr-2"></i> आगमन सोहळा २०२४
+                    </a>
+                </div>
+            </section>
+            
+            <!-- Videos Gallery -->
+            <section class="bg-white bg-opacity-90 rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold text-orange-700 mb-4 flex items-center">
+                    <i class="fas fa-video mr-2"></i> Videos | व्हिडीओ गॅलरी
+                </h2>
+                
+                <div class="space-y-4">
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/२०२२" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                        <i class="fas fa-film mr-2"></i> २०२२
+                    </a>
+                    
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/आगमन-सोहळा-२०२३" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                        <i class="fas fa-film mr-2"></i> आगमन सोहळा - २०२३
+                    </a>
+                    
+                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/आगमन-सोहळा-२०२४" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                        <i class="fas fa-film mr-2"></i> आगमन सोहळा २०२४
+                    </a>
+                </div>
+            </section>
         </div>
-
-        <!-- Social Media Icons at the Bottom -->
-        <div class="social-icons">
-            <a href="https://www.youtube.com/@jakeriacha_vighnaharta" target="_blank">
-                <img src="https://play-lh.googleusercontent.com/6am0i3walYwNLc08QOOhRJttQENNGkhlKajXSERf3JnPVRQczIyxw2w3DxeMRTOSdsY" alt="YouTube Icon" class="social-icon">
-            </a>
-            <a href="https://www.instagram.com/jakeriacha_vighnaharta/" target="_blank">
-                <img src="https://blog.logomyway.com/wp-content/uploads/2022/01/Instagram_logo.png" alt="Instagram Icon" class="social-icon">
-            </a>
+        
+        <!-- Info and Donation Sections -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Info Section -->
+            <section class="bg-white bg-opacity-90 rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold text-orange-700 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i> Info | महिती
+                </h2>
+                <p class="text-gray-700 mb-4">
+                    Learn more about the history and significance of जकेरियाचा विघ्नहर्ता celebrations.
+                </p>
+                <a href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                    <i class="fas fa-book-open mr-2"></i> View Information
+                </a>
+            </section>
+            
+            <!-- Donation Section -->
+            <section class="bg-white bg-opacity-90 rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold text-orange-700 mb-4 flex items-center">
+                    <i class="fas fa-hand-holding-heart mr-2"></i> UPI | भक्तिपूर्वक योगदान
+                </h2>
+                <p class="text-gray-700 mb-4">
+                    Offer your support to the celebration and contribute via UPI.
+                </p>
+                <a href="https://sites.google.com/view/jakeriachavighnaharta/upi" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center">
+                    <i class="fas fa-rupee-sign mr-2"></i> Donate Now
+                </a>
+            </section>
         </div>
-    </div>
+        
+        <!-- Social Media Section -->
+        <section class="bg-white bg-opacity-90 rounded-xl shadow-md p-6 mt-8">
+            <h2 class="text-2xl font-bold text-orange-700 mb-4 text-center">
+                <i class="fas fa-share-alt mr-2"></i> Follow Us on Social Media
+            </h2>
+            
+            <div class="flex justify-center gap-6 mt-6">
+                <a href="#" class="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition" title="YouTube">
+                    <i class="fab fa-youtube text-2xl"></i>
+                </a>
+                <a href="#" class="bg-pink-600 text-white p-3 rounded-full hover:bg-pink-700 transition" title="Instagram">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+            </div>
+            
+            <div class="mt-6 text-center text-gray-600">
+                <p>YouTube: @jakeriacha_vighnaharta</p>
+                <p class="mt-2">Instagram: @jakeriacha_vighnaharta</p>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-orange-800 text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">जकेरियाचा विघ्नहर्ता - गणेश उत्सव</p>
+            <p class="text-orange-200">© 2024 All Rights Reserved</p>
+            
+            <div class="mt-4">
+                <p class="text-sm text-orange-200">
+                    <i class="fas fa-om mr-1"></i> गणपती बाप्पा मोरया! मंगलमूर्ती मोरया! <i class="fas fa-om ml-1"></i>
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Countdown to next Ganesh Chaturthi (September 7, 2024)
+        function updateCountdown() {
+            const now = new Date();
+            const nextGanesh = new Date('September 7, 2024 00:00:00');
+            const diff = nextGanesh - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+        
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        
+        // Play devotional sound on click
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.btn-gold, .floating, header');
+            
+            elements.forEach(el => {
+                el.addEventListener('click', function() {
+                    // In a real implementation, you would play a sound here
+                    console.log('Playing devotional sound...');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
