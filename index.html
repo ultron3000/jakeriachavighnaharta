@@ -1,15 +1,16 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>जकेरियाचा विघ्नहर्ता</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>जकेरियाचा विघ्नहर्ता</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;family=Tiro+Devanagari+Hindi:ital@0;1&amp;display=swap" rel="stylesheet"/>
+<style>
         :root {
             --primary: #ff8f00;
             --secondary: #ffc107;
@@ -236,218 +237,206 @@
     </style>
 </head>
 <body class="min-h-screen antialiased">
-    <!-- Loading Screen -->
-    <div id="loading" class="fixed inset-0 bg-orange-500 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="loader mb-4"></div>
-        <p class="text-white font-semibold text-lg">Loading Divine Blessings...</p>
-    </div>
-    
-    <!-- Ganesha Silhouette Background -->
-    <div class="ganesha-silhouette"></div>
-    
-    <!-- Header with Rangoli Border -->
-    <header class="rangoli-border bg-white bg-opacity-95 shadow-xl pt-24 pb-6 relative">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 relative">
-            <!-- Logo positioned absolutely above the header content -->
-            <div class="absolute left-1/2 transform -translate-x-1/2 -top-16 z-40">
-                <div class="h-24 w-24 md:h-32 md:w-32 rounded-full border-4 border-white shadow-2xl floating bg-orange-100 p-2 glow-box pulse">
-                    <img src="https://i.postimg.cc/tTW5BYQw/JB-logo.jpg" alt="JB Logo" class="w-full h-full rounded-full object-cover">
-                </div>
-            </div>
+<!-- Loading Screen -->
+<div class="fixed inset-0 bg-orange-500 z-50 flex flex-col items-center justify-center transition-opacity duration-500" id="loading">
+<div class="loader mb-4"></div>
+<p class="text-white font-semibold text-lg">Loading Divine Blessings...</p>
+</div>
+<!-- Ganesha Silhouette Background -->
+<div class="ganesha-silhouette"></div>
+<!-- Header with Rangoli Border -->
+<header class="rangoli-border pt-24 pb-6 relative"><div class="relative w-full h-[70vh] sm:h-[80vh] flex flex-col justify-center items-center text-white text-center overflow-hidden">
+<div class="absolute inset-0 z-[-1]">
+<iframe
+  src="https://www.youtube.com/embed/LzSedwfx8CQ?autoplay=1&mute=1&controls=0&loop=1&playlist=LzSedwfx8CQ&modestbranding=1&showinfo=0"
+  frameborder="0"
+  allow="autoplay; encrypted-media"
+  allowfullscreen
+  class="absolute top-1/2 left-1/2 w-[177.77vh] h-[100vh] -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+</iframe>
+</div>
 
-            <!-- Marquee with Devotional Message -->
-            <div class="bg-yellow-100 text-orange-800 font-bold py-2 md:py-3 px-4 rounded-full overflow-hidden mt-16 shadow-inner">
-                <div class="marquee-container">
-                    <div class="marquee">
-                        <i class="fas fa-om mr-3 text-orange-600"></i> 
+<div class="max-w-6xl mx-auto px-4 sm:px-6 relative">
+<!-- Logo positioned absolutely above the header content -->
+<div class="absolute left-1/2 transform -translate-x-1/2 -top-16 z-40">
+<div class="h-24 w-24 md:h-32 md:w-32 rounded-full border-4 border-white shadow-2xl floating bg-orange-100 p-2 glow-box pulse">
+<img alt="JB Logo" class="w-full h-full rounded-full object-cover" src="https://i.postimg.cc/tTW5BYQw/JB-logo.jpg"/>
+</div>
+</div>
+<!-- Marquee with Devotional Message -->
+<div class="bg-yellow-100 text-orange-800 font-bold py-2 md:py-3 px-4 rounded-full overflow-hidden mt-16 shadow-inner">
+<div class="marquee-container">
+<div class="marquee">
+<i class="fas fa-om mr-3 text-orange-600"></i> 
                         गणपती बाप्पा मोरया! मंगलमूर्ती मोरया! 
                         <i class="fas fa-om ml-3 text-orange-600"></i>
-                        &nbsp;&nbsp;&nbsp;
+                           
                         <i class="fas fa-om mr-3 text-orange-600"></i> 
                         जय गणेश देवा! श्री गणेशाय नमः! 
                         <i class="fas fa-om ml-3 text-orange-600"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 py-6 md:py-8 max-w-6xl">
-        <!-- Hero Section with Title and Countdown -->
-        <section class="hero-section p-6 md:p-8 mb-8">
-            <div class="text-center mb-6 md:mb-8 relative z-10">
-                <h1 class="main-title text-3xl md:text-4xl lg:text-5xl font-bold text-orange-800 mb-3 md:mb-4 glow-text">
+</div>
+</div>
+</div>
+</div>
+</div></header>
+<!-- Main Content -->
+<main class="container mx-auto px-4 sm:px-6 py-6 md:py-8 max-w-6xl">
+<!-- Hero Section with Title and Countdown -->
+<section class="hero-section p-6 md:p-8 mb-8">
+<div class="text-center mb-6 md:mb-8 relative z-10">
+<h1 class="main-title text-3xl md:text-4xl lg:text-5xl font-bold text-orange-800 mb-3 md:mb-4 glow-text">
                     जकेरीया बंदर रोड सार्वजनिक गणेशोत्सव मंडळ
                 </h1>
-                <p class="subtitle text-base md:text-lg text-gray-700 italic mb-4 md:mb-6">
+<p class="subtitle text-base md:text-lg text-gray-700 italic mb-4 md:mb-6">
                     एक श्रद्धेचा उत्सव — जिथे आठवणी, भक्ती आणि भावनेची सांगड घातलेली आहे
                 </p>
-                
-                <!-- Floating Ganesha Icon -->
-                <div class="flex justify-center mt-4 md:mt-6">
-                    <div class="floating bg-yellow-100 p-3 md:p-4 rounded-full shadow-lg glow-box">
-                        <i class="fas fa-om text-3xl md:text-4xl text-orange-600"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Countdown to Next Ganesh Utsav -->
-            <div class="mt-6 md:mt-8">
-                <h3 class="text-xl md:text-2xl font-semibold text-orange-600 mb-4 md:mb-6 text-center">
-                    <i class="fas fa-clock mr-2"></i> Next Ganesh Utsav Countdown
+<!-- Floating Ganesha Icon -->
+<div class="flex justify-center mt-4 md:mt-6">
+<div class="floating bg-yellow-100 p-3 md:p-4 rounded-full shadow-lg glow-box">
+<i class="fas fa-om text-3xl md:text-4xl text-orange-600"></i>
+</div>
+</div>
+</div>
+<!-- Countdown to Next Ganesh Utsav -->
+<div class="mt-6 md:mt-8">
+<h3 class="text-xl md:text-2xl font-semibold text-orange-600 mb-4 md:mb-6 text-center">
+<i class="fas fa-clock mr-2"></i> Next Ganesh Utsav Countdown
                 </h3>
-                <div class="grid countdown-grid grid-cols-4 gap-3 md:flex md:justify-center md:gap-6">
-                    <div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
-                        <div class="text-2xl md:text-4xl font-bold text-orange-700" id="days">00</div>
-                        <div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Days</div>
-                    </div>
-                    <div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
-                        <div class="text-2xl md:text-4xl font-bold text-orange-700" id="hours">00</div>
-                        <div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Hours</div>
-                    </div>
-                    <div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
-                        <div class="text-2xl md:text-4xl font-bold text-orange-700" id="minutes">00</div>
-                        <div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Minutes</div>
-                    </div>
-                    <div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
-                        <div class="text-2xl md:text-4xl font-bold text-orange-700" id="seconds">00</div>
-                        <div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Seconds</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Gallery Sections -->
-        <div class="grid md:grid-cols-2 gap-5 md:gap-8 mb-8 md:mb-10">
-            <!-- Images Gallery -->
-            <section class="card p-5 md:p-6 hover:glow-box">
-                <h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-5 flex items-center justify-center md:justify-start">
-                    <i class="fas fa-camera-retro mr-3 text-orange-500"></i> Images | छायाचित्र संग्रह
+<div class="grid countdown-grid grid-cols-4 gap-3 md:flex md:justify-center md:gap-6">
+<div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
+<div class="text-2xl md:text-4xl font-bold text-orange-700" id="days">00</div>
+<div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Days</div>
+</div>
+<div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
+<div class="text-2xl md:text-4xl font-bold text-orange-700" id="hours">00</div>
+<div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Hours</div>
+</div>
+<div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
+<div class="text-2xl md:text-4xl font-bold text-orange-700" id="minutes">00</div>
+<div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Minutes</div>
+</div>
+<div class="countdown-item p-3 md:p-4 text-center min-w-[70px]">
+<div class="text-2xl md:text-4xl font-bold text-orange-700" id="seconds">00</div>
+<div class="text-xs md:text-sm text-gray-600 uppercase tracking-wider">Seconds</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery Sections -->
+<div class="grid md:grid-cols-2 gap-5 md:gap-8 mb-8 md:mb-10">
+<!-- Images Gallery -->
+<section class="card p-5 md:p-6 hover:glow-box">
+<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-5 flex items-center justify-center md:justify-start">
+<i class="fas fa-camera-retro mr-3 text-orange-500"></i> Images | छायाचित्र संग्रह
                 </h2>
-                
-                <div class="space-y-3 md:space-y-4">
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/२०२२" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg">
-                        <i class="fas fa-images mr-2"></i> २०२२
+<div class="space-y-3 md:space-y-4">
+<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/images/२०२२" target="_blank">
+<i class="fas fa-images mr-2"></i> २०२२
                     </a>
-                    
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg">
-                        <i class="fas fa-images mr-2"></i> आगमन सोहळा - २०२३
+<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">
+<i class="fas fa-images mr-2"></i> आगमन सोहळा - २०२३
                     </a>
-                    
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg">
-                        <i class="fas fa-images mr-2"></i> आगमन सोहळा २०२४
+<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank">
+<i class="fas fa-images mr-2"></i> आगमन सोहळा २०२४
                     </a>
-                </div>
-            </section>
-            
-            <!-- Videos Gallery -->
-            <section class="card p-5 md:p-6 hover:glow-box">
-                <h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-5 flex items-center justify-center md:justify-start">
-                    <i class="fas fa-video mr-3 text-orange-500"></i> Videos | व्हिडीओ गॅलरी
+</div>
+</section>
+<!-- Videos Gallery -->
+<section class="card p-5 md:p-6 hover:glow-box">
+<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-5 flex items-center justify-center md:justify-start">
+<i class="fas fa-video mr-3 text-orange-500"></i> Videos | व्हिडीओ गॅलरी
                 </h2>
-                
-                <div class="space-y-3 md:space-y-4">
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/२०२२" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg">
-                        <i class="fas fa-film mr-2"></i> २०२२
+<div class="space-y-3 md:space-y-4">
+<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/videos/२०२२" target="_blank">
+<i class="fas fa-film mr-2"></i> २०२२
                     </a>
-                    
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg">
-                        <i class="fas fa-film mr-2"></i> आगमन सोहळा - २०२३
+<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">
+<i class="fas fa-film mr-2"></i> आगमन सोहळा - २०२३
                     </a>
-                    
-                    <a href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank" class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg">
-                        <i class="fas fa-film mr-2"></i> आगमन सोहळा २०२४
+<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%AA" target="_blank">
+<i class="fas fa-film mr-2"></i> आगमन सोहळा २०२४
                     </a>
-                </div>
-            </section>
-        </div>
-        
-        <!-- UPI Donation Section -->
-        <section class="card p-6 md:p-8 mb-8 md:mb-10 hover:glow-box">
-            <div class="text-center">
-                <div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
-                    <i class="fas fa-hand-holding-heart text-3xl text-orange-600"></i>
-                </div>
-                <h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-3 md:mb-4">
+</div>
+</section>
+</div>
+<!-- UPI Donation Section -->
+<section class="card p-6 md:p-8 mb-8 md:mb-10 hover:glow-box">
+<div class="text-center">
+<div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
+<i class="fas fa-hand-holding-heart text-3xl text-orange-600"></i>
+</div>
+<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-3 md:mb-4">
                     UPI | भक्तिपूर्वक योगदान
                 </h2>
-                <p class="text-gray-700 mb-4 md:mb-5 text-base md:text-lg">
+<p class="text-gray-700 mb-4 md:mb-5 text-base md:text-lg">
                     Offer your support to the celebration and contribute via UPI.
                 </p>
-                <a href="https://ultron3000.github.io/upi/" target="_blank" class="inline-block btn-gold text-orange-800 font-semibold py-3 px-6 rounded-lg text-center max-w-xs mx-auto hover:shadow-lg">
-                    <i class="fas fa-rupee-sign mr-2"></i> Donate Now
+<a class="inline-block btn-gold text-orange-800 font-semibold py-3 px-6 rounded-lg text-center max-w-xs mx-auto hover:shadow-lg" href="https://ultron3000.github.io/upi/" target="_blank">
+<i class="fas fa-rupee-sign mr-2"></i> Donate Now
                 </a>
-            </div>
-        </section>
-        
-        <!-- Info Section -->
-        <section class="card p-6 md:p-8 mb-8 md:mb-10 hover:glow-box">
-            <div class="text-center">
-                <div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
-                    <i class="fas fa-info-circle text-3xl text-orange-600"></i>
-                </div>
-                <h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-3 md:mb-4">
+</div>
+</section>
+<!-- Info Section -->
+<section class="card p-6 md:p-8 mb-8 md:mb-10 hover:glow-box">
+<div class="text-center">
+<div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
+<i class="fas fa-info-circle text-3xl text-orange-600"></i>
+</div>
+<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-3 md:mb-4">
                     Info | महिती
                 </h2>
-                <p class="text-gray-700 mb-4 md:mb-5 text-base md:text-lg">
+<p class="text-gray-700 mb-4 md:mb-5 text-base md:text-lg">
                     Learn more about the history and significance of जकेरियाचा विघ्नहर्ता celebrations.
                 </p>
-                <a href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank" class="inline-block btn-gold text-orange-800 font-semibold py-3 px-6 rounded-lg text-center max-w-xs mx-auto hover:shadow-lg">
-                    <i class="fas fa-book-open mr-2"></i> View Information
+<a class="inline-block btn-gold text-orange-800 font-semibold py-3 px-6 rounded-lg text-center max-w-xs mx-auto hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank">
+<i class="fas fa-book-open mr-2"></i> View Information
                 </a>
-            </div>
-        </section>
-        
-        <!-- Social Media Section -->
-        <section class="card p-6 md:p-8">
-            <div class="text-center">
-                <div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
-                    <i class="fas fa-share-alt text-3xl text-orange-600"></i>
-                </div>
-                <h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-6">
+</div>
+</section>
+<!-- Social Media Section -->
+<section class="card p-6 md:p-8">
+<div class="text-center">
+<div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
+<i class="fas fa-share-alt text-3xl text-orange-600"></i>
+</div>
+<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-6">
                     Follow Us on Social Media
                 </h2>
-                
-                <div class="flex justify-center gap-5 md:gap-8 mb-5 md:mb-6">
-                    <a href="https://www.youtube.com/@jakeriacha_vighnaharta" class="social-icon bg-red-600 text-white p-3 md:p-4 rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg" title="YouTube">
-                        <i class="fab fa-youtube text-2xl md:text-3xl"></i>
-                    </a>
-                    <a href="https://www.instagram.com/jakeriacha_vighnaharta/" class="social-icon bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 text-white p-3 md:p-4 rounded-full hover:opacity-90 transition-all duration-300 shadow-lg" title="Instagram">
-                        <i class="fab fa-instagram text-2xl md:text-3xl"></i>
-                    </a>
-                </div>
-                
-                <div class="text-gray-600 text-sm md:text-base space-y-1">
-                    <p class="font-medium">YouTube: @jakeriacha_vighnaharta</p>
-                    <p class="font-medium">Instagram: @jakeriacha_vighnaharta</p>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <!-- Footer -->
-    <footer class="bg-gradient-to-b from-orange-700 to-orange-900 text-white py-6 md:py-8 mt-10 md:mt-12">
-        <div class="container mx-auto px-4 sm:px-6 text-center">
-            <div class="mb-3 md:mb-4">
-                <i class="fas fa-om text-2xl md:text-3xl text-orange-200"></i>
-            </div>
-            <p class="mb-2 md:mb-3 text-sm md:text-base font-medium">
+<div class="flex justify-center gap-5 md:gap-8 mb-5 md:mb-6">
+<a class="social-icon bg-red-600 text-white p-3 md:p-4 rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg" href="https://www.youtube.com/@jakeriacha_vighnaharta" title="YouTube">
+<i class="fab fa-youtube text-2xl md:text-3xl"></i>
+</a>
+<a class="social-icon bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 text-white p-3 md:p-4 rounded-full hover:opacity-90 transition-all duration-300 shadow-lg" href="https://www.instagram.com/jakeriacha_vighnaharta/" title="Instagram">
+<i class="fab fa-instagram text-2xl md:text-3xl"></i>
+</a>
+</div>
+<div class="text-gray-600 text-sm md:text-base space-y-1">
+<p class="font-medium">YouTube: @jakeriacha_vighnaharta</p>
+<p class="font-medium">Instagram: @jakeriacha_vighnaharta</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-gradient-to-b from-orange-700 to-orange-900 text-white py-6 md:py-8 mt-10 md:mt-12">
+<div class="container mx-auto px-4 sm:px-6 text-center">
+<div class="mb-3 md:mb-4">
+<i class="fas fa-om text-2xl md:text-3xl text-orange-200"></i>
+</div>
+<p class="mb-2 md:mb-3 text-sm md:text-base font-medium">
                 जकेरियाचा विघ्नहर्ता - गणेश उत्सव
             </p>
-            <p class="text-orange-200 text-xs md:text-sm mb-3 md:mb-4">
+<p class="text-orange-200 text-xs md:text-sm mb-3 md:mb-4">
                 © 2024 All Rights Reserved
             </p>
-            
-            <div class="mt-3 md:mt-4">
-                <p class="text-sm md:text-base text-orange-200 font-medium italic">
+<div class="mt-3 md:mt-4">
+<p class="text-sm md:text-base text-orange-200 font-medium italic">
                     गणपती बाप्पा मोरया! मंगलमूर्ती मोरया!
                 </p>
-            </div>
-        </div>
-    </footer>
-    
-    <script>
+</div>
+</div>
+</footer>
+<script>
         // Hide loading screen when page is loaded
         window.addEventListener('load', function() {
             setTimeout(function() {
