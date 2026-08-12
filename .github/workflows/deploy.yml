@@ -1,22 +1,24 @@
-name: 🚀 Sync to InfinityFree
+name: Deploy to InfinityFree
 
 on:
   push:
     branches:
-      - main # Change this to master if your primary branch is named master
+      - main
 
 jobs:
-  web-deploy:
-    name: 🎉 Deploy Changes
+  deploy:
     runs-on: ubuntu-latest
-    steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
 
-    - name: 📂 Sync files to server
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ftpupload.net         # Replace with your actual FTP Hostname if different
-        username: if0_3xxxxxx          # Replace with your actual FTP Username
-        password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: /htdocs/           # This forces files straight into InfinityFree's web folder
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to InfinityFree
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          server-dir: /htdocs/
