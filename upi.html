@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>जकेरियाचा विघ्नहर्ता</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff9800, #ff5722);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-code {
+            border: 8px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .upi-link {
+            word-break: break-all;
+        }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="bg-white rounded-xl shadow-xl w-full p-6">
+            <!-- Title -->
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-orange-700">जकेरियाचा विघ्नहर्ता</h1>
+            </div>
+
+            <!-- QR Code -->
+            <div class="flex justify-center mb-6">
+                <img src="https://i.postimg.cc/xT4bRTP9/UPI-New-Logo.png" alt="UPI QR Code" class="qr-code w-full max-w-[280px] h-auto rounded-lg">
+            </div>
+
+            <!-- UPI ID -->
+            <div class="text-center mb-6">
+                <p class="text-sm text-gray-600 mb-1">UPI ID:</p>
+                <a href="upi://pay?pa=qr919820689840-6263@unionbankofindia&pn=जकेरियाचा विघ्नहर्ता&mc=0000&tid=TXNID123&cu=INR" 
+                   class="upi-link text-orange-600 font-medium text-sm hover:underline break-all">
+                    qr919820689840-6263@unionbankofindia
+                </a>
+            </div>
+
+            <!-- Payment Buttons -->
+            <div class="space-y-4">
+                <button onclick="payNowFixed()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 text-lg">
+                    Pay Now (No Amount)
+                </button>
+                
+                <input type="number" id="amountInput" placeholder="Enter Amount (₹)" 
+                       class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg">
+                
+                <button onclick="payNowAmount()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 text-lg">
+                    Pay Now with Amount
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function payNowFixed() {
+            const upiId = "qr919820689840-6263@unionbankofindia";
+            const message = "Donation to जकेरियाचा विघ्नहर्ता";
+            const uri = `upi://pay?pa=${upiId}&pn=जकेरियाचा विघ्नहर्ता&mc=0000&tid=TXN0001&cu=INR&tn=${encodeURIComponent(message)}`;
+            window.location.href = uri;
+        }
+
+        function payNowAmount() {
+            const upiId = "qr919820689840-6263@unionbankofindia";
+            const amount = document.getElementById('amountInput').value;
+            const message = "Donation to जकेरियाचा विघ्नहर्ता";
+
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            const uri = `upi://pay?pa=${upiId}&pn=जकेरियाचा विघ्नहर्ता&mc=0000&tid=TXN0002&am=${amount}&cu=INR&tn=${encodeURIComponent(message)}`;
+            window.location.href = uri;
+        }
+    </script>
+</body>
+</html>
