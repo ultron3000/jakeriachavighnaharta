@@ -1,429 +1,320 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>जकेरियाचा विघ्नहर्ता</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;family=Tiro+Devanagari+Hindi:ital@0;1&amp;display=swap" rel="stylesheet"/>
-<style>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>जकेरियाचा विघ्नहर्ता</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Yatra+One&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet"/>
+    <style>
         :root {
-            --primary: #ff8f00;
-            --secondary: #ffc107;
-            --dark: #e65100;
-            --light: #fff3e0;
+            --primary: #c2185b;
+            --festive-gold: #d4a359;
+            --dark-maroon: #2d0206;
+            --gold-gradient: linear-gradient(135deg, #fde68a 0%, #d97706 100%);
         }
         
         body {
             font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif;
-            background-color: var(--light);
-            background-image: url('https://transparenttextures.com/patterns/rice-paper-3.png');
-            color: #333;
+            background-color: #170103;
+            color: #f3f4f6;
             overflow-x: hidden;
         }
+
+        .marathi-font {
+            font-family: 'Yatra One', 'Tiro Devanagari Hindi', serif;
+        }
         
-        .marquee-container {
-            overflow: hidden;
-            white-space: nowrap;
+        /* Premium 3D Layering cards */
+        .premium-card {
+            background: linear-gradient(145deg, rgba(50, 4, 9, 0.85) 0%, rgba(26, 1, 4, 0.95) 100%);
+            border: 1px solid rgba(212, 163, 89, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-radius: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: perspective(1000px) translateZ(0);
+        }
+        
+        .premium-card:hover {
+            transform: perspective(1000px) translateY(-6px) translateZ(10px);
+            border-color: rgba(212, 163, 89, 0.5);
+            box-shadow: 0 20px 40px rgba(212, 163, 89, 0.15), 0 25px 50px rgba(0, 0, 0, 0.6);
+        }
+        
+        /* 3D Interactive Buttons */
+        .btn-3d {
+            background: linear-gradient(135deg, #d97706 0%, #9a3412 100%);
+            color: #fff !important;
+            border: 1px solid rgba(253, 230, 138, 0.3);
+            box-shadow: 0 4px 0 #7c2d12, 0 8px 16px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-3d:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #7c2d12, 0 12px 20px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+        }
+
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #7c2d12, 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Fluid Video Container Scaling Rules */
+        .video-wrapper {
             position: relative;
-        }
-        
-        .marquee {
-            display: inline-block;
-            animation: marquee 25s linear infinite;
-        }
-        
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        
-        .rangoli-border {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .rangoli-border::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="none" stroke="%23ff8f00" stroke-width="2" d="M0,0 L100,100 M100,0 L0,100 M50,0 L50,100 M0,50 L100,50" opacity="0.3"/></svg>');
-            background-size: 100px 100px;
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
-        .ganesha-silhouette {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23f3d2a2" d="M50 10c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40zm0 5c19.3 0 35 15.7 35 35s-15.7 35-35 35-35-15.7-35-35 15.7-35 35-35zm-5 10v10h-5v5h5v5h-5v5h5v5h-5v5h5v5h-5v5h5v5h10v-5h5v-5h-5v-5h5v-5h-5v-5h5v-5h-5v-10h-10z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 80%;
-            opacity: 0.08;
-            z-index: -1;
-            pointer-events: none;
+            height: 50vh;
+            min-height: 320px;
         }
-        
-        .floating {
-            animation: floating 3s ease-in-out infinite;
+        @media (min-width: 768px) {
+            .video-wrapper { height: 65vh; }
         }
-        
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
-        }
-        
-        .btn-gold {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            box-shadow: 0 4px 15px rgba(245, 215, 66, 0.4);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-gold:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(245, 215, 66, 0.6);
-        }
-        
-        .btn-gold::after {
-            content: "";
+
+        /* Traditional Ornamental Corner Accents */
+        .corner-detail {
             position: absolute;
-            top: -50%;
-            left: -60%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255,255,255,0.2);
-            transform: rotate(30deg);
-            transition: all 0.3s;
-        }
-        
-        .btn-gold:hover::after {
-            left: 100%;
-        }
-        
-        .countdown-item {
-            background: rgba(255,255,255,0.85);
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-        
-        .countdown-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-        }
-        
-        .hero-section {
-            background: linear-gradient(135deg, rgba(255,247,230,0.95) 0%, rgba(255,240,210,0.95) 100%);
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-section::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%23ffc107" fill-opacity="0.05" d="M30,10 Q50,0 70,10 Q100,30 90,50 Q100,70 70,90 Q50,100 30,90 Q0,70 10,50 Q0,30 30,10 Z"/></svg>');
-            background-size: 150px 150px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--festive-gold);
             opacity: 0.5;
             pointer-events: none;
         }
-        
-        .card {
-            background: rgba(255,255,255,0.9);
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
-        }
-        
-        .social-icon {
-            transition: all 0.3s ease;
-        }
-        
-        .social-icon:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-        
-        .glow-text {
-            text-shadow: 0 0 10px rgba(255,215,0,0.7);
-        }
-        
-        .glow-box {
-            box-shadow: 0 0 20px rgba(255,215,0,0.5);
-        }
-        
-        @media (max-width: 640px) {
-            .countdown-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-            
-            .marquee {
-                font-size: 0.9rem;
-                padding: 0.5rem 0;
-            }
-            
-            .main-title {
-                font-size: 1.8rem;
-                line-height: 2.2rem;
-            }
-            
-            .subtitle {
-                font-size: 1rem;
-            }
-            
-            .hero-section {
-                padding: 1.5rem;
-            }
-            
-            .card {
-                padding: 1.25rem;
-            }
-            
-            .btn-gold {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-            }
-        }
-        
-        /* Loading animation */
+        .tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; }
+        .tr { top: 12px; right: 12px; border-left: 0; border-bottom: 0; }
+        .bl { bottom: 12px; left: 12px; border-right: 0; border-top: 0; }
+        .br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; }
+
+        /* Smooth Loader */
         .loader {
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            border-top: 4px solid var(--primary);
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+            border-top: 3px solid #f59e0b;
+            width: 45px;
+            height: 45px;
+            animation: spin 0.8s linear infinite;
         }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-    
-@keyframes fade-in {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 0.1; transform: scale(1); }
-}
-.animate-fade-in {
-    animation: fade-in 2s ease-out forwards;
-}
-</style>
+    </style>
 </head>
-<body class="min-h-screen antialiased">
-<!-- Loading Screen -->
-<div class="fixed inset-0 bg-orange-500 z-50 flex flex-col items-center justify-center transition-opacity duration-500" id="loading">
-<div class="loader mb-4"></div>
-<p class="text-white font-semibold text-lg">जकेरियाचा विघ्नहर्ता</p>
-</div>
-<!-- Ganesha Silhouette Background -->
-<!-- Header with Rangoli Border -->
-<div class="absolute inset-0 z-10 flex flex-col justify-start items-center pt-6 sm:pt-10 pointer-events-none"><div class="w-full h-full bg-no-repeat bg-center bg-contain opacity-10 absolute top-0 left-0 z-0"></div><div class="relative z-20 pointer-events-auto mt-4 sm:mt-6">
-<div class="h-24 w-24 md:h-32 md:w-32 rounded-full border-4 border-white shadow-2xl floating bg-orange-100 p-2 glow-box pulse">
-<img alt="JB Logo" class="w-full h-full rounded-full object-cover" src="https://i.postimg.cc/tTW5BYQw/JB-logo.jpg"/>
-</div>
-</div></div><div class="relative w-full h-[70vh] sm:h-[80vh] flex flex-col justify-center items-center text-white text-center overflow-hidden">
-<div class="absolute inset-0 z-[-1]">
-<iframe 
-  class="absolute top-1/2 left-1/2 w-[177.77vh] h-[100vh] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-  src="https://www.youtube.com/embed/OWlS-RNM9QU?autoplay=1&mute=1&controls=0&loop=1&playlist=OWlS-RNM9QU&modestbranding=1&showinfo=0"
-  frameborder="0"
-  allow="autoplay; encrypted-media"
-  allowfullscreen>
-</iframe>
-</div>
-<div class="max-w-6xl mx-auto px-4 sm:px-6 relative">
-<!-- Logo positioned absolutely above the header content -->
-</div>
-</div>
-</div>
-</div>
-</div></header>
-<!-- Main Content -->
-<main class="container mx-auto px-4 sm:px-6 py-6 md:py-8 max-w-6xl">
-<!-- Hero Section with Title and Countdown -->
-<section class="hero-section p-6 md:p-8 mb-8">
-<div class="text-center mb-6 md:mb-8 relative z-10">
-<h1 class="main-title text-3xl md:text-4xl lg:text-5xl font-bold text-orange-800 mb-3 md:mb-4 glow-text">
-                    जकेरीया बंदर रोड सार्वजनिक गणेशोत्सव मंडळ
-                </h1>
-<!-- Floating Ganesha Icon -->
-<div class="flex justify-center mt-4 md:mt-6">
-<div class="floating bg-yellow-100 p-3 md:p-4 rounded-full shadow-lg glow-box">
-<i class="fas fa-om text-3xl md:text-4xl text-orange-600"></i>
-</div>
-</div>
-</div>
-<!-- Replaced Image -->
-<div class="mt-6 md:mt-8">
-    <img src="https://i.postimg.cc/gcKYVQXL/LIC-Logo-500x281.png" alt="LIC Logo" class="max-w-full h-auto" />
-</div>
-</section>
-<!-- Gallery Sections -->
-<div class="grid md:grid-cols-2 gap-5 md:gap-8 mb-8 md:mb-10">
-<!-- Images Gallery -->
-<section class="card p-5 md:p-6 hover:glow-box">
-<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-5 flex items-center justify-center md:justify-start">
-<i class="fas fa-camera-retro mr-3 text-orange-500"></i> Images | छायाचित्र संग्रह
-                </h2>
-<div class="space-y-3 md:space-y-4">
-<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/images/२०२२" target="_blank">
-<i class="fas fa-images mr-2"></i> २०२२
-                    </a>
-<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A8%E0%A5%A9" target="_blank">
-<i class="fas fa-images mr-2"></i> आगमन सोहळा - २०२३
-                    </a>
-<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A2%E0%A5%AA" target="_blank">
-<i class="fas fa-images mr-2"></i> आगमन सोहळा २०२४
-                    </a>
-<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://drive.google.com/drive/folders/1LXN_0hWN1tTP2fIbloeOOY4cpZX7z8TT" target="_blank">
-<i class="fas fa-images mr-2"></i> आगमन सोहळा २०२५
-                    </a>
-</div>
-</section>
-<!-- Videos Gallery -->
-<section class="card p-5 md:p-6 hover:glow-box">
-<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-5 flex items-center justify-center md:justify-start">
-<i class="fas fa-video mr-3 text-orange-500"></i> Videos | व्हिडीओ गॅलरी
-                </h2>
-<div class="space-y-3 md:space-y-4">
-<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/videos/२०२२" target="_blank">
-<i class="fas fa-film mr-2"></i> २०२२
-                    </a>
-<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A0%E0%A5%A2%E0%A5%A3" target="_blank">
-<i class="fas fa-film mr-2"></i> आगमन सोहळा - २०२३
-                    </a>
-<a class="block btn-gold text-orange-800 font-semibold py-3 px-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A2%E0%A5%A6%E0%A5%A2%E0%A5%AA" target="_blank">
-<i class="fas fa-film mr-2"></i> आगमन सोहळा २०२४
-                    </a>
-</div>
-</section>
-</div>
-<!-- UPI Donation Section -->
-<section class="card p-6 md:p-8 mb-8 md:mb-10 hover:glow-box">
-<div class="text-center">
-<div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
-<i class="fas fa-hand-holding-heart text-3xl text-orange-600"></i>
-</div>
-<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-3 md:mb-4">
-                    UPI | भक्तिपूर्वक योगदान
-                </h2>
-<p class="text-gray-700 mb-4 md:mb-5 text-base md:text-lg">
-                    Offer your support to the celebration and contribute via UPI.
-                </p>
-<a class="inline-block btn-gold text-orange-800 font-semibold py-3 px-6 rounded-lg text-center max-w-xs mx-auto hover:shadow-lg" href="https://ultron3000.github.io/jakeriachavighnaharta/upi/" target="_blank">
-<i class="fas fa-rupee-sign mr-2"></i> Donate Now
-                </a>
-</div>
-</section>
-<!-- Info Section -->
-<section class="card p-6 md:p-8 mb-8 md:mb-10 hover:glow-box">
-<div class="text-center">
-<div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
-<i class="fas fa-info-circle text-3xl text-orange-600"></i>
-</div>
-<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-3 md:mb-4">
-                    Info | महिती
-                </h2>
-<p class="text-gray-700 mb-4 md:mb-5 text-base md:text-lg">
-                    Learn more about the history and significance of जकेरियाचा विघ्नहर्ता celebrations.
-                </p>
-<a class="inline-block btn-gold text-orange-800 font-semibold py-3 px-6 rounded-lg text-center max-w-xs mx-auto hover:shadow-lg" href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank">
-<i class="fas fa-book-open mr-2"></i> View Information
-                </a>
-</div>
-</section>
-<!-- Social Media Section -->
-<section class="card p-6 md:p-8">
-<div class="text-center">
-<div class="inline-block bg-yellow-100 p-3 rounded-full mb-4 shadow-md">
-<i class="fas fa-share-alt text-3xl text-orange-600"></i>
-</div>
-<h2 class="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-6">
-                    Follow Us on Social Media
-                </h2>
-<div class="flex justify-center gap-5 md:gap-8 mb-5 md:mb-6">
-<a class="social-icon bg-red-600 text-white p-3 md:p-4 rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg" href="https://www.youtube.com/@jakeriacha_vighnaharta" title="YouTube">
-<i class="fab fa-youtube text-2xl md:text-3xl"></i>
-</a>
-<a class="social-icon bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 text-white p-3 md:p-4 rounded-full hover:opacity-90 transition-all duration-300 shadow-lg" href="https://www.instagram.com/jakeriacha_vighnaharta/" title="Instagram">
-<i class="fab fa-instagram text-2xl md:text-3xl"></i>
-</a>
-</div>
-<div class="text-gray-600 text-sm md:text-base space-y-1">
-<p class="font-medium">YouTube: @jakeriacha_vighnaharta</p>
-<p class="font-medium">Instagram: @jakeriacha.vighnaharta</p>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-gradient-to-b from-orange-700 to-orange-900 text-white py-6 md:py-8 mt-10 md:mt-12">
-<div class="container mx-auto px-4 sm:px-6 text-center">
-<div class="mb-3 md:mb-4">
-<i class="fas fa-om text-2xl md:text-3xl text-orange-200"></i>
-</div>
-<p class="mb-2 md:mb-3 text-sm md:text-base font-medium">
-                जकेरियाचा विघ्नहर्ता - गणेश उत्सव
+<body class="min-h-screen antialiased selection:bg-amber-500 selection:text-black">
+
+    <!-- Loading Screen Overlay -->
+    <div id="loading" class="fixed inset-0 bg-[#2d0206] z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="loader mb-4"></div>
+        <p class="text-amber-400 font-medium tracking-widest marathi-font text-xl">जकेरियाचा विघ्नहर्ता</p>
+    </div>
+
+    <!-- Navigation Bar Header Layout -->
+    <nav class="w-full bg-black/40 backdrop-blur-md border-b border-white/5 absolute top-0 left-0 z-40 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <!-- Perfectly Placed Top Left Brand Area -->
+            <div class="flex items-center space-x-3">
+                <div class="h-12 w-12 rounded-full border-2 border-amber-400 shadow-lg overflow-hidden bg-amber-900/50">
+                    <!-- CHANGE THIS URL TO YOUR INSTANT GITHUB RAW CDN IMAGE LINK -->
+                    <img alt="JB Logo" class="w-full h-full object-cover" src="https://ultron3000.github.io/jakeriachavighnaharta/assets/logo.jpeg"/>
+                </div>
+                <div>
+                    <span class="marathi-font text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400 tracking-wide block">जकेरियाचा विघ्नहर्ता</span>
+                    <span class="text-[9px] text-amber-500/70 tracking-widest block uppercase font-medium">|| स्थापना १९६४ ||</span>
+                </div>
+            </div>
+            <div class="hidden sm:block">
+                <i class="fas fa-om text-amber-400/60 text-xl"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Perfect Aspect Dynamic Video Banner Section -->
+    <header class="video-wrapper overflow-hidden bg-black shadow-2xl">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#170103] via-transparent to-black/50 z-20 pointer-events-none"></div>
+        <!-- Optimized Iframe Aspect Scaling Layout Grid -->
+        <div class="absolute inset-0 w-full h-full pointer-events-none">
+            <iframe 
+                class="absolute top-1/2 left-1/2 w-[177.77vw] h-[56.25vw] min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-110"
+                src="https://www.youtube.com/embed/OWlS-RNM9QU?autoplay=1&mute=1&controls=0&loop=1&playlist=OWlS-RNM9QU&modestbranding=1&rel=0"
+                frameborder="0"
+                allow="autoplay; encrypted-media">
+            </iframe>
+        </div>
+    </header>
+
+    <!-- Main Content Layer Area -->
+    <main class="container mx-auto px-4 sm:px-6 py-8 max-w-5xl -mt-12 relative z-30">
+        
+        <!-- Hero Callout Container Section -->
+        <section class="premium-card p-6 md:p-10 mb-8 text-center relative overflow-hidden">
+            <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+            <div class="corner-detail bl"></div><div class="corner-detail br"></div>
+            
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,163,89,0.04)_0%,transparent_70%)] pointer-events-none"></div>
+
+            <h1 class="marathi-font text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-amber-200 via-amber-400 to-amber-600 mb-4 drop-shadow-md">
+                जकेरीया बंदर रोड सार्वजनिक गणेशोत्सव मंडळ
+            </h1>
+            
+            <div class="w-24 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto my-4"></div>
+            
+            <p class="text-sm md:text-base text-stone-300 font-light max-w-2xl mx-auto tracking-wide">
+               
             </p>
-<p class="text-orange-200 text-xs md:text-sm mb-3 md:mb-4">
-                © 2024 All Rights Reserved
-            </p>
-<div class="mt-3 md:mt-4">
-<p class="text-sm md:text-base text-orange-200 font-medium italic">
-                    गणपती बाप्पा मोरया! मंगलमूर्ती मोरया!
-                </p>
-</div>
-</div>
-</footer>
-<script>
-        // Hide loading screen when page is loaded
+        </section>
+
+        <!-- Brand Sponsor Asset Alignment Placement -->
+        <div class="premium-card p-4 mb-8 flex justify-center items-center bg-black/40 border border-white/5">
+            <img src="https://i.postimg.cc/gcKYVQXL/LIC-Logo-500x281.png" alt="LIC Logo" class="h-16 w-auto object-contain opacity-80 filter brightness-110">
+        </div>
+
+        <!-- 3D Interactive Media Gallery Grids Section -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Picture Albums Collection Wrap -->
+            <section class="premium-card p-6 relative">
+                <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+                <h2 class="text-xl font-semibold text-amber-400 mb-6 flex items-center">
+                    <i class="fas fa-camera-retro mr-3 text-orange-500"></i>
+                    <span>Images | छायाचित्र संग्रह</span>
+                </h2>
+                <div class="space-y-3">
+                    <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://sites.google.com/view/jakeriachavighnaharta/images/२०२२" target="_blank">
+                        <i class="fas fa-images mr-2"></i> २०२२ संग्रह
+                    </a>
+                    <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A2%E0%A5%A3" target="_blank">
+                        <i class="fas fa-images mr-2"></i> आगमन सोहळा २०२३
+                    </a>
+                    <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://sites.google.com/view/jakeriachavighnaharta/images/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A2%E0%A5%AA" target="_blank">
+                        <i class="fas fa-images mr-2"></i> आगमन सोहळा २०२४
+                    </a>
+                    <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://drive.google.com/drive/folders/1LXN_0hWN1tTP2fIbloeOOY4cpZX7z8TT" target="_blank">
+                        <i class="fas fa-images mr-2"></i> आगमन सोहळा २०२५
+                    </a>
+                </div>
+            </section>
+
+            <!-- Video Galleries Collection Wrap -->
+            <section class="premium-card p-6 relative">
+                <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+                <h2 class="text-xl font-semibold text-amber-400 mb-6 flex items-center">
+                    <i class="fas fa-video mr-3 text-orange-500"></i>
+                    <span>Videos | व्हिडीओ गॅलरी</span>
+                </h2>
+                <div class="space-y-3">
+                    <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://sites.google.com/view/jakeriachavighnaharta/videos/२०२२" target="_blank">
+                        <i class="fas fa-film mr-2"></i> २०२२ गॅलरी
+                    </a>
+                    <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A8%E0%A5%A6%E0%A5%A2%E0%A5%A3" target="_blank">
+                        <i class="fas fa-film mr-2"></i> आगमन सोहळा २०२३
+                    </a>
+                    <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://sites.google.com/view/jakeriachavighnaharta/videos/%E0%A4%86%E0%A4%97%E0%A4%AE%E0%A4%A8-%E0%A4%B8%E0%A4%B9%E0%A4%B3-%E0%A5%A2%E0%A5%A6%E0%A5%A2%E0%A5%AA" target="_blank">
+                        <i class="fas fa-film mr-2"></i> आगमन सोहळा २०२४
+                    </a>
+                </div>
+            </section>
+        </div>
+
+        <!-- Transaction Node Context Info Grid Block -->
+        <div class="grid sm:grid-cols-2 gap-6 mb-8">
+            <!-- Donation Callout Block -->
+            <section class="premium-card p-6 text-center relative">
+                <div class="inline-flex bg-amber-500/10 p-3 rounded-full mb-4 border border-amber-500/20 text-amber-400">
+                    <i class="fas fa-hand-holding-heart text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-amber-300 mb-2">UPI | भक्तिपूर्वक योगदान</h3>
+                <p class="text-xs text-stone-400 mb-5 leading-relaxed">Offer your secure devotional support directly to the ongoing celebration via smart interface links.</p>
+                <a class="block btn-3d font-semibold py-3 px-6 rounded-xl text-sm" href="https://ultron3000.github.io/jakeriachavighnaharta/upi" target="_blank">
+                    <i class="fas fa-rupee-sign mr-2"></i> Donate Securely
+                </a>
+            </section>
+
+            <!-- Devotional Context Significance Info Block -->
+            <section class="premium-card p-6 text-center relative">
+                <div class="inline-flex bg-amber-500/10 p-3 rounded-full mb-4 border border-amber-500/20 text-amber-400">
+                    <i class="fas fa-info-circle text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-amber-300 mb-2">Info | माहिती पत्रक</h3>
+                <p class="text-xs text-stone-400 mb-5 leading-relaxed">Learn more about the rich history, values, and community significance of the traditional celebrations.</p>
+                <a class="block btn-3d font-semibold py-3 px-6 rounded-xl text-sm" href="https://sites.google.com/view/jakeriachavighnaharta/info" target="_blank">
+                    <i class="fas fa-book-open mr-2"></i> Read History
+                </a>
+            </section>
+        </div>
+
+        <!-- High-Impact Social Streams Vector Links Block -->
+        <section class="premium-card p-6 md:p-8 text-center relative overflow-hidden">
+            <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+            <div class="corner-detail bl"></div><div class="corner-detail br"></div>
+            
+            <h3 class="text-base font-bold text-amber-400/90 tracking-widest uppercase mb-6 marathi-font">आमच्याशी जोडून रहा | Connect With Us</h3>
+            
+            <!-- Modern 3D Responsive Grid Link Wrapper System -->
+            <div class="grid grid-cols-4 gap-4 max-w-sm mx-auto justify-items-center">
+                <!-- YouTube Channel Layer Node -->
+                <a class="h-14 w-14 rounded-full bg-red-600/10 hover:bg-red-600 border border-red-600/30 text-red-500 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://www.youtube.com/@jakeriacha.vighnaharta" 
+                   target="_blank" 
+                   aria-label="YouTube"
+                   title="YouTube">
+                    <i class="fab fa-youtube text-2xl"></i>
+                </a>
+                
+                <!-- Instagram Media Node Link -->
+                <a class="h-14 w-14 rounded-full bg-pink-600/10 hover:bg-gradient-to-tr hover:from-pink-500 hover:to-yellow-500 border border-pink-600/30 text-pink-400 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://www.instagram.com/jakeriacha.vighnaharta/" 
+                   target="_blank" 
+                   aria-label="Instagram"
+                   title="Instagram">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+                
+                <!-- Facebook Portal Community Node -->
+                <a class="h-14 w-14 rounded-full bg-blue-600/10 hover:bg-blue-600 border border-blue-600/30 text-blue-500 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://www.facebook.com/share/1DVBVVozSh/" 
+                   target="_blank" 
+                   aria-label="Facebook"
+                   title="Facebook">
+                    <i class="fab fa-facebook-f text-2xl"></i>
+                </a>
+                
+                <!-- Google Maps Navigation Location Pin -->
+                <a class="h-14 w-14 rounded-full bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-600/30 text-emerald-500 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://maps.app.goo.gl/zPG3i64hxMwcKQzy8" 
+                   target="_blank" 
+                   aria-label="Location"
+                   title="Location">
+                    <i class="fas fa-map-marker-alt text-2xl"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Layout System Footer Element -->
+    <footer class="bg-gradient-to-b from-[#1f0205] to-[#0a0001] text-white py-8 border-t border-amber-500/20 text-center">
+        <div class="container mx-auto px-4 space-y-3">
+            <i class="fas fa-om text-2xl text-amber-400/60"></i>
+            <p class="marathi-font text-base text-amber-300">जकेरियाचा विघ्नहर्ता सार्वजनिक उत्सव मंडळ</p>
+            <p class="text-stone-500 text-xs"> <span class="italic text-amber-500/80 font-medium">गणपती बाप्पा मोरया! मंगलमूर्ती मोरया!</span></p>
+        </div>
+    </footer>
+
+    <!-- Functional Initialization Loader Mechanics Script -->
+    <script>
         window.addEventListener('load', function() {
             setTimeout(function() {
-                document.getElementById('loading').style.opacity = '0';
+                const loadingOverlay = document.getElementById('loading');
+                loadingOverlay.style.opacity = '0';
                 setTimeout(function() {
-                    document.getElementById('loading').style.display = 'none';
+                    loadingOverlay.style.display = 'none';
                 }, 500);
-            }, 800);
+            }, 600);
         });
-</script>
+    </script>
 </body>
 </html>
-
-
-
-
