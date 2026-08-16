@@ -8,19 +8,49 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
         
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: radial-gradient(circle at top, #800c1b 0%, #380209 100%); min-height: 100vh; }
-        .chat-card { background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); }
-        .scroll-smooth-ios { -webkit-overflow-scrolling: touch; }
-        #chatBox::-webkit-scrollbar { width: 4px; }
-        #chatBox::-webkit-scrollbar-thumb { background: rgba(212, 163, 89, 0.4); border-radius: 4px; }
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top, #800c1b 0%, #380209 100%);
+        }
+
+        .chat-card {
+            background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+        }
+
+        .scroll-smooth-ios {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        #chatBox::-webkit-scrollbar {
+            width: 4px;
+        }
+        #chatBox::-webkit-scrollbar-thumb {
+            background: rgba(212, 163, 89, 0.4);
+            border-radius: 4px;
+        }
+
+        input[type="text"] {
+            font-size: 16px !important;
+        }
     </style>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
-<body class="flex items-center justify-center p-2 sm:p-4">
+<body class="flex items-center justify-center sm:p-4">
 
     <!-- Nickname Selection Modal -->
     <div id="nicknameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
@@ -28,7 +58,7 @@
             <h2 class="text-amber-300 text-lg font-semibold mb-1">Enter Your Name</h2>
             <p class="text-xs text-amber-500/70 mb-4">Choose a nickname so others know who is chatting!</p>
             <input type="text" id="nicknameInput" placeholder="e.g. Rahul, Amit..." maxlength="18"
-                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 text-sm mb-4">
+                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 mb-4">
             <button onclick="saveNickname()" 
                     class="w-full bg-gradient-to-r from-amber-400 to-yellow-600 text-stone-950 font-bold py-3 rounded-xl text-sm">
                 Join Chat Room
@@ -36,48 +66,90 @@
         </div>
     </div>
 
+    <!-- Room Switcher Modal -->
+    <div id="roomModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
+        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <h2 class="text-amber-300 text-lg font-semibold mb-1">Switch Chat Room</h2>
+            <p class="text-xs text-amber-500/70 mb-4">Enter a Room Code or switch back to Global.</p>
+            <input type="text" id="roomInput" placeholder="Room Name (e.g. room123)" maxlength="20"
+                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 mb-3">
+            <div class="flex gap-2 mb-3">
+                <button onclick="joinCustomRoom()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold py-2.5 rounded-xl text-xs">
+                    Join Room
+                </button>
+                <button onclick="joinGlobalRoom()" class="flex-1 bg-stone-800 hover:bg-stone-700 text-amber-300 font-bold py-2.5 rounded-xl text-xs border border-amber-500/30">
+                    Global Chat
+                </button>
+            </div>
+            <button onclick="closeRoomModal()" class="text-xs text-amber-500/60 hover:text-amber-300">Cancel</button>
+        </div>
+    </div>
+
     <!-- Main Chat Window -->
-    <div class="w-full max-w-md chat-card rounded-3xl p-4 sm:p-5 border border-amber-500/30 flex flex-col h-[94vh] max-h-[850px] relative overflow-hidden">
+    <div class="w-full h-full sm:h-[94vh] sm:max-h-[850px] sm:max-w-md chat-card sm:rounded-3xl p-3 sm:p-5 border-0 sm:border sm:border-amber-500/30 flex flex-col relative overflow-hidden">
         
         <!-- Header -->
-        <div class="pb-3 border-b border-amber-500/20 flex items-center justify-between z-10">
-            <div>
-                <div class="flex items-center gap-1.5">
-                    <h1 class="text-amber-300 text-base sm:text-lg font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता</h1>
-                    <button onclick="openNicknameModal()" title="Change Nickname" class="text-amber-500/60 hover:text-amber-300 text-xs">✏️</button>
+        <div class="pb-2.5 border-b border-amber-500/20 flex items-center justify-between shrink-0 z-10">
+            <div class="flex items-center gap-2">
+                <!-- Home Link -->
+                <a href="https://jakeriachavighnaharta.site.je/" title="Back to Home"
+                   class="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 border border-amber-500/30 text-amber-300 hover:bg-amber-500 hover:text-stone-950 transition">
+                    🏠
+                </a>
+                <div>
+                    <div class="flex items-center gap-1">
+                        <h1 class="text-amber-300 text-sm sm:text-base font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता</h1>
+                        <button onclick="openNicknameModal()" title="Change Nickname" class="text-amber-500/60 hover:text-amber-300 text-xs">✏️</button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="currentUserBadge" class="text-[10px] text-amber-500/70">Setting up...</span>
+                        <span id="currentRoomBadge" class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">#global</span>
+                    </div>
                 </div>
-                <p id="currentUserBadge" class="text-[11px] text-amber-500/70">Setting up...</p>
             </div>
             
-            <div class="flex items-center gap-2">
-                <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-full border border-amber-500/20">
-                    <span class="relative flex h-2.5 w-2.5">
+            <div class="flex items-center gap-1.5">
+                <!-- Rooms Switcher -->
+                <button onclick="openRoomModal()" title="Switch Room" 
+                        class="p-1.5 rounded-lg bg-black/40 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs">
+                    🚪 Rooms
+                </button>
+
+                <!-- Clear Local Chat -->
+                <button onclick="clearLocalChat()" title="Clear Chat Window" 
+                        class="p-1.5 rounded-lg bg-black/40 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs">
+                    🗑️
+                </button>
+
+                <!-- Online Counter -->
+                <div class="flex items-center space-x-1.5 bg-black/50 px-2.5 py-1 rounded-full border border-amber-500/20">
+                    <span class="relative flex h-2 w-2">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span id="onlineCount" class="text-xs text-emerald-400 font-medium">1 Online</span>
+                    <span id="onlineCount" class="text-[11px] text-emerald-400 font-medium">1</span>
                 </div>
             </div>
         </div>
 
-        <!-- On-Screen Debugger (Alerts if Firebase Rules are blocking access) -->
-        <div id="debugBox" class="hidden bg-red-900/50 border border-red-500/50 text-red-200 text-xs p-2.5 rounded-xl my-2 text-center font-medium"></div>
+        <!-- Debugger -->
+        <div id="debugBox" class="hidden bg-red-900/50 border border-red-500/50 text-red-200 text-xs p-2.5 rounded-xl my-2 text-center font-medium shrink-0"></div>
 
-        <!-- Chat Container -->
-        <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1 scroll-smooth-ios"></div>
+        <!-- Scrollable Messages Area -->
+        <div id="chatBox" class="flex-1 overflow-y-auto py-3 space-y-3 pr-1 scroll-smooth-ios"></div>
 
-        <!-- Reply Preview Banner -->
-        <div id="replyPreview" class="hidden bg-black/60 border-l-2 border-amber-400 px-3 py-1.5 text-xs text-amber-200/80 flex justify-between items-center rounded-r-lg mb-1">
+        <!-- Reply Banner -->
+        <div id="replyPreview" class="hidden bg-black/60 border-l-2 border-amber-400 px-3 py-1.5 text-xs text-amber-200/80 flex justify-between items-center rounded-r-lg mb-1 shrink-0">
             <span id="replyText" class="truncate">Replying to...</span>
-            <button onclick="cancelReply()" class="text-amber-500/70 hover:text-amber-300 ml-2 font-bold">✕</button>
+            <button onclick="cancelReply()" class="text-amber-500/70 hover:text-amber-300 ml-2 font-bold p-1">✕</button>
         </div>
 
-        <!-- Input Box -->
-        <div class="pt-2 border-t border-amber-500/20 flex gap-2 z-10">
+        <!-- Input Bar -->
+        <div class="pt-2 pb-1 border-t border-amber-500/20 flex gap-2 shrink-0 z-10">
             <input type="text" id="messageInput" placeholder="Write a message..." autocomplete="off"
-                   class="flex-1 bg-black/50 border border-amber-500/30 rounded-xl px-4 py-3 text-white placeholder-amber-900/50 focus:outline-none focus:border-amber-400 text-sm">
+                   class="flex-1 bg-black/50 border border-amber-500/30 rounded-xl px-4 py-2.5 text-white placeholder-amber-900/50 focus:outline-none focus:border-amber-400">
             <button onclick="sendMessage()" 
-                    class="bg-gradient-to-r from-amber-400 to-yellow-600 active:scale-95 text-stone-950 font-bold px-5 py-3 rounded-xl transition text-sm flex items-center justify-center shadow-lg">
+                    class="bg-gradient-to-r from-amber-400 to-yellow-600 active:scale-95 text-stone-950 font-bold px-4 sm:px-5 py-2.5 rounded-xl transition text-sm flex items-center justify-center shadow-lg shrink-0">
                 Send
             </button>
         </div>
@@ -105,7 +177,6 @@
             box.classList.remove('hidden');
         }
 
-        // Unique session identifier per tab/browser
         let clientId = sessionStorage.getItem('chat_client_id');
         if (!clientId) {
             clientId = 'usr_' + Math.random().toString(36).substr(2, 9);
@@ -118,6 +189,9 @@
         } else {
             updateUserBadge();
         }
+
+        let currentRoom = "global";
+        let activeQueryRef = null;
 
         function openNicknameModal() {
             document.getElementById('nicknameInput').value = userNickname || '';
@@ -133,10 +207,49 @@
         }
 
         function updateUserBadge() {
-            document.getElementById('currentUserBadge').innerText = `You are: ${userNickname}`;
+            document.getElementById('currentUserBadge').innerText = `You: ${userNickname}`;
         }
 
-        // Real-Time Heartbeat Tracker
+        function openRoomModal() { document.getElementById('roomModal').classList.remove('hidden'); }
+        function closeRoomModal() { document.getElementById('roomModal').classList.add('hidden'); }
+
+        function joinCustomRoom() {
+            const raw = document.getElementById('roomInput').value.trim().toLowerCase();
+            if (!raw) return;
+            const cleanRoom = raw.replace(/[^a-z0-9_-]/g, '');
+            switchRoom(cleanRoom);
+            closeRoomModal();
+        }
+
+        function joinGlobalRoom() {
+            switchRoom("global");
+            closeRoomModal();
+        }
+
+        function startPrivateChatWith(otherClientId, otherNickname) {
+            if (otherClientId === clientId) return;
+            const sortedIds = [clientId, otherClientId].sort();
+            const privateRoomCode = `private_${sortedIds[0]}_${sortedIds[1]}`;
+            if (confirm(`Start private 1-on-1 chat with ${otherNickname}?`)) {
+                switchRoom(privateRoomCode, `DM: ${otherNickname}`);
+            }
+        }
+
+        function switchRoom(roomCode, displayName) {
+            currentRoom = roomCode;
+            document.getElementById('currentRoomBadge').innerText = displayName ? displayName : `#${roomCode}`;
+            document.getElementById('chatBox').innerHTML = '';
+            listenToMessages();
+        }
+
+        function clearLocalChat() {
+            if (confirm("Clear local messages on your screen?")) {
+                document.getElementById('chatBox').innerHTML = '';
+                localStorage.setItem('chat_cleared_' + currentRoom, Date.now());
+            }
+        }
+
+        // Online Presence Tracker
         function startHeartbeat() {
             const statusRef = db.ref('/status/' + clientId);
             
@@ -145,14 +258,15 @@
                     nickname: userNickname || 'Guest',
                     lastPing: Date.now()
                 }).catch((err) => {
-                    showError("⚠️ Database Rules Error! Please complete Step 1 to set rules to true.");
+                    showError("⚠️ Firebase Database Permission Error! Set rules to true.");
                 });
             }
 
             updateStatus();
             setInterval(updateStatus, 4000);
 
-            window.addEventListener('beforeunload', () => { statusRef.remove(); });
+            // Automatic disconnect cleanup
+            statusRef.onDisconnect().remove();
 
             db.ref('/status').on('value', (snapshot) => {
                 const now = Date.now();
@@ -163,13 +277,10 @@
                         activeCount++;
                     }
                 });
-                document.getElementById('onlineCount').innerText = `${Math.max(1, activeCount)} Online`;
-            }, (err) => {
-                showError("Read Error: " + err.message);
+                document.getElementById('onlineCount').innerText = `${Math.max(1, activeCount)}`;
             });
         }
 
-        // Reply System
         let replyingTo = null;
 
         function setReply(sender, text) {
@@ -183,7 +294,6 @@
             document.getElementById('replyPreview').classList.add('hidden');
         }
 
-        // Send Message
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
@@ -206,29 +316,51 @@
                 msgData.replyTo = replyingTo;
             }
 
-            db.ref('/messages').push(msgData).catch((err) => {
-                showError("Send Failed: Check Firebase Database Rules.");
+            // Consistent path for messages
+            db.ref(`/rooms/${currentRoom}/messages`).push(msgData).catch((err) => {
+                showError("Send Failed: Check Database Rules.");
             });
 
             input.value = '';
             cancelReply();
+            setTimeout(scrollToBottom, 50);
         }
 
         document.getElementById('messageInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Listen for Real-Time Messages
+        document.getElementById('messageInput').addEventListener('focus', () => {
+            setTimeout(scrollToBottom, 300);
+        });
+
+        function scrollToBottom() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
         function listenToMessages() {
             const chatBox = document.getElementById('chatBox');
-            const messagesRef = db.ref('/messages').limitToLast(60);
+            
+            // Remove previous active listener
+            if (activeQueryRef) {
+                activeQueryRef.off();
+            }
 
-            messagesRef.on('child_added', (snapshot) => {
+            const lastCleared = localStorage.getItem('chat_cleared_' + currentRoom) || 0;
+            activeQueryRef = db.ref(`/rooms/${currentRoom}/messages`).limitToLast(60);
+
+            activeQueryRef.on('child_added', (snapshot) => {
                 const data = snapshot.val();
+                
+                if (data.timestamp && data.timestamp < lastCleared) {
+                    return;
+                }
+
                 const isMe = data.clientId === clientId;
                 
                 const msgDiv = document.createElement('div');
-                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3`;
+                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
 
                 let replyHTML = '';
                 if (data.replyTo) {
@@ -239,9 +371,13 @@
                     `;
                 }
 
+                const senderLabel = isMe 
+                    ? `You (${escapeHtml(data.sender)})` 
+                    : `<button onclick="startPrivateChatWith('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" class="hover:underline text-amber-300">${escapeHtml(data.sender)} 🔒</button>`;
+
                 msgDiv.innerHTML = `
                     <div class="flex items-center gap-1.5 mb-0.5 px-1">
-                        <span class="text-[10px] text-amber-500/70 font-semibold">${isMe ? 'You (' + escapeHtml(data.sender) + ')' : escapeHtml(data.sender)}</span>
+                        <span class="text-[10px] text-amber-500/70 font-semibold">${senderLabel}</span>
                     </div>
                     <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words relative">
                         ${replyHTML}
@@ -253,7 +389,7 @@
                 `;
 
                 chatBox.appendChild(msgDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
+                scrollToBottom();
             });
         }
 
