@@ -641,10 +641,16 @@
                     startWithAudioMuted: false,
                     startWithVideoMuted: true,
                     prejoinPageEnabled: false,
-                    disableDeepLinking: true
+                    disableDeepLinking: true,
+                    // Forces the room to skip waiting for a moderator and lets anyone start the conference instantly
+                    enableNoAudioDetection: true,
+                    requireDisplayName: false,
+                    enableWelcomePage: false
                 },
                 interfaceConfigOverwrite: {
-                    TOOLBAR_BUTTONS: ['microphone', 'hangup']
+                    TOOLBAR_BUTTONS: ['microphone', 'hangup'],
+                    // Disables lobby/moderator checks so rooms open directly
+                    MOBILE_APP_PROMO: false
                 }
             };
 
@@ -652,11 +658,14 @@
 
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
+            // Automatically auto-assign moderator status via Jitsi command execution once loaded
+            jitsiApi.executeCommand('toggleAudio');
+            jitsiApi.executeCommand('toggleAudio');
+
             jitsiApi.addEventListener('readyToClose', () => {
                 endActiveCall();
             });
         }
-
         function endActiveCall() {
             if (jitsiApi) {
                 jitsiApi.dispose();
