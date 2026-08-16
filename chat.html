@@ -2,27 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Community Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>जकेरियाचा विघ्नहर्ता - Global Community Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
         
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
             background: radial-gradient(circle at top, #800c1b 0%, #380209 100%);
             min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+
+        html {
+            height: -webkit-fill-available;
         }
 
         .chat-card {
-            background: linear-gradient(145deg, rgba(40, 3, 7, 0.9) 0%, rgba(20, 1, 3, 0.95) 100%);
+            background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
                         0 0 40px rgba(212, 163, 89, 0.15);
         }
 
-        /* Custom Scrollbar */
+        /* iOS Webkit Smooth Scroll */
+        .scroll-smooth-ios {
+            -webkit-overflow-scrolling: touch;
+        }
+
         #chatBox::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         #chatBox::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.2);
@@ -40,39 +54,49 @@
 </head>
 <body class="flex items-center justify-center p-2 sm:p-4">
 
-    <!-- App Container -->
-    <div class="w-full max-w-md chat-card rounded-3xl p-4 sm:p-6 border border-amber-500/30 flex flex-col h-[92vh]">
+    <!-- Universal App Container -->
+    <div class="w-full max-w-md chat-card rounded-3xl p-4 sm:p-5 border border-amber-500/30 flex flex-col h-[94vh] max-h-[850px] relative overflow-hidden">
         
-        <!-- Header with Live Counter -->
-        <div class="pb-3 border-b border-amber-500/20 flex items-center justify-between">
+        <!-- Header with Multi-platform Presence -->
+        <div class="pb-3 border-b border-amber-500/20 flex items-center justify-between z-10">
             <div>
-                <h1 class="text-amber-300 text-lg font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता Chat</h1>
-                <p class="text-xs text-amber-500/70">Public Community Room</p>
+                <h1 class="text-amber-300 text-base sm:text-lg font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता</h1>
+                <p class="text-[11px] text-amber-500/70 flex items-center gap-1">
+                    <span>🌐 Universal Live Room</span>
+                </p>
             </div>
             
-            <!-- Online Users Indicator -->
-            <div class="flex items-center space-x-2 bg-black/40 px-3 py-1.5 rounded-full border border-amber-500/20">
-                <span class="relative flex h-2.5 w-2.5">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
-                <span id="onlineCount" class="text-xs text-emerald-400 font-medium">0 Online</span>
+            <div class="flex items-center gap-2">
+                <!-- Share Button for Web/iOS Users -->
+                <button onclick="shareChat()" title="Share Web Link" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 p-2 rounded-full border border-amber-500/30 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                </button>
+
+                <!-- Live Online Indicator -->
+                <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-full border border-amber-500/20">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span id="onlineCount" class="text-xs text-emerald-400 font-medium">-- Active</span>
+                </div>
             </div>
         </div>
 
-        <!-- Chat Messages Container -->
-        <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
-            <div class="text-center text-xs text-amber-400/50 my-2">
-                Connecting to room...
+        <!-- Chat Container -->
+        <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1 scroll-smooth-ios">
+            <div class="text-center text-xs text-amber-400/50 my-4">
+                Connecting to cross-platform network...
             </div>
         </div>
 
-        <!-- Input Box & Actions -->
-        <div class="pt-3 border-t border-amber-500/20 flex gap-2">
-            <input type="text" id="messageInput" placeholder="Type a message..." 
-                   class="flex-1 bg-black/40 border border-amber-500/30 rounded-xl px-4 py-2.5 text-white placeholder-amber-900/50 focus:outline-none focus:border-amber-400 text-sm">
+        <!-- Input Box -->
+        <div class="pt-3 border-t border-amber-500/20 flex gap-2 z-10">
+            <input type="text" id="messageInput" placeholder="Write a message..." 
+                   autocomplete="off"
+                   class="flex-1 bg-black/50 border border-amber-500/30 rounded-xl px-4 py-3 text-white placeholder-amber-900/50 focus:outline-none focus:border-amber-400 text-sm">
             <button onclick="sendMessage()" 
-                    class="bg-gradient-to-r from-amber-400 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 text-stone-950 font-bold px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center">
+                    class="bg-gradient-to-r from-amber-400 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 active:scale-95 text-stone-950 font-bold px-5 py-3 rounded-xl transition text-sm flex items-center justify-center shadow-lg">
                 Send
             </button>
         </div>
@@ -80,7 +104,7 @@
     </div>
 
     <script>
-        // Your exact Firebase configuration integrated
+        // Your Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
             authDomain: "ultron-85fba.firebaseapp.com",
@@ -98,9 +122,15 @@
         const db = firebase.database();
 
         let currentUser = null;
-        let randomDevoteeId = "Devotee_" + Math.floor(1000 + Math.random() * 9000);
 
-        // Anonymous Auth (No user login needed)
+        // Remember user nickname in local storage (web/iOS persistence)
+        let userHandle = localStorage.getItem('chat_handle');
+        if (!userHandle) {
+            userHandle = "Devotee_" + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('chat_handle', userHandle);
+        }
+
+        // Automatic Anonymous Authentication for App, iOS Safari, Android, Web
         auth.signInAnonymously().catch(console.error);
 
         auth.onAuthStateChanged((user) => {
@@ -111,7 +141,7 @@
             }
         });
 
-        // Real-time Presence Counter
+        // Real-Time Global Online Counter Across All Domains
         function setupPresence(uid) {
             const userStatusRef = db.ref('/status/' + uid);
             const connectedRef = db.ref('.info/connected');
@@ -120,8 +150,9 @@
             connectedRef.on('value', (snapshot) => {
                 if (snapshot.val() === false) return;
 
+                // Automatically remove status on close / disconnect
                 userStatusRef.onDisconnect().remove().then(() => {
-                    userStatusRef.set({ online: true });
+                    userStatusRef.set({ online: true, platform: getPlatform() });
                 });
             });
 
@@ -139,8 +170,9 @@
 
             db.ref('/messages').push({
                 uid: currentUser.uid,
-                sender: randomDevoteeId,
+                sender: userHandle,
                 text: message,
+                platform: getPlatform(),
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
@@ -154,18 +186,21 @@
         // Listen for Real-Time Messages
         function listenToMessages() {
             const chatBox = document.getElementById('chatBox');
-            const messagesRef = db.ref('/messages').limitToLast(50);
+            const messagesRef = db.ref('/messages').limitToLast(60);
 
             messagesRef.on('child_added', (snapshot) => {
                 const data = snapshot.val();
                 const isMe = data.uid === (currentUser ? currentUser.uid : null);
                 
                 const msgDiv = document.createElement('div');
-                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2`;
+                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
 
                 msgDiv.innerHTML = `
-                    <span class="text-[10px] text-amber-500/60 mb-0.5 px-1">${isMe ? 'You' : data.sender}</span>
-                    <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/50 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[80%] text-xs shadow-md break-words">
+                    <div class="flex items-center gap-1 mb-0.5 px-1">
+                        <span class="text-[10px] text-amber-500/60 font-medium">${isMe ? 'You' : data.sender}</span>
+                        <span class="text-[9px] text-amber-500/40">• ${data.platform || 'web'}</span>
+                    </div>
+                    <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words">
                         ${escapeHtml(data.text)}
                     </div>
                 `;
@@ -173,6 +208,27 @@
                 chatBox.appendChild(msgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
             });
+        }
+
+        // Helper to detect iOS / Android / Web
+        function getPlatform() {
+            const ua = navigator.userAgent;
+            if (/iPhone|iPad|iPod/i.test(ua)) return 'iOS';
+            if (/Android/i.test(ua)) return 'Android';
+            return 'Web';
+        }
+
+        // Helper to share page URL with iPhone / Web users
+        function shareChat() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'जकेरियाचा विघ्नहर्ता Chat',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert("Live Chat Web link copied to clipboard! Share it with iOS/web users.");
+            }
         }
 
         function escapeHtml(text) {
