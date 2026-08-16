@@ -439,7 +439,6 @@
             const msgKey = snapshot.key;
             const now = Date.now();
 
-            // Auto-hide messages older than 1 hour (3,600,000 ms)
             if (data.expireAt && data.expireAt < now) {
                 const existingEl = document.getElementById(`msg-${msgKey}`);
                 if (existingEl) existingEl.remove();
@@ -471,7 +470,6 @@
                 `;
             }
 
-            // Call button triggering Firebase Signaling Call
             const callBtnHTML = !isMe 
                 ? `<button onclick="initiateFirebaseCall('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" title="Call ${escapeHtml(data.sender)}" class="ml-1.5 px-1 text-green-400 hover:text-green-300 text-xs font-bold">📞 Call</button>`
                 : '';
@@ -525,7 +523,7 @@
             return div.innerHTML;
         }
 
-        // --- FIREBASE SIGNALING & JITSI AUDIO FIX ---
+        // --- DIRECT MEET.JIT.SI OPEN ROOM CONFIG (NO LOGIN WALL) ---
         let activeCallRef = null;
         let activeCallRoom = null;
         let jitsiApi = null;
@@ -536,8 +534,8 @@
             const cleanCallerId = clientId.replace(/[^a-zA-Z0-9]/g, '');
             const cleanTargetId = targetClientId.replace(/[^a-zA-Z0-9]/g, '');
             
-            // Prefixed room avoids public domain authentication screens
-            activeCallRoom = `vpaas-magic-cookie-jakeriachat_${cleanCallerId}_${cleanTargetId}`;
+            // Unique random secure hash string for public meet.jit.si room to bypass auth
+            activeCallRoom = `vighnaharta_secure_call_${cleanCallerId}_${cleanTargetId}_${Math.random().toString(36).substring(2, 7)}`;
 
             activeCallRef = db.ref(`/calls/${targetClientId}`);
 
@@ -630,7 +628,7 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            const domain = "8x8.vc";
+            const domain = "meet.jit.si";
             const options = {
                 roomName: roomName,
                 width: "100%",
