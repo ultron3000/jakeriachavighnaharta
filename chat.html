@@ -115,10 +115,10 @@
                     🚪 Rooms
                 </button>
 
-                <!-- Clear Local Chat -->
-                <button onclick="clearLocalChat()" title="Clear Chat Window" 
-                        class="p-1.5 rounded-lg bg-black/40 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs">
-                    🗑️
+                <!-- Delete All Messages Button -->
+                <button onclick="deleteAllRoomMessages()" title="Delete All Messages for Everyone" 
+                        class="p-1.5 rounded-lg bg-black/40 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs">
+                    🗑️ All
                 </button>
 
                 <!-- Online Counter -->
@@ -242,10 +242,24 @@
             listenToMessages();
         }
 
-        function clearLocalChat() {
-            if (confirm("Clear local messages on your screen?")) {
-                document.getElementById('chatBox').innerHTML = '';
-                localStorage.setItem('chat_cleared_' + currentRoom, Date.now());
+        // --- DELETION FUNCTIONS --- //
+
+        // 1. Delete Single Message globally
+        function deleteSingleMessage(msgKey) {
+            if (confirm("Delete this message for everyone?")) {
+                db.ref(`/rooms/${currentRoom}/messages/${msgKey}`).remove()
+                .catch(err => showError("Delete failed: " + err.message));
+            }
+        }
+
+        // 2. Delete All Messages in Room globally
+        function deleteAllRoomMessages() {
+            if (confirm(`Are you sure you want to PERMANENTLY delete ALL messages in #${currentRoom} for everyone?`)) {
+                db.ref(`/rooms/${currentRoom}/messages`).remove()
+                .then(() => {
+                    document.getElementById('chatBox').innerHTML = '';
+                })
+                .catch(err => showError("Clear failed: " + err.message));
             }
         }
 
@@ -265,7 +279,6 @@
             updateStatus();
             setInterval(updateStatus, 4000);
 
-            // Automatic disconnect cleanup
             statusRef.onDisconnect().remove();
 
             db.ref('/status').on('value', (snapshot) => {
@@ -316,7 +329,6 @@
                 msgData.replyTo = replyingTo;
             }
 
-            // Consistent path for messages
             db.ref(`/rooms/${currentRoom}/messages`).push(msgData).catch((err) => {
                 showError("Send Failed: Check Database Rules.");
             });
@@ -341,25 +353,22 @@
 
         function listenToMessages() {
             const chatBox = document.getElementById('chatBox');
-            
-            // Remove previous active listener
+            const roomRef = db.ref(`/rooms/${currentRoom}/messages`);
+
             if (activeQueryRef) {
                 activeQueryRef.off();
             }
 
-            const lastCleared = localStorage.getItem('chat_cleared_' + currentRoom) || 0;
-            activeQueryRef = db.ref(`/rooms/${currentRoom}/messages`).limitToLast(60);
+            activeQueryRef = roomRef.limitToLast(60);
 
+            // Listen for added messages
             activeQueryRef.on('child_added', (snapshot) => {
                 const data = snapshot.val();
-                
-                if (data.timestamp && data.timestamp < lastCleared) {
-                    return;
-                }
-
+                const msgKey = snapshot.key;
                 const isMe = data.clientId === clientId;
                 
                 const msgDiv = document.createElement('div');
+                msgDiv.id = `msg-${msgKey}`;
                 msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
 
                 let replyHTML = '';
@@ -375,6 +384,11 @@
                     ? `You (${escapeHtml(data.sender)})` 
                     : `<button onclick="startPrivateChatWith('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" class="hover:underline text-amber-300">${escapeHtml(data.sender)} 🔒</button>`;
 
+                // Show delete button on your messages
+                const deleteBtnHTML = isMe 
+                    ? `<button onclick="deleteSingleMessage('${msgKey}')" title="Delete Message" class="text-[9px] text-red-400/70 hover:text-red-300 mt-0.5 px-1">🗑️ Delete</button>`
+                    : '';
+
                 msgDiv.innerHTML = `
                     <div class="flex items-center gap-1.5 mb-0.5 px-1">
                         <span class="text-[10px] text-amber-500/70 font-semibold">${senderLabel}</span>
@@ -383,13 +397,25 @@
                         ${replyHTML}
                         <div>${escapeHtml(data.text)}</div>
                     </div>
-                    <button onclick="setReply('${escapeHtml(data.sender)}', '${escapeHtml(data.text)}')" class="text-[9px] text-amber-500/50 hover:text-amber-300 mt-0.5 px-1">
-                        ↩ Reply
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="setReply('${escapeHtml(data.sender)}', '${escapeHtml(data.text)}')" class="text-[9px] text-amber-500/50 hover:text-amber-300 mt-0.5 px-1">
+                            ↩ Reply
+                        </button>
+                        ${deleteBtnHTML}
+                    </div>
                 `;
 
                 chatBox.appendChild(msgDiv);
                 scrollToBottom();
+            });
+
+            // Listen for removed messages in real time for all users
+            roomRef.on('child_removed', (snapshot) => {
+                const removedKey = snapshot.key;
+                const el = document.getElementById(`msg-${removedKey}`);
+                if (el) {
+                    el.remove();
+                }
             });
         }
 
