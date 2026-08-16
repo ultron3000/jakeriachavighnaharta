@@ -46,9 +46,8 @@
         }
     </style>
 
-    <!-- Firebase v9 Compatibility SDKs -->
+    <!-- Firebase App & Realtime Database SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="flex items-center justify-center p-2 sm:p-4">
@@ -61,7 +60,7 @@
             <div>
                 <h1 class="text-amber-300 text-base sm:text-lg font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता</h1>
                 <p class="text-[11px] text-amber-500/70 flex items-center gap-1">
-                    <span>🌐 Universal Live Room</span>
+                    <span>🌐 Live Chat Room</span>
                 </p>
             </div>
             
@@ -75,17 +74,13 @@
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
-                    <span id="onlineCount" class="text-xs text-emerald-400 font-medium">Connecting...</span>
+                    <span id="onlineCount" class="text-xs text-emerald-400 font-medium">1 Online</span>
                 </div>
             </div>
         </div>
 
         <!-- Chat Container -->
-        <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1 scroll-smooth-ios">
-            <div id="statusNotice" class="text-center text-xs text-amber-400/70 my-4 bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
-                Connecting to live network...
-            </div>
-        </div>
+        <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1 scroll-smooth-ios"></div>
 
         <!-- Input Box -->
         <div class="pt-3 border-t border-amber-500/20 flex gap-2 z-10">
@@ -113,16 +108,15 @@
         };
 
         // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (e) {
-            console.error(e);
-        }
-
-        const auth = firebase.auth();
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let currentUser = null;
+        // Unique Browser/Device Client ID Generation
+        let clientId = localStorage.getItem('chat_client_id');
+        if (!clientId) {
+            clientId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('chat_client_id', clientId);
+        }
 
         let userHandle = localStorage.getItem('chat_handle');
         if (!userHandle) {
@@ -130,62 +124,38 @@
             localStorage.setItem('chat_handle', userHandle);
         }
 
-        // Authenticate Anonymously
-        auth.signInAnonymously().catch((error) => {
-            console.error("Auth Error:", error);
-            const notice = document.getElementById('statusNotice');
-            if (notice) {
-                notice.innerText = "Auth Error: Enable Anonymous Auth in Firebase Console.";
-                notice.classList.add('text-red-400');
-            }
-        });
-
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                currentUser = user;
-                setupPresence(user.uid);
-                listenToMessages();
-                
-                const notice = document.getElementById('statusNotice');
-                if (notice) notice.remove();
-            }
-        });
-
-        function setupPresence(uid) {
-            const userStatusRef = db.ref('/status/' + uid);
+        // 1. Presence System (Online User Counter)
+        function setupPresence() {
+            const userStatusRef = db.ref('/status/' + clientId);
             const connectedRef = db.ref('.info/connected');
             const allStatusRef = db.ref('/status');
 
             connectedRef.on('value', (snapshot) => {
-                if (snapshot.val() === false) return;
-
-                userStatusRef.onDisconnect().remove().then(() => {
-                    userStatusRef.set({ online: true, platform: getPlatform() });
-                });
+                if (snapshot.val() === true) {
+                    userStatusRef.onDisconnect().remove().then(() => {
+                        userStatusRef.set({ online: true, platform: getPlatform() });
+                    });
+                }
             });
 
             allStatusRef.on('value', (snapshot) => {
-                const count = snapshot.numChildren();
+                const count = snapshot.numChildren() || 1;
                 document.getElementById('onlineCount').innerText = `${count} Online`;
-            }, (error) => {
-                console.error("Database Error:", error);
-                document.getElementById('onlineCount').innerText = "Rules Locked";
             });
         }
 
+        // 2. Send Message Function
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
-            if (!message || !currentUser) return;
+            if (!message) return;
 
             db.ref('/messages').push({
-                uid: currentUser.uid,
+                clientId: clientId,
                 sender: userHandle,
                 text: message,
                 platform: getPlatform(),
                 timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).catch((err) => {
-                alert("Permission Denied: Please set Database Rules to true in Firebase Console.");
             });
 
             input.value = '';
@@ -195,13 +165,14 @@
             if (e.key === 'Enter') sendMessage();
         });
 
+        // 3. Real-Time Chat Reader
         function listenToMessages() {
             const chatBox = document.getElementById('chatBox');
             const messagesRef = db.ref('/messages').limitToLast(60);
 
             messagesRef.on('child_added', (snapshot) => {
                 const data = snapshot.val();
-                const isMe = data.uid === (currentUser ? currentUser.uid : null);
+                const isMe = data.clientId === clientId;
                 
                 const msgDiv = document.createElement('div');
                 msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
@@ -245,6 +216,10 @@
             div.innerText = text;
             return div.innerHTML;
         }
+
+        // Start real-time connections
+        setupPresence();
+        listenToMessages();
     </script>
 </body>
 </html>
