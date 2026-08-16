@@ -1,325 +1,660 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Chat & WebRTC Call</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background: #121212; color: #fff; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-    .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 20px; }
-    
-    /* Video Section */
-    .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; background: #1e1e1e; padding: 15px; border-radius: 10px; }
-    video { width: 100%; height: 260px; background: #000; border-radius: 8px; object-fit: cover; }
-    
-    /* Control Buttons */
-    .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-    button { padding: 10px 16px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; background: #2563eb; color: #fff; }
-    button:hover { opacity: 0.9; }
-    button.danger { background: #dc2626; }
-    button.success { background: #16a34a; }
-    
-    /* Call Popup Modal */
-    .popup { display: none; position: fixed; top: 20px; right: 20px; background: #22c55e; color: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 1000; }
-    .popup.active { display: flex; align-items: center; gap: 15px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>जकेरियाचा विघ्नहर्ता - Community Chat & Calls</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
 
-    /* Global Chat Section */
-    .chat-box { background: #1e1e1e; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; height: 350px; }
-    .chat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
-    .message { background: #2a2a2a; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
-    .message.call-notif { background: #3b82f6; color: #fff; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-    .chat-input { display: flex; gap: 10px; margin-top: 10px; }
-    .chat-input input { flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #333; background: #2a2a2a; color: #fff; }
-  </style>
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top, #800c1b 0%, #380209 100%);
+        }
+
+        .chat-card {
+            background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+        }
+
+        .scroll-smooth-ios {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        #chatBox::-webkit-scrollbar {
+            width: 4px;
+        }
+        #chatBox::-webkit-scrollbar-thumb {
+            background: rgba(212, 163, 89, 0.4);
+            border-radius: 4px;
+        }
+
+        input[type="text"] {
+            font-size: 16px !important;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .call-pulse {
+            animation: pulse-ring 1.8s infinite;
+        }
+    </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <!-- Jitsi External API -->
+    <script src="https://meet.jit.si/external_api.js"></script>
 </head>
-<body>
+<body class="flex items-center justify-center sm:p-4">
 
-<div class="container">
-  <h2>Global Chat & Direct Video Call</h2>
-
-  <!-- Incoming Call Popup -->
-  <div id="callPopup" class="popup">
-    <span id="popupText">Incoming Call...</span>
-    <button class="success" id="acceptCallBtn">Accept</button>
-    <button class="danger" onclick="closePopup()">Reject</button>
-  </div>
-
-  <!-- Video Call Stream Section -->
-  <div class="video-grid">
-    <div>
-      <h4>Local Video</h4>
-      <video id="localVideo" autoplay playsinline muted></video>
+    <!-- INCOMING / OUTGOING CALL ALERT MODAL -->
+    <div id="callAlertModal" class="fixed inset-0 z-[70] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center p-4">
+        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl flex flex-col items-center">
+            <div id="callAvatar" class="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-500 rounded-full flex items-center justify-center text-emerald-400 text-3xl font-bold mb-4 call-pulse">
+                📞
+            </div>
+            <h2 id="callAlertTitle" class="text-amber-300 text-lg font-semibold mb-1">Incoming Call...</h2>
+            <p id="callAlertSubtext" class="text-xs text-amber-500/80 mb-6">User is calling you for an audio chat</p>
+            
+            <div id="callAlertButtons" class="flex gap-3 w-full">
+                <!-- Accept / Decline buttons rendered dynamically -->
+            </div>
+        </div>
     </div>
-    <div>
-      <h4>Remote Video</h4>
-      <video id="remoteVideo" autoplay playsinline></video>
+
+    <!-- JITSI AUDIO CALL OVERLAY CONTAINER -->
+    <div id="jitsiModal" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center p-2 sm:p-4">
+        <div class="w-full max-w-md h-[80vh] bg-stone-900 rounded-3xl overflow-hidden border border-amber-500/40 flex flex-col relative shadow-2xl">
+            <div class="p-3 bg-black/80 border-b border-amber-500/20 flex justify-between items-center shrink-0">
+                <span class="text-xs text-amber-300 font-semibold flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Audio Call Active
+                </span>
+                <button onclick="endActiveCall()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition">
+                    End Call ✕
+                </button>
+            </div>
+            <div id="jitsiContainer" class="w-full flex-1 bg-black"></div>
+        </div>
     </div>
-    <div class="controls">
-      <button id="startMediaBtn">1. Enable Camera</button>
-      <button id="createCallBtn" class="success">2. Start Call</button>
-      <button id="endCallBtn" class="danger">End Call</button>
+
+    <!-- NICKNAME SELECTION MODAL -->
+    <div id="nicknameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
+        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <h2 class="text-amber-300 text-lg font-semibold mb-1">Enter Your Name</h2>
+            <p class="text-xs text-amber-500/70 mb-4">Choose a nickname so others know who is chatting!</p>
+            <input type="text" id="nicknameInput" placeholder="e.g. Rahul, Amit..." maxlength="18"
+                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 mb-4">
+            <button onclick="saveNickname()" 
+                    class="w-full bg-gradient-to-r from-amber-400 to-yellow-600 text-stone-950 font-bold py-3 rounded-xl text-sm">
+                Join Chat Room
+            </button>
+        </div>
     </div>
-  </div>
 
-  <!-- Global Chat Section -->
-  <div class="chat-box">
-    <div class="chat-header">
-      <h3>Global Chat (Auto-expires after 1 hour)</h3>
-      <button id="wipeChatBtn" class="danger">Wipe Chat</button>
+    <!-- ROOM SWITCHER MODAL -->
+    <div id="roomModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
+        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <h2 class="text-amber-300 text-lg font-semibold mb-1">Switch Chat Room</h2>
+            <p class="text-xs text-amber-500/70 mb-4">Enter a Room Code or switch back to Global.</p>
+            <input type="text" id="roomInput" placeholder="Room Name (e.g. room123)" maxlength="20"
+                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 mb-3">
+            <div class="flex gap-2 mb-3">
+                <button onclick="joinCustomRoom()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold py-2.5 rounded-xl text-xs">
+                    Join Room
+                </button>
+                <button onclick="joinGlobalRoom()" class="flex-1 bg-stone-800 hover:bg-stone-700 text-amber-300 font-bold py-2.5 rounded-xl text-xs border border-amber-500/30">
+                    Global Chat
+                </button>
+            </div>
+            <button onclick="closeRoomModal()" class="text-xs text-amber-500/60 hover:text-amber-300">Cancel</button>
+        </div>
     </div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-input">
-      <input type="text" id="msgInput" placeholder="Type a message...">
-      <button id="sendMsgBtn">Send</button>
+
+    <!-- MAIN CHAT WINDOW -->
+    <div class="w-full h-full sm:h-[94vh] sm:max-h-[850px] sm:max-w-md chat-card sm:rounded-3xl p-3 sm:p-5 border-0 sm:border sm:border-amber-500/30 flex flex-col relative overflow-hidden">
+        
+        <!-- HEADER -->
+        <div class="pb-2.5 border-b border-amber-500/20 flex items-center justify-between shrink-0 z-10">
+            <div class="flex items-center gap-2">
+                <a href="https://jakeriachavighnaharta.site.je/" title="Back to Home"
+                   class="flex items-center justify-center w-9 h-9 rounded-full overflow-hidden border border-amber-500/40 shadow-md hover:scale-105 transition active:scale-95 shrink-0 bg-black">
+                    <img src="https://ultron3000.github.io/jakeriachavighnaharta/assets/logonew.jpg" 
+                         alt="Logo Home" 
+                         class="w-full h-full object-cover">
+                </a>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1">
+                        <h1 class="text-amber-300 text-sm sm:text-base font-semibold tracking-wide truncate">जकेरियाचा विघ्नहर्ता</h1>
+                        <button onclick="openNicknameModal()" title="Change Nickname" class="text-amber-500/60 hover:text-amber-300 text-xs shrink-0">✏️</button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="currentUserBadge" class="text-[10px] text-amber-500/70 truncate">Setting up...</span>
+                        <span id="currentRoomBadge" class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">#global</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="openRoomModal()" title="Switch Room" 
+                        class="p-1.5 rounded-lg bg-black/40 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs">
+                    🚪 Rooms
+                </button>
+
+                <div class="flex items-center space-x-1.5 bg-black/50 px-2.5 py-1 rounded-full border border-amber-500/20">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span id="onlineCount" class="text-[11px] text-emerald-400 font-medium">1</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="debugBox" class="hidden bg-red-900/50 border border-red-500/50 text-red-200 text-xs p-2.5 rounded-xl my-2 text-center font-medium shrink-0"></div>
+
+        <div id="chatBox" class="flex-1 overflow-y-auto py-3 space-y-3 pr-1 scroll-smooth-ios"></div>
+
+        <div id="replyPreview" class="hidden bg-black/60 border-l-2 border-amber-400 px-3 py-1.5 text-xs text-amber-200/80 flex justify-between items-center rounded-r-lg mb-1 shrink-0">
+            <span id="replyText" class="truncate">Replying to...</span>
+            <button onclick="cancelReply()" class="text-amber-500/70 hover:text-amber-300 ml-2 font-bold p-1">✕</button>
+        </div>
+
+        <div class="pt-2 pb-1 border-t border-amber-500/20 flex items-center gap-2 shrink-0 z-10 w-full">
+            <input type="text" id="messageInput" placeholder="Write a message..." autocomplete="off" autocorrect="off" spellcheck="false"
+                   class="flex-1 min-w-0 bg-black/50 border border-amber-500/30 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-amber-900/50 focus:outline-none focus:border-amber-400">
+            <button onclick="sendMessage()" 
+                    class="bg-gradient-to-r from-amber-400 to-yellow-600 active:scale-95 text-stone-950 font-bold px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center shadow-lg shrink-0 h-[42px]">
+                Send
+            </button>
+        </div>
+
     </div>
-  </div>
-</div>
 
-<!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { 
-    getFirestore, collection, addDoc, doc, setDoc, getDoc, 
-    onSnapshot, updateDoc, query, where, orderBy, serverTimestamp, 
-    getDocs, writeBatch 
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
+            authDomain: "ultron-85fba.firebaseapp.com",
+            databaseURL: "https://ultron-85fba-default-rtdb.firebaseio.com",
+            projectId: "ultron-85fba",
+            storageBucket: "ultron-85fba.firebasestorage.app",
+            messagingSenderId: "727225448009",
+            appId: "1:727225448009:web:e827bd0a819ddae42d3198",
+            measurementId: "G-EEDR5XX34M"
+        };
 
-  // 1. REPLACE WITH YOUR FIREBASE CONFIGURATION
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // STUN servers to resolve network address traversal
-  const rtcConfig = {
-    iceServers: [
-      { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
-    ]
-  };
-
-  let localStream = null;
-  let remoteStream = null;
-  let peerConnection = null;
-  let incomingRoomId = null;
-
-  const localVideo = document.getElementById("localVideo");
-  const remoteVideo = document.getElementById("remoteVideo");
-  const chatMessages = document.getElementById("chatMessages");
-  const msgInput = document.getElementById("msgInput");
-
-  // ==========================================
-  // WEBRTC CALL LOGIC (FIXES HANGING JOIN ROOM)
-  // ==========================================
-
-  // Step 1: Initialize Camera/Mic
-  document.getElementById("startMediaBtn").addEventListener("click", async () => {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    remoteStream = new MediaStream();
-    localVideo.srcObject = localStream;
-    remoteVideo.srcObject = remoteStream;
-    alert("Camera and Microphone enabled!");
-  });
-
-  // Step 2: Caller creates room
-  document.getElementById("createCallBtn").addEventListener("click", async () => {
-    if (!localStream) return alert("Please click '1. Enable Camera' first!");
-
-    peerConnection = new RTCPeerConnection(rtcConfig);
-
-    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-    peerConnection.ontrack = (event) => {
-      event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
-    };
-
-    const callDocRef = doc(collection(db, "calls"));
-    const offerCandidates = collection(callDocRef, "offerCandidates");
-    const answerCandidates = collection(callDocRef, "answerCandidates");
-
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate) addDoc(offerCandidates, event.candidate.toJSON());
-    };
-
-    const offerDescription = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offerDescription);
-
-    await setDoc(callDocRef, { offer: { sdp: offerDescription.sdp, type: offerDescription.type } });
-
-    // Send call notification in Global Chat (expires in 1 hour)
-    await sendGlobalMessage(`Incoming call! Room ID: ${callDocRef.id}`, "call_notification", callDocRef.id);
-
-    // Listen for Callee's SDP Answer
-    onSnapshot(callDocRef, (snapshot) => {
-      const data = snapshot.data();
-      if (peerConnection && !peerConnection.currentRemoteDescription && data?.answer) {
-        const answerDescription = new RTCSessionDescription(data.answer);
-        peerConnection.setRemoteDescription(answerDescription);
-      }
-    });
-
-    // Listen for Callee ICE Candidates
-    onSnapshot(answerCandidates, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+        function showError(msg) {
+            const box = document.getElementById('debugBox');
+            box.innerText = msg;
+            box.classList.remove('hidden');
         }
-      });
-    });
 
-    alert("Call initiated! Waiting for opponent to join...");
-  });
-
-  // Step 3: Callee joins room
-  async function joinCallRoom(roomId) {
-    if (!localStream) {
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      remoteStream = new MediaStream();
-      localVideo.srcObject = localStream;
-      remoteVideo.srcObject = remoteStream;
-    }
-
-    const callDocRef = doc(db, "calls", roomId);
-    const callData = (await getDoc(callDocRef)).data();
-
-    if (!callData || !callData.offer) return alert("Call room has expired or does not exist.");
-
-    peerConnection = new RTCPeerConnection(rtcConfig);
-
-    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-    peerConnection.ontrack = (event) => {
-      event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
-    };
-
-    const offerCandidates = collection(callDocRef, "offerCandidates");
-    const answerCandidates = collection(callDocRef, "answerCandidates");
-
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate) addDoc(answerCandidates, event.candidate.toJSON());
-    };
-
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
-    const answerDescription = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answerDescription);
-
-    await updateDoc(callDocRef, { answer: { type: answerDescription.type, sdp: answerDescription.sdp } });
-
-    onSnapshot(offerCandidates, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+        let clientId = sessionStorage.getItem('chat_client_id');
+        if (!clientId) {
+            clientId = 'usr_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('chat_client_id', clientId);
         }
-      });
-    });
 
-    closePopup();
-  }
+        let userNickname = localStorage.getItem('chat_nickname');
+        if (!userNickname) {
+            document.getElementById('nicknameModal').classList.remove('hidden');
+        } else {
+            updateUserBadge();
+        }
 
-  // End Call
-  document.getElementById("endCallBtn").addEventListener("click", () => {
-    if (peerConnection) {
-      peerConnection.close();
-      peerConnection = null;
-    }
-    if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
-      localStream = null;
-    }
-    localVideo.srcObject = null;
-    remoteVideo.srcObject = null;
-    alert("Call ended.");
-  });
+        let currentRoom = "global";
+        let activeQueryRef = null;
 
-  // ==========================================
-  // CHAT & AUTO-EXPIRE LOGIC (1 HOUR)
-  // ==========================================
+        // --- IDLE AUTO CLEAR ---
+        let idleTimer = null;
+        const IDLE_LIMIT = 5 * 60 * 1000;
 
-  async function sendGlobalMessage(text, type = "chat", roomId = null) {
-    const ONE_HOUR = 60 * 60 * 1000;
-    const expireDate = new Date(Date.now() + ONE_HOUR);
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                const chatBox = document.getElementById('chatBox');
+                if (chatBox) {
+                    chatBox.innerHTML = `
+                        <div class="text-center text-amber-500/60 text-xs py-4">
+                            💤 Session went idle. Chat cleared for performance. Move screen or send message to resume.
+                        </div>
+                    `;
+                }
+            }, IDLE_LIMIT);
+        }
 
-    await addDoc(collection(db, "global_chat"), {
-      text,
-      type,
-      roomId,
-      createdAt: serverTimestamp(),
-      expireAt: expireDate
-    });
-  }
+        ['click', 'touchstart', 'mousemove', 'keypress', 'scroll'].forEach(evt => {
+            window.addEventListener(evt, resetIdleTimer, true);
+        });
+        resetIdleTimer();
 
-  // Listen to Global Chat (Filters out messages older than 1 hour)
-  const q = query(
-    collection(db, "global_chat"),
-    where("expireAt", ">=", new Date()),
-    orderBy("expireAt", "asc")
-  );
+        // --- NICKNAME & ROOM MODALS ---
+        function openNicknameModal() {
+            document.getElementById('nicknameInput').value = userNickname || '';
+            document.getElementById('nicknameModal').classList.remove('hidden');
+        }
 
-  onSnapshot(q, (snapshot) => {
-    chatMessages.innerHTML = "";
-    snapshot.docs.forEach((docSnap) => {
-      const data = docSnap.data();
-      const msgDiv = document.createElement("div");
+        function saveNickname() {
+            const val = document.getElementById('nicknameInput').value.trim();
+            userNickname = val ? val : "Guest_" + Math.floor(100 + Math.random() * 900);
+            localStorage.setItem('chat_nickname', userNickname);
+            document.getElementById('nicknameModal').classList.add('hidden');
+            updateUserBadge();
+        }
 
-      if (data.type === "call_notification") {
-        msgDiv.className = "message call-notif";
-        msgDiv.innerHTML = `
-          <span>${data.text}</span>
-          <button class="success" onclick="triggerPopup('${data.roomId}')">Join Call</button>
-        `;
-      } else {
-        msgDiv.className = "message";
-        msgDiv.textContent = data.text;
-      }
-      chatMessages.appendChild(msgDiv);
-    });
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  });
+        function updateUserBadge() {
+            document.getElementById('currentUserBadge').innerText = `You: ${userNickname}`;
+        }
 
-  // Send message button
-  document.getElementById("sendMsgBtn").addEventListener("click", async () => {
-    if (msgInput.value.trim() !== "") {
-      await sendGlobalMessage(msgInput.value.trim());
-      msgInput.value = "";
-    }
-  });
+        function openRoomModal() { document.getElementById('roomModal').classList.remove('hidden'); }
+        function closeRoomModal() { document.getElementById('roomModal').classList.add('hidden'); }
 
-  // Wipe Chat Button
-  document.getElementById("wipeChatBtn").addEventListener("click", async () => {
-    if (confirm("Are you sure you want to wipe all global chat messages?")) {
-      const querySnapshot = await getDocs(collection(db, "global_chat"));
-      const batch = writeBatch(db);
-      querySnapshot.forEach((d) => batch.delete(d.ref));
-      await batch.commit();
-    }
-  });
+        function joinCustomRoom() {
+            const raw = document.getElementById('roomInput').value.trim().toLowerCase();
+            if (!raw) return;
+            const cleanRoom = raw.replace(/[^a-z0-9_-]/g, '');
+            switchRoom(cleanRoom);
+            closeRoomModal();
+        }
 
-  // ==========================================
-  // POPUP CONTROLS
-  // ==========================================
-  window.triggerPopup = (roomId) => {
-    incomingRoomId = roomId;
-    document.getElementById("popupText").textContent = `Incoming Call! Room: ${roomId.substring(0, 6)}...`;
-    document.getElementById("callPopup").classList.add("active");
-  };
+        function joinGlobalRoom() {
+            switchRoom("global");
+            closeRoomModal();
+        }
 
-  window.closePopup = () => {
-    document.getElementById("callPopup").classList.remove("active");
-    incomingRoomId = null;
-  };
+        function startPrivateChatWith(otherClientId, otherNickname) {
+            if (otherClientId === clientId) return;
+            const sortedIds = [clientId, otherClientId].sort();
+            const privateRoomCode = `private_${sortedIds[0]}_${sortedIds[1]}`;
+            if (confirm(`Start private 1-on-1 chat with ${otherNickname}?`)) {
+                switchRoom(privateRoomCode, `DM: ${otherNickname}`);
+            }
+        }
 
-  document.getElementById("acceptCallBtn").addEventListener("click", () => {
-    if (incomingRoomId) joinCallRoom(incomingRoomId);
-  });
-</script>
+        function switchRoom(roomCode, displayName) {
+            currentRoom = roomCode;
+            document.getElementById('currentRoomBadge').innerText = displayName ? displayName : `#${roomCode}`;
+            document.getElementById('chatBox').innerHTML = '';
+            listenToMessages();
+        }
 
+        function deleteSingleMessage(msgKey) {
+            if (confirm("Delete this message for everyone?")) {
+                db.ref(`/rooms/${currentRoom}/messages/${msgKey}`).remove()
+                .catch(err => showError("Delete failed: " + err.message));
+            }
+        }
+
+        // --- ONLINE HEARTBEAT ---
+        function startHeartbeat() {
+            const statusRef = db.ref('/status/' + clientId);
+            
+            function updateStatus() {
+                statusRef.set({
+                    nickname: userNickname || 'Guest',
+                    lastPing: Date.now()
+                }).catch((err) => {
+                    showError("⚠️ Permission Error! Check Database Rules.");
+                });
+            }
+
+            updateStatus();
+            setInterval(updateStatus, 4000);
+
+            statusRef.onDisconnect().remove();
+
+            db.ref('/status').on('value', (snapshot) => {
+                const now = Date.now();
+                let activeCount = 0;
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    if (data && data.lastPing && (now - data.lastPing < 10000)) {
+                        activeCount++;
+                    }
+                });
+                document.getElementById('onlineCount').innerText = `${Math.max(1, activeCount)}`;
+            });
+        }
+
+        // --- CHAT MESSAGING ---
+        let replyingTo = null;
+
+        function setReply(sender, text) {
+            replyingTo = { sender, text };
+            document.getElementById('replyText').innerText = `Replying to ${sender}: "${text}"`;
+            document.getElementById('replyPreview').classList.remove('hidden');
+        }
+
+        function cancelReply() {
+            replyingTo = null;
+            document.getElementById('replyPreview').classList.add('hidden');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            if (!userNickname) {
+                userNickname = "Guest_" + Math.floor(100 + Math.random() * 900);
+                localStorage.setItem('chat_nickname', userNickname);
+                updateUserBadge();
+            }
+
+            const msgData = {
+                clientId: clientId,
+                sender: userNickname,
+                text: message,
+                seenBy: { [clientId]: true },
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            if (replyingTo) {
+                msgData.replyTo = replyingTo;
+            }
+
+            db.ref(`/rooms/${currentRoom}/messages`).push(msgData).catch((err) => {
+                showError("Send Failed: Check Database Rules.");
+            });
+
+            input.value = '';
+            cancelReply();
+            setTimeout(scrollToBottom, 50);
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        document.getElementById('messageInput').addEventListener('focus', () => {
+            setTimeout(scrollToBottom, 300);
+        });
+
+        function scrollToBottom() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function listenToMessages() {
+            const chatBox = document.getElementById('chatBox');
+            const roomRef = db.ref(`/rooms/${currentRoom}/messages`);
+
+            if (activeQueryRef) {
+                activeQueryRef.off();
+            }
+
+            activeQueryRef = roomRef.limitToLast(60);
+
+            activeQueryRef.on('child_added', (snapshot) => { renderOrUpdateMessage(snapshot); });
+            activeQueryRef.on('child_changed', (snapshot) => { renderOrUpdateMessage(snapshot); });
+
+            roomRef.on('child_removed', (snapshot) => {
+                const removedKey = snapshot.key;
+                const el = document.getElementById(`msg-${removedKey}`);
+                if (el) el.remove();
+            });
+        }
+
+        function renderOrUpdateMessage(snapshot) {
+            const data = snapshot.val();
+            const msgKey = snapshot.key;
+            const isMe = data.clientId === clientId;
+
+            if (!isMe && (!data.seenBy || !data.seenBy[clientId])) {
+                db.ref(`/rooms/${currentRoom}/messages/${msgKey}/seenBy/${clientId}`).set(true);
+            }
+
+            let tickHTML = '';
+            if (isMe) {
+                const seenCount = data.seenBy ? Object.keys(data.seenBy).length : 1;
+                if (seenCount > 1) {
+                    tickHTML = `<span class="text-sky-400 font-bold ml-1" title="Seen">✓✓</span>`;
+                } else {
+                    tickHTML = `<span class="text-stone-900/60 font-bold ml-1" title="Sent">✓</span>`;
+                }
+            }
+
+            let replyHTML = '';
+            if (data.replyTo) {
+                replyHTML = `
+                    <div class="text-[10px] bg-black/40 border-l-2 border-amber-400 px-2 py-1 rounded-r mb-1 opacity-80 max-w-full truncate">
+                        <span class="font-semibold text-amber-300">@${escapeHtml(data.replyTo.sender)}:</span> ${escapeHtml(data.replyTo.text)}
+                    </div>
+                `;
+            }
+
+            // Call button triggering Firebase Signaling Call
+            const callBtnHTML = !isMe 
+                ? `<button onclick="initiateFirebaseCall('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" title="Call ${escapeHtml(data.sender)}" class="ml-1.5 px-1 text-green-400 hover:text-green-300 text-xs font-bold">📞 Call</button>`
+                : '';
+
+            const senderLabel = isMe 
+                ? `You (${escapeHtml(data.sender)})` 
+                : `<button onclick="startPrivateChatWith('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" class="hover:underline text-amber-300">${escapeHtml(data.sender)} 🔒</button> ${callBtnHTML}`;
+
+            const deleteBtnHTML = isMe 
+                ? `<button onclick="deleteSingleMessage('${msgKey}')" title="Delete Message" class="text-[9px] text-red-400/80 hover:text-red-300 mt-0.5 px-1">🗑️ Delete</button>`
+                : '';
+
+            const chatBox = document.getElementById('chatBox');
+            let msgDiv = document.getElementById(`msg-${msgKey}`);
+            const isNew = !msgDiv;
+
+            if (isNew) {
+                msgDiv = document.createElement('div');
+                msgDiv.id = `msg-${msgKey}`;
+            }
+
+            msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
+            msgDiv.innerHTML = `
+                <div class="flex items-center gap-1.5 mb-0.5 px-1">
+                    <span class="text-[10px] text-amber-500/70 font-semibold flex items-center">${senderLabel}</span>
+                </div>
+                <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words relative flex flex-col">
+                    ${replyHTML}
+                    <div class="flex items-end justify-between gap-2">
+                        <span>${escapeHtml(data.text)}</span>
+                        ${tickHTML}
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="setReply('${escapeHtml(data.sender)}', '${escapeHtml(data.text)}')" class="text-[9px] text-amber-500/50 hover:text-amber-300 mt-0.5 px-1">
+                        ↩ Reply
+                    </button>
+                    ${deleteBtnHTML}
+                </div>
+            `;
+
+            if (isNew) {
+                chatBox.appendChild(msgDiv);
+                scrollToBottom();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text || '';
+            return div.innerHTML;
+        }
+
+        // --- FIREBASE POWERED CALL SIGNALING & JITSI INTEGRATION ---
+        let activeCallRef = null;
+        let activeCallRoom = null;
+        let jitsiApi = null;
+
+        // Step 1: Caller initiates the call via Firebase
+        function initiateFirebaseCall(targetClientId, targetNickname) {
+            if (targetClientId === clientId) return;
+
+            const cleanCallerId = clientId.replace(/[^a-zA-Z0-9]/g, '');
+            const cleanTargetId = targetClientId.replace(/[^a-zA-Z0-9]/g, '');
+            activeCallRoom = `JakeriaCall_${cleanCallerId}_${cleanTargetId}`;
+
+            activeCallRef = db.ref(`/calls/${targetClientId}`);
+
+            // Send call alert signal to target user's Firebase node
+            activeCallRef.set({
+                callerId: clientId,
+                callerName: userNickname || 'Guest',
+                roomName: activeCallRoom,
+                status: 'ringing',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            // Show Calling Overlay for Caller
+            document.getElementById('callAlertTitle').innerText = `Calling ${targetNickname}...`;
+            document.getElementById('callAlertSubtext').innerText = "Waiting for answer...";
+            document.getElementById('callAlertButtons').innerHTML = `
+                <button onclick="declineCall('${targetClientId}')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition">
+                    Cancel Call
+                </button>
+            `;
+            document.getElementById('callAlertModal').classList.remove('hidden');
+            document.getElementById('callAlertModal').classList.add('flex');
+
+            // Listen for status changes (Accepted or Declined)
+            activeCallRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.status === 'accepted') {
+                        document.getElementById('callAlertModal').classList.add('hidden');
+                        document.getElementById('callAlertModal').classList.remove('flex');
+                        openJitsiAudioRoom(activeCallRoom);
+                    } else if (data.status === 'declined') {
+                        alert(`${targetNickname} declined the call.`);
+                        closeCallAlertUI(targetClientId);
+                    }
+                }
+            });
+        }
+
+        // Step 2: Global listener on every client for incoming calls targeted to them
+        function listenForIncomingCalls() {
+            const myCallRef = db.ref(`/calls/${clientId}`);
+            myCallRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.status === 'ringing') {
+                    activeCallRoom = data.roomName;
+                    
+                    // Show Incoming Call Popup for Callee
+                    document.getElementById('callAlertTitle').innerText = `Incoming Call`;
+                    document.getElementById('callAlertSubtext').innerText = `${data.callerName} is calling you...`;
+                    document.getElementById('callAlertButtons').innerHTML = `
+                        <button onclick="acceptIncomingCall('${data.callerId}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                            Accept Call
+                        </button>
+                        <button onclick="declineCall('${clientId}')" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                            Decline
+                        </button>
+                    `;
+                    document.getElementById('callAlertModal').classList.remove('hidden');
+                    document.getElementById('callAlertModal').classList.add('flex');
+                } else if (!data) {
+                    // Call cancelled by caller
+                    document.getElementById('callAlertModal').classList.add('hidden');
+                    document.getElementById('callAlertModal').classList.remove('flex');
+                }
+            });
+        }
+
+        // Step 3: Callee accepts call
+        function acceptIncomingCall(callerId) {
+            db.ref(`/calls/${clientId}`).update({ status: 'accepted' });
+            document.getElementById('callAlertModal').classList.add('hidden');
+            document.getElementById('callAlertModal').classList.remove('flex');
+            openJitsiAudioRoom(activeCallRoom);
+        }
+
+        // Step 4: Decline / Cancel Call
+        function declineCall(targetId) {
+            const idToClear = targetId || clientId;
+            db.ref(`/calls/${idToClear}`).update({ status: 'declined' });
+            setTimeout(() => {
+                db.ref(`/calls/${idToClear}`).remove();
+            }, 500);
+            closeCallAlertUI(idToClear);
+        }
+
+        function closeCallAlertUI(targetId) {
+            document.getElementById('callAlertModal').classList.add('hidden');
+            document.getElementById('callAlertModal').classList.remove('flex');
+            if (activeCallRef) {
+                activeCallRef.off();
+                activeCallRef = null;
+            }
+        }
+
+        // Step 5: Launch Jitsi Audio Room directly without login prompts
+        function openJitsiAudioRoom(roomName) {
+            const modal = document.getElementById('jitsiModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const domain = "meet.jit.si";
+            const options = {
+                roomName: roomName,
+                width: "100%",
+                height: "100%",
+                parentNode: document.getElementById('jitsiContainer'),
+                userInfo: {
+                    displayName: userNickname || "Guest"
+                },
+                configOverwrite: {
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: true,
+                    prejoinPageEnabled: false, // Disables prejoin screen & avoids moderator/login prompts
+                    disableDeepLinking: true
+                },
+                interfaceConfigOverwrite: {
+                    TOOLBAR_BUTTONS: ['microphone', 'hangup']
+                }
+            };
+
+            if (jitsiApi) jitsiApi.dispose();
+
+            jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+            jitsiApi.addEventListener('readyToClose', () => {
+                endActiveCall();
+            });
+        }
+
+        function endActiveCall() {
+            if (jitsiApi) {
+                jitsiApi.dispose();
+                jitsiApi = null;
+            }
+            document.getElementById('jitsiModal').classList.add('hidden');
+            document.getElementById('jitsiModal').classList.remove('flex');
+            document.getElementById('jitsiContainer').innerHTML = '';
+            
+            db.ref(`/calls/${clientId}`).remove();
+            if (activeCallRef) activeCallRef.remove();
+        }
+
+        // Start Core Services
+        startHeartbeat();
+        listenToMessages();
+        listenForIncomingCalls();
+    </script>
 </body>
 </html>
