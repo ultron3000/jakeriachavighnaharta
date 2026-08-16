@@ -41,9 +41,17 @@
             border-radius: 4px;
         }
 
-        /* Prevent auto-zoom on mobile inputs */
         input[type="text"] {
             font-size: 16px !important;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .call-pulse {
+            animation: pulse-ring 1.8s infinite;
         }
     </style>
 
@@ -51,28 +59,47 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
-    <!-- Jitsi Meet External API for Free Audio Calling -->
+    <!-- Jitsi External API -->
     <script src="https://meet.jit.si/external_api.js"></script>
 </head>
 <body class="flex items-center justify-center sm:p-4">
 
-    <!-- Jitsi Audio Call Modal Overlay -->
+    <!-- INCOMING / OUTGOING CALL ALERT MODAL (FIREBASE POWERED) -->
+    <div id="callAlertModal" class="fixed inset-0 z-[70] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center p-4">
+        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl flex flex-col items-center">
+            <div id="callAvatar" class="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-500 rounded-full flex items-center justify-center text-emerald-400 text-3xl font-bold mb-4 call-pulse">
+                📞
+            </div>
+            <h2 id="callAlertTitle" class="text-amber-300 text-lg font-semibold mb-1">Incoming Call...</h2>
+            <p id="callAlertSubtext" class="text-xs text-amber-500/80 mb-6">User is calling you for an audio chat</p>
+            
+            <div id="callAlertButtons" class="flex gap-3 w-full">
+                <button id="acceptCallBtn" onclick="acceptIncomingCall()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                    Accept Call
+                </button>
+                <button onclick="declineCall()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                    Decline
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JITSI AUDIO CALL OVERLAY CONTAINER -->
     <div id="jitsiModal" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center p-2 sm:p-4">
         <div class="w-full max-w-md h-[80vh] bg-stone-900 rounded-3xl overflow-hidden border border-amber-500/40 flex flex-col relative shadow-2xl">
             <div class="p-3 bg-black/80 border-b border-amber-500/20 flex justify-between items-center shrink-0">
                 <span class="text-xs text-amber-300 font-semibold flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Audio Call Active
                 </span>
-                <button onclick="closeAudioCall()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition">
+                <button onclick="endActiveCall()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition">
                     End Call ✕
                 </button>
             </div>
-            <!-- Jitsi Call iFrame Container -->
             <div id="jitsiContainer" class="w-full flex-1 bg-black"></div>
         </div>
     </div>
 
-    <!-- Nickname Selection Modal -->
+    <!-- NICKNAME SELECTION MODAL -->
     <div id="nicknameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
         <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
             <h2 class="text-amber-300 text-lg font-semibold mb-1">Enter Your Name</h2>
@@ -86,7 +113,7 @@
         </div>
     </div>
 
-    <!-- Room Switcher Modal -->
+    <!-- ROOM SWITCHER MODAL -->
     <div id="roomModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
         <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
             <h2 class="text-amber-300 text-lg font-semibold mb-1">Switch Chat Room</h2>
@@ -105,13 +132,12 @@
         </div>
     </div>
 
-    <!-- Main Chat Window -->
+    <!-- MAIN CHAT WINDOW -->
     <div class="w-full h-full sm:h-[94vh] sm:max-h-[850px] sm:max-w-md chat-card sm:rounded-3xl p-3 sm:p-5 border-0 sm:border sm:border-amber-500/30 flex flex-col relative overflow-hidden">
         
-        <!-- Header -->
+        <!-- HEADER -->
         <div class="pb-2.5 border-b border-amber-500/20 flex items-center justify-between shrink-0 z-10">
             <div class="flex items-center gap-2">
-                <!-- Logo Image as Home Link -->
                 <a href="https://jakeriachavighnaharta.site.je/" title="Back to Home"
                    class="flex items-center justify-center w-9 h-9 rounded-full overflow-hidden border border-amber-500/40 shadow-md hover:scale-105 transition active:scale-95 shrink-0 bg-black">
                     <img src="https://ultron3000.github.io/jakeriachavighnaharta/assets/logonew.jpg" 
@@ -131,13 +157,11 @@
             </div>
             
             <div class="flex items-center gap-1.5 shrink-0">
-                <!-- Rooms Switcher -->
                 <button onclick="openRoomModal()" title="Switch Room" 
                         class="p-1.5 rounded-lg bg-black/40 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs">
                     🚪 Rooms
                 </button>
 
-                <!-- Online Counter -->
                 <div class="flex items-center space-x-1.5 bg-black/50 px-2.5 py-1 rounded-full border border-amber-500/20">
                     <span class="relative flex h-2 w-2">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -148,19 +172,15 @@
             </div>
         </div>
 
-        <!-- Debugger -->
         <div id="debugBox" class="hidden bg-red-900/50 border border-red-500/50 text-red-200 text-xs p-2.5 rounded-xl my-2 text-center font-medium shrink-0"></div>
 
-        <!-- Scrollable Messages Area -->
         <div id="chatBox" class="flex-1 overflow-y-auto py-3 space-y-3 pr-1 scroll-smooth-ios"></div>
 
-        <!-- Reply Banner -->
         <div id="replyPreview" class="hidden bg-black/60 border-l-2 border-amber-400 px-3 py-1.5 text-xs text-amber-200/80 flex justify-between items-center rounded-r-lg mb-1 shrink-0">
             <span id="replyText" class="truncate">Replying to...</span>
             <button onclick="cancelReply()" class="text-amber-500/70 hover:text-amber-300 ml-2 font-bold p-1">✕</button>
         </div>
 
-        <!-- Mobile Optimized Input Bar -->
         <div class="pt-2 pb-1 border-t border-amber-500/20 flex items-center gap-2 shrink-0 z-10 w-full">
             <input type="text" id="messageInput" placeholder="Write a message..." autocomplete="off" autocorrect="off" spellcheck="false"
                    class="flex-1 min-w-0 bg-black/50 border border-amber-500/30 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-amber-900/50 focus:outline-none focus:border-amber-400">
@@ -173,7 +193,6 @@
     </div>
 
     <script>
-        // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
             authDomain: "ultron-85fba.firebaseapp.com",
@@ -210,7 +229,7 @@
         let currentRoom = "global";
         let activeQueryRef = null;
 
-        // --- 5 MINUTE IDLE AUTO-CLEAR TIMEOUT ---
+        // --- IDLE AUTO CLEAR ---
         let idleTimer = null;
         const IDLE_LIMIT = 5 * 60 * 1000;
 
@@ -233,7 +252,7 @@
         });
         resetIdleTimer();
 
-        // --- USER MODAL CONTROLS ---
+        // --- NICKNAME & ROOM MODALS ---
         function openNicknameModal() {
             document.getElementById('nicknameInput').value = userNickname || '';
             document.getElementById('nicknameModal').classList.remove('hidden');
@@ -283,7 +302,6 @@
             listenToMessages();
         }
 
-        // --- WHATSAPP-STYLE SENDER-ONLY DELETION ---
         function deleteSingleMessage(msgKey) {
             if (confirm("Delete this message for everyone?")) {
                 db.ref(`/rooms/${currentRoom}/messages/${msgKey}`).remove()
@@ -291,7 +309,7 @@
             }
         }
 
-        // --- ONLINE HEARTBEAT COUNTER ---
+        // --- ONLINE HEARTBEAT ---
         function startHeartbeat() {
             const statusRef = db.ref('/status/' + clientId);
             
@@ -300,7 +318,7 @@
                     nickname: userNickname || 'Guest',
                     lastPing: Date.now()
                 }).catch((err) => {
-                    showError("⚠️ Permission Error! Ensure Database Rules are published.");
+                    showError("⚠️ Permission Error! Set Database Rules to true.");
                 });
             }
 
@@ -322,7 +340,7 @@
             });
         }
 
-        // --- CHAT MESSAGING ENGINE ---
+        // --- CHAT MESSAGING ---
         let replyingTo = null;
 
         function setReply(sender, text) {
@@ -391,13 +409,8 @@
 
             activeQueryRef = roomRef.limitToLast(60);
 
-            activeQueryRef.on('child_added', (snapshot) => {
-                renderOrUpdateMessage(snapshot);
-            });
-
-            activeQueryRef.on('child_changed', (snapshot) => {
-                renderOrUpdateMessage(snapshot);
-            });
+            activeQueryRef.on('child_added', (snapshot) => { renderOrUpdateMessage(snapshot); });
+            activeQueryRef.on('child_changed', (snapshot) => { renderOrUpdateMessage(snapshot); });
 
             roomRef.on('child_removed', (snapshot) => {
                 const removedKey = snapshot.key;
@@ -411,12 +424,10 @@
             const msgKey = snapshot.key;
             const isMe = data.clientId === clientId;
 
-            // Automatically mark message as Seen
             if (!isMe && (!data.seenBy || !data.seenBy[clientId])) {
                 db.ref(`/rooms/${currentRoom}/messages/${msgKey}/seenBy/${clientId}`).set(true);
             }
 
-            // Determine WhatsApp tick status
             let tickHTML = '';
             if (isMe) {
                 const seenCount = data.seenBy ? Object.keys(data.seenBy).length : 1;
@@ -436,9 +447,9 @@
                 `;
             }
 
-            // Audio Call Button next to other users
+            // Call button triggering Firebase Signaling Call
             const callBtnHTML = !isMe 
-                ? `<button onclick="startAudioCall('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" title="Call ${escapeHtml(data.sender)}" class="ml-1.5 px-1 text-green-400 hover:text-green-300 text-xs">📞</button>`
+                ? `<button onclick="initiateFirebaseCall('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" title="Call ${escapeHtml(data.sender)}" class="ml-1.5 px-1 text-green-400 hover:text-green-300 text-xs font-bold">📞 Call</button>`
                 : '';
 
             const senderLabel = isMe 
@@ -490,30 +501,113 @@
             return div.innerHTML;
         }
 
-        // --- JITSI AUDIO CALLING INTEGRATION ---
+        // --- FIREBASE POWERED CALL SIGNALING & JITSI INTEGRATION ---
+        let activeCallRef = null;
+        let activeCallRoom = null;
         let jitsiApi = null;
 
-        function startAudioCall(targetClientId, targetNickname) {
+        // Step 1: Caller initiates the call via Firebase
+        function initiateFirebaseCall(targetClientId, targetNickname) {
             if (targetClientId === clientId) return;
 
-            const sortedIds = [clientId, targetClientId].sort();
-            const callRoomName = `JakeriaCall_${sortedIds[0]}_${sortedIds[1]}`;
+            // Generate clean room ID without special characters
+            const rawRoom = `JakeriaCall${clientId}${targetClientId}`.replace(/[^a-zA-Z0-9]/g, '');
+            activeCallRoom = rawRoom;
 
-            // Send invitation notification to chat
-            const inviteText = `📞 Audio Call starting with ${targetNickname}...`;
-            
-            db.ref(`/rooms/${currentRoom}/messages`).push({
-                clientId: clientId,
-                sender: userNickname,
-                text: inviteText,
-                seenBy: { [clientId]: true },
+            activeCallRef = db.ref(`/calls/${targetClientId}`);
+
+            // Send call alert signal to receiver's Firebase node
+            activeCallRef.set({
+                callerId: clientId,
+                callerName: userNickname || 'Guest',
+                roomName: activeCallRoom,
+                status: 'ringing',
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
-            openJitsiCall(callRoomName);
+            // Show Calling Overlay for Caller
+            document.getElementById('callAlertTitle').innerText = `Calling ${targetNickname}...`;
+            document.getElementById('callAlertSubtext').innerText = "Waiting for answer...";
+            document.getElementById('callAlertButtons').innerHTML = `
+                <button onclick="declineCall()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition">
+                    Cancel Call
+                </button>
+            `;
+            document.getElementById('callAlertModal').classList.remove('hidden');
+            document.getElementById('callAlertModal').classList.add('flex');
+
+            // Listen for status changes (Accepted or Declined)
+            activeCallRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.status === 'accepted') {
+                        document.getElementById('callAlertModal').classList.add('hidden');
+                        document.getElementById('callAlertModal').classList.remove('flex');
+                        openJitsiAudioRoom(activeCallRoom);
+                    } else if (data.status === 'declined') {
+                        alert(`${targetNickname} declined the call.`);
+                        closeCallAlertUI();
+                    }
+                }
+            });
         }
 
-        function openJitsiCall(roomName) {
+        // Step 2: Global listener for incoming call alerts on this device
+        function listenForIncomingCalls() {
+            const myCallRef = db.ref(`/calls/${clientId}`);
+            myCallRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.status === 'ringing') {
+                    activeCallRoom = data.roomName;
+                    
+                    // Show Incoming Call Popup for Callee
+                    document.getElementById('callAlertTitle').innerText = `Incoming Call`;
+                    document.getElementById('callAlertSubtext').innerText = `${data.callerName} is calling you...`;
+                    document.getElementById('callAlertButtons').innerHTML = `
+                        <button onclick="acceptIncomingCall()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                            Accept Call
+                        </button>
+                        <button onclick="declineCall()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                            Decline
+                        </button>
+                    `;
+                    document.getElementById('callAlertModal').classList.remove('hidden');
+                    document.getElementById('callAlertModal').classList.add('flex');
+                } else if (!data) {
+                    // Call cancelled by caller
+                    document.getElementById('callAlertModal').classList.add('hidden');
+                    document.getElementById('callAlertModal').classList.remove('flex');
+                }
+            });
+        }
+
+        // Step 3: Callee accepts call
+        function acceptIncomingCall() {
+            db.ref(`/calls/${clientId}`).update({ status: 'accepted' });
+            document.getElementById('callAlertModal').classList.add('hidden');
+            document.getElementById('callAlertModal').classList.remove('flex');
+            openJitsiAudioRoom(activeCallRoom);
+        }
+
+        // Step 4: Decline / Cancel Call
+        function declineCall() {
+            if (activeCallRef) {
+                activeCallRef.update({ status: 'declined' });
+                setTimeout(() => activeCallRef.remove(), 1000);
+            }
+            db.ref(`/calls/${clientId}`).remove();
+            closeCallAlertUI();
+        }
+
+        function closeCallAlertUI() {
+            document.getElementById('callAlertModal').classList.add('hidden');
+            document.getElementById('callAlertModal').classList.remove('flex');
+            if (activeCallRef) activeCallRef.off();
+            activeCallRef = null;
+        }
+
+        // Step 5: Launch Jitsi Audio Room (Fixed parameters so no login is requested)
+        function openJitsiAudioRoom(roomName) {
             const modal = document.getElementById('jitsiModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -529,11 +623,12 @@
                 },
                 configOverwrite: {
                     startWithAudioMuted: false,
-                    startWithVideoMuted: true, // Force Audio-only call
+                    startWithVideoMuted: true,
+                    prejoinPageEnabled: false, // Bypass prejoin screen to prevent login prompt
                     disableDeepLinking: true
                 },
                 interfaceConfigOverwrite: {
-                    TOOLBAR_BUTTONS: ['microphone', 'hangup', 'tileview']
+                    TOOLBAR_BUTTONS: ['microphone', 'hangup']
                 }
             };
 
@@ -542,24 +637,27 @@
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
             jitsiApi.addEventListener('readyToClose', () => {
-                closeAudioCall();
+                endActiveCall();
             });
         }
 
-        function closeAudioCall() {
+        function endActiveCall() {
             if (jitsiApi) {
                 jitsiApi.dispose();
                 jitsiApi = null;
             }
-            const modal = document.getElementById('jitsiModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            document.getElementById('jitsiModal').classList.add('hidden');
+            document.getElementById('jitsiModal').classList.remove('flex');
             document.getElementById('jitsiContainer').innerHTML = '';
+            
+            db.ref(`/calls/${clientId}`).remove();
+            if (activeCallRef) activeCallRef.remove();
         }
 
         // Start Core Services
         startHeartbeat();
         listenToMessages();
+        listenForIncomingCalls();
     </script>
 </body>
 </html>
