@@ -27,10 +27,6 @@
         .marathi-font {
             font-family: 'Yatra One', 'Tiro Devanagari Hindi', serif;
         }
-
-        .marathi-numerals {
-    font-family: 'Yatra One', serif;
-}
         
         /* Premium 3D Layering cards */
         .premium-card {
@@ -117,21 +113,59 @@
     </div>
 
     <!-- Navigation Bar Header Layout -->
-    <nav class="w-full bg-black/40 backdrop-blur-md border-b border-white/5 absolute top-0 left-0 z-40 px-4 py-3">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <nav class="w-full bg-black/60 backdrop-blur-md border-b border-amber-500/20 absolute top-0 left-0 z-40 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between relative">
             <!-- Perfectly Placed Top Left Brand Area -->
             <div class="flex items-center space-x-3">
                 <div class="h-12 w-12 rounded-full border-2 border-amber-400 shadow-lg overflow-hidden bg-amber-900/50">
-                    <!-- CHANGE THIS URL TO YOUR INSTANT GITHUB RAW CDN IMAGE LINK -->
                     <img alt="JB Logo" class="w-full h-full object-cover" src="https://ultron3000.github.io/jakeriachavighnaharta/assets/logonew.jpg"/>
                 </div>
                 <div>
-                    <span class="marathi-font text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400 tracking-wide block">जकेरियाचा विघ्नहर्ता</span>
-                    <span class="text-[9px] text-amber-500/70 tracking-widest block uppercase font-medium">|| स्थापना <span class="marathi-font">१९६४</span> ||</span>
+                    <span class="marathi-font text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400 tracking-wide block">जकेरियाचा विघ्नहर्ता</span>
+                    <span class="text-[9px] text-amber-500/70 tracking-widest block uppercase font-medium">|| स्थापना १९६४ ||</span>
                 </div>
             </div>
-            <div class="hidden sm:block">
-                <i class="fas fa-om text-amber-400/60 text-xl"></i>
+
+            <!-- Right Side Controls: Desktop Links + Hamburger Menu Button -->
+            <div class="flex items-center space-x-4">
+                <!-- Desktop Menu Links -->
+                <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                    <a href="https://jakeriachavighnaharta.site.je/" class="text-amber-300 hover:text-amber-400 transition">Home</a>
+                    <a href="https://jakeriachavighnaharta.site.je/images.html" class="text-stone-300 hover:text-amber-400 transition">Images</a>
+                    <a href="https://jakeriachavighnaharta.site.je/videos.html" class="text-stone-300 hover:text-amber-400 transition">Videos</a>
+                    <a href="https://jakeriachavighnaharta.site.je/upi.html" class="text-stone-300 hover:text-amber-400 transition">UPI</a>
+                    <a href="https://jakeriachavighnaharta.site.je/info.html" class="text-stone-300 hover:text-amber-400 transition">Info</a>
+                    <a href="https://jakeriachavighnaharta.site.je/chat.html" class="text-stone-300 hover:text-amber-400 transition">Chat</a>
+                </div>
+
+                <!-- Hamburger Menu Button -->
+                <button id="menuBtn" aria-label="Toggle Navigation Menu" class="h-11 w-11 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center hover:bg-amber-500/20 active:scale-95 transition">
+                    <i id="menuIcon" class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Dropdown Menu Panel (Hamburger Content Overlay) -->
+        <div id="mobileMenu" class="hidden absolute top-full left-0 w-full bg-[#1c0205]/95 backdrop-blur-xl border-b border-amber-500/30 shadow-2xl py-4 px-6 transition-all duration-300 z-50">
+            <div class="max-w-6xl mx-auto flex flex-col space-y-3">
+                <a href="https://jakeriachavighnaharta.site.je/" class="flex items-center py-2.5 px-4 rounded-xl text-amber-300 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-home w-8 text-amber-400"></i> Home | मुख्यपृष्ठ
+                </a>
+                <a href="https://jakeriachavighnaharta.site.je/images.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-camera-retro w-8 text-orange-500"></i> Images | छायाचित्र संग्रह
+                </a>
+                <a href="https://jakeriachavighnaharta.site.je/videos.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-video w-8 text-orange-500"></i> Videos | व्हिडीओ गॅलरी
+                </a>
+                <a href="https://jakeriachavighnaharta.site.je/upi.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-rupee-sign w-8 text-amber-400"></i> UPI | भक्तिपूर्वक योगदान
+                </a>
+                <a href="https://jakeriachavighnaharta.site.je/info.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-info-circle w-8 text-amber-400"></i> Info | माहिती पत्रक
+                </a>
+                <a href="https://jakeriachavighnaharta.site.je/chat.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-comments w-8 text-emerald-400"></i> Chat | समुदाय चर्चा
+                </a>
             </div>
         </div>
     </nav>
@@ -188,9 +222,7 @@
                 </h2>
                 <div class="space-y-3">
                     <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://jakeriachavighnaharta.site.je/images.html" target="_self">
-                        <i class="fas fa-images mr-2"></i> 
-                    </a>
-
+                        <i class="fas fa-images mr-2"></i> View Images Gallery
                     </a>
                 </div>
             </section>
@@ -204,9 +236,7 @@
                 </h2>
                 <div class="space-y-3">
                     <a class="block btn-3d font-medium py-3.5 px-4 rounded-xl text-center tracking-wide" href="https://jakeriachavighnaharta.site.je/videos.html" target="_self">
-                        <i class="fas fa-film mr-2"></i> 
-                    </a>
-
+                        <i class="fas fa-film mr-2"></i> View Videos Gallery
                     </a>
                 </div>
             </section>
@@ -292,10 +322,37 @@
     <footer class="bg-gradient-to-b from-[#1f0205] to-[#0a0001] text-white py-8 border-t border-amber-500/20 text-center">
         <div class="container mx-auto px-4 space-y-3">
             <i class="fas fa-om text-2xl text-amber-400/60"></i>
-            <p class="marathi-font text-base text-amber-300">जकेरीया बंदर रोड सार्वजनिक गणेशोत्सव मंडळ</p>
+            <p class="marathi-font text-base text-amber-300">जकेरियाचा विघ्नहर्ता सार्वजनिक उत्सव मंडळ</p>
             <p class="text-stone-500 text-xs"> <span class="italic text-amber-500/80 font-medium">गणपती बाप्पा मोरया! मंगलमूर्ती मोरया!</span></p>
         </div>
     </footer>
+
+    <!-- Hamburger Toggle Script -->
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+            }
+        });
+
+        // Close menu when clicking outside
+        window.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+            }
+        });
+    </script>
 
     <!-- Functional Initialization Loader Mechanics Script -->
     <script>
@@ -310,6 +367,239 @@
         });
     </script>
     <!-- Disable DevTools + View Source Protection -->
+<script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
+
+<script>
+/* =========================
+   Mobile Detection
+========================= */
+const isMobile =
+    /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+/* =========================
+   Disable DevTools
+========================= */
+DisableDevtool({
+    disable: true,
+    disableMenu: true,
+    clearLog: true,
+    disableSelect: true,
+    disableCopy: true,
+    disableCut: true,
+    disablePaste: true,
+
+    /* FIXED */
+    disableMobile: false,
+
+    interval: 100,
+
+    ondevtoolopen: function () {
+
+        /* ONLY DESKTOP */
+        if (!isMobile) {
+            document.body.innerHTML = "";
+            window.location.replace("about:blank");
+        }
+    }
+});
+
+/* =========================
+   Block View Source Shortcuts
+========================= */
+document.addEventListener("keydown", function (e) {
+
+    // F12
+    if (e.key === "F12") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+U
+    if (e.ctrlKey && e.key.toLowerCase() === "u") {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+Shift+J
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "j") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+S
+    if (e.ctrlKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+P
+    if (e.ctrlKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+A
+    if (e.ctrlKey && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+C
+    if (e.ctrlKey && e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+X
+    if (e.ctrlKey && e.key.toLowerCase() === "x") {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl+V
+    if (e.ctrlKey && e.key.toLowerCase() === "v") {
+        e.preventDefault();
+        return false;
+    }
+});
+
+/* =========================
+   Disable Right Click
+========================= */
+document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+});
+
+/* =========================
+   Disable Dragging
+========================= */
+document.addEventListener("dragstart", function (e) {
+    e.preventDefault();
+});
+
+/* =========================
+   Disable Selection
+========================= */
+document.addEventListener("selectstart", function (e) {
+    e.preventDefault();
+});
+
+/* =========================
+   Disable Copy Actions
+========================= */
+["copy", "cut", "paste"].forEach(function(evt) {
+
+    document.addEventListener(evt, function(e) {
+        e.preventDefault();
+    });
+
+});
+
+/* =========================
+   Detect DevTools Window
+   (Desktop ONLY - FIXED)
+========================= */
+if (!isMobile) {
+
+    setInterval(function () {
+
+        const widthThreshold =
+            window.outerWidth - window.innerWidth > 220;
+
+        const heightThreshold =
+            window.outerHeight - window.innerHeight > 220;
+
+        if (widthThreshold || heightThreshold) {
+
+            document.body.innerHTML = "";
+            window.location.replace("about:blank");
+        }
+
+    }, 1500);
+
+}
+
+/* =========================
+   Disable Console
+========================= */
+(function () {
+
+    console.clear();
+
+    function block() {
+        return false;
+    }
+
+    console.log = block;
+    console.warn = block;
+    console.error = block;
+    console.info = block;
+    console.debug = block;
+    console.table = block;
+
+})();
+
+/* =========================
+   Block "view-source:"
+========================= */
+if (window.location.href.startsWith("view-source:")) {
+
+    document.body.innerHTML = "";
+    window.location.replace("about:blank");
+
+}
+
+/* =========================
+   Prevent iframe inspection
+========================= */
+if (window.top !== window.self) {
+
+    try {
+        window.top.location = window.self.location;
+    } catch (e) {}
+
+}
+</script>
+
+<style>
+html, body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow-x: hidden;
+}
+
+/* Disable image dragging */
+img {
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+
+/* Hide selection */
+::selection {
+    background: transparent;
+}
+</style>
+
+
+
+<!-- Disable DevTools + View Source Protection -->
 <script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
 
 <script>
