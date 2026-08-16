@@ -46,29 +46,42 @@
         }
     </style>
 
-    <!-- Firebase App & Realtime Database SDKs -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="flex items-center justify-center p-2 sm:p-4">
 
-    <!-- Universal App Container -->
+    <!-- Nickname Selection Modal -->
+    <div id="nicknameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
+        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <h2 class="text-amber-300 text-lg font-semibold mb-1">Enter Your Name</h2>
+            <p class="text-xs text-amber-500/70 mb-4">Choose a nickname so others know who is chatting!</p>
+            <input type="text" id="nicknameInput" placeholder="e.g. Rahul, Amit..." 
+                   maxlength="18"
+                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 text-sm mb-4">
+            <button onclick="saveNickname()" 
+                    class="w-full bg-gradient-to-r from-amber-400 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 text-stone-950 font-bold py-3 rounded-xl transition text-sm">
+                Join Chat Room
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Chat Window -->
     <div class="w-full max-w-md chat-card rounded-3xl p-4 sm:p-5 border border-amber-500/30 flex flex-col h-[94vh] max-h-[850px] relative overflow-hidden">
         
         <!-- Header -->
         <div class="pb-3 border-b border-amber-500/20 flex items-center justify-between z-10">
             <div>
-                <h1 class="text-amber-300 text-base sm:text-lg font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता</h1>
-                <p class="text-[11px] text-amber-500/70 flex items-center gap-1">
-                    <span>🌐 Live Chat Room</span>
-                </p>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="text-amber-300 text-base sm:text-lg font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता</h1>
+                    <button onclick="openNicknameModal()" title="Change Nickname" class="text-amber-500/60 hover:text-amber-300 text-xs">✏️</button>
+                </div>
+                <p id="currentUserBadge" class="text-[11px] text-amber-500/70">Setting up...</p>
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="shareChat()" title="Share Web Link" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 p-2 rounded-full border border-amber-500/30 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                </button>
-
+                <!-- Live Counter -->
                 <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-full border border-amber-500/20">
                     <span class="relative flex h-2.5 w-2.5">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -82,8 +95,14 @@
         <!-- Chat Container -->
         <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1 scroll-smooth-ios"></div>
 
+        <!-- Replying To Preview Indicator -->
+        <div id="replyPreview" class="hidden bg-black/60 border-l-2 border-amber-400 px-3 py-1.5 text-xs text-amber-200/80 flex justify-between items-center rounded-r-lg mb-1">
+            <span id="replyText" class="truncate">Replying to...</span>
+            <button onclick="cancelReply()" class="text-amber-500/70 hover:text-amber-300 ml-2 font-bold">✕</button>
+        </div>
+
         <!-- Input Box -->
-        <div class="pt-3 border-t border-amber-500/20 flex gap-2 z-10">
+        <div class="pt-2 border-t border-amber-500/20 flex gap-2 z-10">
             <input type="text" id="messageInput" placeholder="Write a message..." 
                    autocomplete="off"
                    class="flex-1 bg-black/50 border border-amber-500/30 rounded-xl px-4 py-3 text-white placeholder-amber-900/50 focus:outline-none focus:border-amber-400 text-sm">
@@ -107,65 +126,124 @@
             measurementId: "G-EEDR5XX34M"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Unique Browser/Device Client ID Generation
+        // 1. Client Identifier & Nickname Handling
         let clientId = localStorage.getItem('chat_client_id');
         if (!clientId) {
-            clientId = 'user_' + Math.random().toString(36).substr(2, 9);
+            clientId = 'usr_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('chat_client_id', clientId);
         }
 
-        let userHandle = localStorage.getItem('chat_handle');
-        if (!userHandle) {
-            userHandle = "Devotee_" + Math.floor(1000 + Math.random() * 9000);
-            localStorage.setItem('chat_handle', userHandle);
+        let userNickname = localStorage.getItem('chat_nickname');
+        if (!userNickname) {
+            document.getElementById('nicknameModal').classList.remove('hidden');
+        } else {
+            updateUserBadge();
         }
 
-        // 1. Presence System (Online User Counter)
-        function setupPresence() {
-            const userStatusRef = db.ref('/status/' + clientId);
-            const connectedRef = db.ref('.info/connected');
-            const allStatusRef = db.ref('/status');
+        function openNicknameModal() {
+            document.getElementById('nicknameInput').value = userNickname || '';
+            document.getElementById('nicknameModal').classList.remove('hidden');
+        }
 
-            connectedRef.on('value', (snapshot) => {
-                if (snapshot.val() === true) {
-                    userStatusRef.onDisconnect().remove().then(() => {
-                        userStatusRef.set({ online: true, platform: getPlatform() });
-                    });
-                }
+        function saveNickname() {
+            const val = document.getElementById('nicknameInput').value.trim();
+            userNickname = val ? val : "Guest_" + Math.floor(100 + Math.random() * 900);
+            localStorage.setItem('chat_nickname', userNickname);
+            document.getElementById('nicknameModal').classList.add('hidden');
+            updateUserBadge();
+        }
+
+        function updateUserBadge() {
+            document.getElementById('currentUserBadge').innerText = `You are: ${userNickname}`;
+        }
+
+        // 2. Robust Real-Time Heartbeat Presence Counter
+        function startHeartbeat() {
+            const statusRef = db.ref('/status/' + clientId);
+            
+            function updateStatus() {
+                statusRef.set({
+                    nickname: userNickname || 'Guest',
+                    lastPing: Date.now()
+                });
+            }
+
+            // Send ping every 5 seconds
+            updateStatus();
+            setInterval(updateStatus, 5000);
+
+            // Remove on window close
+            window.addEventListener('beforeunload', () => {
+                statusRef.remove();
             });
 
-            allStatusRef.on('value', (snapshot) => {
-                const count = snapshot.numChildren() || 1;
-                document.getElementById('onlineCount').innerText = `${count} Online`;
+            // Listen for active users (pinged in last 12 seconds)
+            db.ref('/status').on('value', (snapshot) => {
+                const now = Date.now();
+                let activeCount = 0;
+                
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    if (data && data.lastPing && (now - data.lastPing < 12000)) {
+                        activeCount++;
+                    }
+                });
+
+                document.getElementById('onlineCount').innerText = `${Math.max(1, activeCount)} Online`;
             });
         }
 
-        // 2. Send Message Function
+        // 3. Reply Feature Variables
+        let replyingTo = null;
+
+        function setReply(sender, text) {
+            replyingTo = { sender, text };
+            document.getElementById('replyText').innerText = `Replying to ${sender}: "${text}"`;
+            document.getElementById('replyPreview').classList.remove('hidden');
+        }
+
+        function cancelReply() {
+            replyingTo = null;
+            document.getElementById('replyPreview').classList.add('hidden');
+        }
+
+        // 4. Send Message Function
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
             if (!message) return;
 
-            db.ref('/messages').push({
+            if (!userNickname) {
+                userNickname = "Guest_" + Math.floor(100 + Math.random() * 900);
+                localStorage.setItem('chat_nickname', userNickname);
+                updateUserBadge();
+            }
+
+            const msgData = {
                 clientId: clientId,
-                sender: userHandle,
+                sender: userNickname,
                 text: message,
-                platform: getPlatform(),
                 timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
+            };
+
+            if (replyingTo) {
+                msgData.replyTo = replyingTo;
+            }
+
+            db.ref('/messages').push(msgData);
 
             input.value = '';
+            cancelReply();
         }
 
         document.getElementById('messageInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // 3. Real-Time Chat Reader
+        // 5. Render Messages with Replies & Nicknames
         function listenToMessages() {
             const chatBox = document.getElementById('chatBox');
             const messagesRef = db.ref('/messages').limitToLast(60);
@@ -175,16 +253,28 @@
                 const isMe = data.clientId === clientId;
                 
                 const msgDiv = document.createElement('div');
-                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
+                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-3`;
+
+                let replyHTML = '';
+                if (data.replyTo) {
+                    replyHTML = `
+                        <div class="text-[10px] bg-black/40 border-l-2 border-amber-400 px-2 py-1 rounded-r mb-1 opacity-80 max-w-full truncate">
+                            <span class="font-semibold text-amber-300">@${escapeHtml(data.replyTo.sender)}:</span> ${escapeHtml(data.replyTo.text)}
+                        </div>
+                    `;
+                }
 
                 msgDiv.innerHTML = `
-                    <div class="flex items-center gap-1 mb-0.5 px-1">
-                        <span class="text-[10px] text-amber-500/60 font-medium">${isMe ? 'You' : data.sender}</span>
-                        <span class="text-[9px] text-amber-500/40">• ${data.platform || 'web'}</span>
+                    <div class="flex items-center gap-1.5 mb-0.5 px-1">
+                        <span class="text-[10px] text-amber-500/70 font-semibold">${isMe ? 'You (' + escapeHtml(data.sender) + ')' : escapeHtml(data.sender)}</span>
                     </div>
-                    <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words">
-                        ${escapeHtml(data.text)}
+                    <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words relative group">
+                        ${replyHTML}
+                        <div>${escapeHtml(data.text)}</div>
                     </div>
+                    <button onclick="setReply('${escapeHtml(data.sender)}', '${escapeHtml(data.text)}')" class="text-[9px] text-amber-500/50 hover:text-amber-300 mt-0.5 px-1">
+                        ↩ Reply
+                    </button>
                 `;
 
                 chatBox.appendChild(msgDiv);
@@ -192,33 +282,14 @@
             });
         }
 
-        function getPlatform() {
-            const ua = navigator.userAgent;
-            if (/iPhone|iPad|iPod/i.test(ua)) return 'iOS';
-            if (/Android/i.test(ua)) return 'Android';
-            return 'Web';
-        }
-
-        function shareChat() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'जकेरियाचा विघ्नहर्ता Chat',
-                    url: window.location.href
-                }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Live Chat Web link copied to clipboard!");
-            }
-        }
-
         function escapeHtml(text) {
             const div = document.createElement('div');
-            div.innerText = text;
+            div.innerText = text || '';
             return div.innerHTML;
         }
 
-        // Start real-time connections
-        setupPresence();
+        // Initialize App
+        startHeartbeat();
         listenToMessages();
     </script>
 </body>
