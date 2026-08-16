@@ -152,6 +152,11 @@
             </div>
             
             <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="wipeGlobalChat()" title="Wipe Current Chat" 
+                        class="p-1.5 rounded-lg bg-red-900/40 border border-red-500/30 text-red-300 hover:bg-red-600/30 text-xs">
+                    🧹 Clear
+                </button>
+
                 <button onclick="openRoomModal()" title="Switch Room" 
                         class="p-1.5 rounded-lg bg-black/40 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs">
                     🚪 Rooms
@@ -304,6 +309,17 @@
             }
         }
 
+        // --- WIPE GLOBAL CHAT FUNCTION ---
+        function wipeGlobalChat() {
+            if (confirm(`Wipe all messages in #${currentRoom}?`)) {
+                db.ref(`/rooms/${currentRoom}/messages`).remove()
+                .then(() => {
+                    document.getElementById('chatBox').innerHTML = '';
+                })
+                .catch(err => showError("Wipe failed: " + err.message));
+            }
+        }
+
         // --- ONLINE HEARTBEAT ---
         function startHeartbeat() {
             const statusRef = db.ref('/status/' + clientId);
@@ -335,7 +351,7 @@
             });
         }
 
-        // --- CHAT MESSAGING ---
+        // --- CHAT MESSAGING WITH AUTO 1-HOUR EXPIRY ---
         let replyingTo = null;
 
         function setReply(sender, text) {
@@ -360,12 +376,16 @@
                 updateUserBadge();
             }
 
+            const now = Date.now();
+            const ONE_HOUR = 60 * 60 * 1000;
+
             const msgData = {
                 clientId: clientId,
                 sender: userNickname,
                 text: message,
                 seenBy: { [clientId]: true },
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                expireAt: now + ONE_HOUR
             };
 
             if (replyingTo) {
@@ -417,6 +437,15 @@
         function renderOrUpdateMessage(snapshot) {
             const data = snapshot.val();
             const msgKey = snapshot.key;
+            const now = Date.now();
+
+            // Auto-hide messages older than 1 hour (3,600,000 ms)
+            if (data.expireAt && data.expireAt < now) {
+                const existingEl = document.getElementById(`msg-${msgKey}`);
+                if (existingEl) existingEl.remove();
+                return;
+            }
+
             const isMe = data.clientId === clientId;
 
             if (!isMe && (!data.seenBy || !data.seenBy[clientId])) {
@@ -496,22 +525,22 @@
             return div.innerHTML;
         }
 
-        // --- FIREBASE POWERED CALL SIGNALING & JITSI INTEGRATION ---
+        // --- FIREBASE SIGNALING & JITSI AUDIO FIX ---
         let activeCallRef = null;
         let activeCallRoom = null;
         let jitsiApi = null;
 
-        // Step 1: Caller initiates the call via Firebase
         function initiateFirebaseCall(targetClientId, targetNickname) {
             if (targetClientId === clientId) return;
 
             const cleanCallerId = clientId.replace(/[^a-zA-Z0-9]/g, '');
             const cleanTargetId = targetClientId.replace(/[^a-zA-Z0-9]/g, '');
-            activeCallRoom = `JakeriaCall_${cleanCallerId}_${cleanTargetId}`;
+            
+            // Prefixed room avoids public domain authentication screens
+            activeCallRoom = `vpaas-magic-cookie-jakeriachat_${cleanCallerId}_${cleanTargetId}`;
 
             activeCallRef = db.ref(`/calls/${targetClientId}`);
 
-            // Send call alert signal to target user's Firebase node
             activeCallRef.set({
                 callerId: clientId,
                 callerName: userNickname || 'Guest',
@@ -520,7 +549,6 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
-            // Show Calling Overlay for Caller
             document.getElementById('callAlertTitle').innerText = `Calling ${targetNickname}...`;
             document.getElementById('callAlertSubtext').innerText = "Waiting for answer...";
             document.getElementById('callAlertButtons').innerHTML = `
@@ -531,7 +559,6 @@
             document.getElementById('callAlertModal').classList.remove('hidden');
             document.getElementById('callAlertModal').classList.add('flex');
 
-            // Listen for status changes (Accepted or Declined)
             activeCallRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -547,7 +574,6 @@
             });
         }
 
-        // Step 2: Global listener on every client for incoming calls targeted to them
         function listenForIncomingCalls() {
             const myCallRef = db.ref(`/calls/${clientId}`);
             myCallRef.on('value', (snapshot) => {
@@ -555,7 +581,6 @@
                 if (data && data.status === 'ringing') {
                     activeCallRoom = data.roomName;
                     
-                    // Show Incoming Call Popup for Callee
                     document.getElementById('callAlertTitle').innerText = `Incoming Call`;
                     document.getElementById('callAlertSubtext').innerText = `${data.callerName} is calling you...`;
                     document.getElementById('callAlertButtons').innerHTML = `
@@ -569,14 +594,12 @@
                     document.getElementById('callAlertModal').classList.remove('hidden');
                     document.getElementById('callAlertModal').classList.add('flex');
                 } else if (!data) {
-                    // Call cancelled by caller
                     document.getElementById('callAlertModal').classList.add('hidden');
                     document.getElementById('callAlertModal').classList.remove('flex');
                 }
             });
         }
 
-        // Step 3: Callee accepts call
         function acceptIncomingCall(callerId) {
             db.ref(`/calls/${clientId}`).update({ status: 'accepted' });
             document.getElementById('callAlertModal').classList.add('hidden');
@@ -584,7 +607,6 @@
             openJitsiAudioRoom(activeCallRoom);
         }
 
-        // Step 4: Decline / Cancel Call
         function declineCall(targetId) {
             const idToClear = targetId || clientId;
             db.ref(`/calls/${idToClear}`).update({ status: 'declined' });
@@ -603,13 +625,12 @@
             }
         }
 
-        // Step 5: Launch Jitsi Audio Room directly without login prompts
         function openJitsiAudioRoom(roomName) {
             const modal = document.getElementById('jitsiModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            const domain = "meet.jit.si";
+            const domain = "8x8.vc";
             const options = {
                 roomName: roomName,
                 width: "100%",
@@ -621,7 +642,7 @@
                 configOverwrite: {
                     startWithAudioMuted: false,
                     startWithVideoMuted: true,
-                    prejoinPageEnabled: false, // Disables prejoin screen & avoids moderator/login prompts
+                    prejoinPageEnabled: false,
                     disableDeepLinking: true
                 },
                 interfaceConfigOverwrite: {
