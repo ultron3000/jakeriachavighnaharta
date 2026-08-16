@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>जकेरियाचा विघ्नहर्ता - Community Chat</title>
+    <title>जकेरियाचा विघ्नहर्ता - Community Chat & Calls</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
@@ -50,8 +50,27 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <!-- Jitsi Meet External API for Free Audio Calling -->
+    <script src="https://meet.jit.si/external_api.js"></script>
 </head>
 <body class="flex items-center justify-center sm:p-4">
+
+    <!-- Jitsi Audio Call Modal Overlay -->
+    <div id="jitsiModal" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center p-2 sm:p-4">
+        <div class="w-full max-w-md h-[80vh] bg-stone-900 rounded-3xl overflow-hidden border border-amber-500/40 flex flex-col relative shadow-2xl">
+            <div class="p-3 bg-black/80 border-b border-amber-500/20 flex justify-between items-center shrink-0">
+                <span class="text-xs text-amber-300 font-semibold flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Audio Call Active
+                </span>
+                <button onclick="closeAudioCall()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition">
+                    End Call ✕
+                </button>
+            </div>
+            <!-- Jitsi Call iFrame Container -->
+            <div id="jitsiContainer" class="w-full flex-1 bg-black"></div>
+        </div>
+    </div>
 
     <!-- Nickname Selection Modal -->
     <div id="nicknameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
@@ -154,6 +173,7 @@
     </div>
 
     <script>
+        // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
             authDomain: "ultron-85fba.firebaseapp.com",
@@ -192,12 +212,11 @@
 
         // --- 5 MINUTE IDLE AUTO-CLEAR TIMEOUT ---
         let idleTimer = null;
-        const IDLE_LIMIT = 5 * 60 * 1000; // 5 Minutes in ms
+        const IDLE_LIMIT = 5 * 60 * 1000;
 
         function resetIdleTimer() {
             clearTimeout(idleTimer);
             idleTimer = setTimeout(() => {
-                // Clear UI local chat box to free memory after 5 min idle
                 const chatBox = document.getElementById('chatBox');
                 if (chatBox) {
                     chatBox.innerHTML = `
@@ -214,6 +233,7 @@
         });
         resetIdleTimer();
 
+        // --- USER MODAL CONTROLS ---
         function openNicknameModal() {
             document.getElementById('nicknameInput').value = userNickname || '';
             document.getElementById('nicknameModal').classList.remove('hidden');
@@ -263,7 +283,7 @@
             listenToMessages();
         }
 
-        // --- WHATSAPP STYLE: SENDER-ONLY DELETE ---
+        // --- WHATSAPP-STYLE SENDER-ONLY DELETION ---
         function deleteSingleMessage(msgKey) {
             if (confirm("Delete this message for everyone?")) {
                 db.ref(`/rooms/${currentRoom}/messages/${msgKey}`).remove()
@@ -271,7 +291,7 @@
             }
         }
 
-        // Online Presence Tracker
+        // --- ONLINE HEARTBEAT COUNTER ---
         function startHeartbeat() {
             const statusRef = db.ref('/status/' + clientId);
             
@@ -280,7 +300,7 @@
                     nickname: userNickname || 'Guest',
                     lastPing: Date.now()
                 }).catch((err) => {
-                    showError("⚠️ Firebase Database Permission Error! Set rules to true.");
+                    showError("⚠️ Permission Error! Ensure Database Rules are published.");
                 });
             }
 
@@ -302,6 +322,7 @@
             });
         }
 
+        // --- CHAT MESSAGING ENGINE ---
         let replyingTo = null;
 
         function setReply(sender, text) {
@@ -330,7 +351,7 @@
                 clientId: clientId,
                 sender: userNickname,
                 text: message,
-                seenBy: { [clientId]: true }, // Mark sender as seen
+                seenBy: { [clientId]: true },
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
@@ -370,7 +391,6 @@
 
             activeQueryRef = roomRef.limitToLast(60);
 
-            // Listen for added or updated messages (for seen status updates)
             activeQueryRef.on('child_added', (snapshot) => {
                 renderOrUpdateMessage(snapshot);
             });
@@ -382,9 +402,7 @@
             roomRef.on('child_removed', (snapshot) => {
                 const removedKey = snapshot.key;
                 const el = document.getElementById(`msg-${removedKey}`);
-                if (el) {
-                    el.remove();
-                }
+                if (el) el.remove();
             });
         }
 
@@ -393,7 +411,7 @@
             const msgKey = snapshot.key;
             const isMe = data.clientId === clientId;
 
-            // Automatically mark message as Seen if opened by someone else
+            // Automatically mark message as Seen
             if (!isMe && (!data.seenBy || !data.seenBy[clientId])) {
                 db.ref(`/rooms/${currentRoom}/messages/${msgKey}/seenBy/${clientId}`).set(true);
             }
@@ -403,10 +421,8 @@
             if (isMe) {
                 const seenCount = data.seenBy ? Object.keys(data.seenBy).length : 1;
                 if (seenCount > 1) {
-                    // Double Blue Tick (Read)
                     tickHTML = `<span class="text-sky-400 font-bold ml-1" title="Seen">✓✓</span>`;
                 } else {
-                    // Single Gray Tick (Sent)
                     tickHTML = `<span class="text-stone-900/60 font-bold ml-1" title="Sent">✓</span>`;
                 }
             }
@@ -420,11 +436,15 @@
                 `;
             }
 
+            // Audio Call Button next to other users
+            const callBtnHTML = !isMe 
+                ? `<button onclick="startAudioCall('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" title="Call ${escapeHtml(data.sender)}" class="ml-1.5 px-1 text-green-400 hover:text-green-300 text-xs">📞</button>`
+                : '';
+
             const senderLabel = isMe 
                 ? `You (${escapeHtml(data.sender)})` 
-                : `<button onclick="startPrivateChatWith('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" class="hover:underline text-amber-300">${escapeHtml(data.sender)} 🔒</button>`;
+                : `<button onclick="startPrivateChatWith('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" class="hover:underline text-amber-300">${escapeHtml(data.sender)} 🔒</button> ${callBtnHTML}`;
 
-            // WhatsApp Style: Delete option visible ONLY to the message sender
             const deleteBtnHTML = isMe 
                 ? `<button onclick="deleteSingleMessage('${msgKey}')" title="Delete Message" class="text-[9px] text-red-400/80 hover:text-red-300 mt-0.5 px-1">🗑️ Delete</button>`
                 : '';
@@ -441,7 +461,7 @@
             msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
             msgDiv.innerHTML = `
                 <div class="flex items-center gap-1.5 mb-0.5 px-1">
-                    <span class="text-[10px] text-amber-500/70 font-semibold">${senderLabel}</span>
+                    <span class="text-[10px] text-amber-500/70 font-semibold flex items-center">${senderLabel}</span>
                 </div>
                 <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words relative flex flex-col">
                     ${replyHTML}
@@ -470,6 +490,74 @@
             return div.innerHTML;
         }
 
+        // --- JITSI AUDIO CALLING INTEGRATION ---
+        let jitsiApi = null;
+
+        function startAudioCall(targetClientId, targetNickname) {
+            if (targetClientId === clientId) return;
+
+            const sortedIds = [clientId, targetClientId].sort();
+            const callRoomName = `JakeriaCall_${sortedIds[0]}_${sortedIds[1]}`;
+
+            // Send invitation notification to chat
+            const inviteText = `📞 Audio Call starting with ${targetNickname}...`;
+            
+            db.ref(`/rooms/${currentRoom}/messages`).push({
+                clientId: clientId,
+                sender: userNickname,
+                text: inviteText,
+                seenBy: { [clientId]: true },
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            openJitsiCall(callRoomName);
+        }
+
+        function openJitsiCall(roomName) {
+            const modal = document.getElementById('jitsiModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const domain = "meet.jit.si";
+            const options = {
+                roomName: roomName,
+                width: "100%",
+                height: "100%",
+                parentNode: document.getElementById('jitsiContainer'),
+                userInfo: {
+                    displayName: userNickname || "Guest"
+                },
+                configOverwrite: {
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: true, // Force Audio-only call
+                    disableDeepLinking: true
+                },
+                interfaceConfigOverwrite: {
+                    TOOLBAR_BUTTONS: ['microphone', 'hangup', 'tileview']
+                }
+            };
+
+            if (jitsiApi) jitsiApi.dispose();
+
+            jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+            jitsiApi.addEventListener('readyToClose', () => {
+                closeAudioCall();
+            });
+        }
+
+        function closeAudioCall() {
+            if (jitsiApi) {
+                jitsiApi.dispose();
+                jitsiApi = null;
+            }
+            const modal = document.getElementById('jitsiModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('jitsiContainer').innerHTML = '';
+        }
+
+        // Start Core Services
         startHeartbeat();
         listenToMessages();
     </script>
