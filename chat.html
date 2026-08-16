@@ -64,7 +64,7 @@
 </head>
 <body class="flex items-center justify-center sm:p-4">
 
-    <!-- INCOMING / OUTGOING CALL ALERT MODAL (FIREBASE POWERED) -->
+    <!-- INCOMING / OUTGOING CALL ALERT MODAL -->
     <div id="callAlertModal" class="fixed inset-0 z-[70] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center p-4">
         <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl flex flex-col items-center">
             <div id="callAvatar" class="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-500 rounded-full flex items-center justify-center text-emerald-400 text-3xl font-bold mb-4 call-pulse">
@@ -74,12 +74,7 @@
             <p id="callAlertSubtext" class="text-xs text-amber-500/80 mb-6">User is calling you for an audio chat</p>
             
             <div id="callAlertButtons" class="flex gap-3 w-full">
-                <button id="acceptCallBtn" onclick="acceptIncomingCall()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
-                    Accept Call
-                </button>
-                <button onclick="declineCall()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
-                    Decline
-                </button>
+                <!-- Accept / Decline buttons rendered dynamically -->
             </div>
         </div>
     </div>
@@ -318,7 +313,7 @@
                     nickname: userNickname || 'Guest',
                     lastPing: Date.now()
                 }).catch((err) => {
-                    showError("⚠️ Permission Error! Set Database Rules to true.");
+                    showError("⚠️ Permission Error! Check Database Rules.");
                 });
             }
 
@@ -510,13 +505,13 @@
         function initiateFirebaseCall(targetClientId, targetNickname) {
             if (targetClientId === clientId) return;
 
-            // Generate clean room ID without special characters
-            const rawRoom = `JakeriaCall${clientId}${targetClientId}`.replace(/[^a-zA-Z0-9]/g, '');
-            activeCallRoom = rawRoom;
+            const cleanCallerId = clientId.replace(/[^a-zA-Z0-9]/g, '');
+            const cleanTargetId = targetClientId.replace(/[^a-zA-Z0-9]/g, '');
+            activeCallRoom = `JakeriaCall_${cleanCallerId}_${cleanTargetId}`;
 
             activeCallRef = db.ref(`/calls/${targetClientId}`);
 
-            // Send call alert signal to receiver's Firebase node
+            // Send call alert signal to target user's Firebase node
             activeCallRef.set({
                 callerId: clientId,
                 callerName: userNickname || 'Guest',
@@ -529,7 +524,7 @@
             document.getElementById('callAlertTitle').innerText = `Calling ${targetNickname}...`;
             document.getElementById('callAlertSubtext').innerText = "Waiting for answer...";
             document.getElementById('callAlertButtons').innerHTML = `
-                <button onclick="declineCall()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition">
+                <button onclick="declineCall('${targetClientId}')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition">
                     Cancel Call
                 </button>
             `;
@@ -546,13 +541,13 @@
                         openJitsiAudioRoom(activeCallRoom);
                     } else if (data.status === 'declined') {
                         alert(`${targetNickname} declined the call.`);
-                        closeCallAlertUI();
+                        closeCallAlertUI(targetClientId);
                     }
                 }
             });
         }
 
-        // Step 2: Global listener for incoming call alerts on this device
+        // Step 2: Global listener on every client for incoming calls targeted to them
         function listenForIncomingCalls() {
             const myCallRef = db.ref(`/calls/${clientId}`);
             myCallRef.on('value', (snapshot) => {
@@ -564,10 +559,10 @@
                     document.getElementById('callAlertTitle').innerText = `Incoming Call`;
                     document.getElementById('callAlertSubtext').innerText = `${data.callerName} is calling you...`;
                     document.getElementById('callAlertButtons').innerHTML = `
-                        <button onclick="acceptIncomingCall()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                        <button onclick="acceptIncomingCall('${data.callerId}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
                             Accept Call
                         </button>
-                        <button onclick="declineCall()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                        <button onclick="declineCall('${clientId}')" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
                             Decline
                         </button>
                     `;
@@ -582,7 +577,7 @@
         }
 
         // Step 3: Callee accepts call
-        function acceptIncomingCall() {
+        function acceptIncomingCall(callerId) {
             db.ref(`/calls/${clientId}`).update({ status: 'accepted' });
             document.getElementById('callAlertModal').classList.add('hidden');
             document.getElementById('callAlertModal').classList.remove('flex');
@@ -590,23 +585,25 @@
         }
 
         // Step 4: Decline / Cancel Call
-        function declineCall() {
-            if (activeCallRef) {
-                activeCallRef.update({ status: 'declined' });
-                setTimeout(() => activeCallRef.remove(), 1000);
-            }
-            db.ref(`/calls/${clientId}`).remove();
-            closeCallAlertUI();
+        function declineCall(targetId) {
+            const idToClear = targetId || clientId;
+            db.ref(`/calls/${idToClear}`).update({ status: 'declined' });
+            setTimeout(() => {
+                db.ref(`/calls/${idToClear}`).remove();
+            }, 500);
+            closeCallAlertUI(idToClear);
         }
 
-        function closeCallAlertUI() {
+        function closeCallAlertUI(targetId) {
             document.getElementById('callAlertModal').classList.add('hidden');
             document.getElementById('callAlertModal').classList.remove('flex');
-            if (activeCallRef) activeCallRef.off();
-            activeCallRef = null;
+            if (activeCallRef) {
+                activeCallRef.off();
+                activeCallRef = null;
+            }
         }
 
-        // Step 5: Launch Jitsi Audio Room (Fixed parameters so no login is requested)
+        // Step 5: Launch Jitsi Audio Room directly without login prompts
         function openJitsiAudioRoom(roomName) {
             const modal = document.getElementById('jitsiModal');
             modal.classList.remove('hidden');
@@ -624,7 +621,7 @@
                 configOverwrite: {
                     startWithAudioMuted: false,
                     startWithVideoMuted: true,
-                    prejoinPageEnabled: false, // Bypass prejoin screen to prevent login prompt
+                    prejoinPageEnabled: false, // Disables prejoin screen & avoids moderator/login prompts
                     disableDeepLinking: true
                 },
                 interfaceConfigOverwrite: {
