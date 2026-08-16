@@ -3,47 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>जकेरियाचा विघ्नहर्ता - Global Community Chat</title>
+    <title>जकेरियाचा विघ्नहर्ता - Community Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
         
-        * {
-            -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: radial-gradient(circle at top, #800c1b 0%, #380209 100%);
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-        }
-
-        html {
-            height: -webkit-fill-available;
-        }
-
-        .chat-card {
-            background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
-                        0 0 40px rgba(212, 163, 89, 0.15);
-        }
-
-        .scroll-smooth-ios {
-            -webkit-overflow-scrolling: touch;
-        }
-
-        #chatBox::-webkit-scrollbar {
-            width: 4px;
-        }
-        #chatBox::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        #chatBox::-webkit-scrollbar-thumb {
-            background: rgba(212, 163, 89, 0.4);
-            border-radius: 4px;
-        }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: radial-gradient(circle at top, #800c1b 0%, #380209 100%); min-height: 100vh; }
+        .chat-card { background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); }
+        .scroll-smooth-ios { -webkit-overflow-scrolling: touch; }
+        #chatBox::-webkit-scrollbar { width: 4px; }
+        #chatBox::-webkit-scrollbar-thumb { background: rgba(212, 163, 89, 0.4); border-radius: 4px; }
     </style>
 
     <!-- Firebase SDKs -->
@@ -57,11 +27,10 @@
         <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
             <h2 class="text-amber-300 text-lg font-semibold mb-1">Enter Your Name</h2>
             <p class="text-xs text-amber-500/70 mb-4">Choose a nickname so others know who is chatting!</p>
-            <input type="text" id="nicknameInput" placeholder="e.g. Rahul, Amit..." 
-                   maxlength="18"
+            <input type="text" id="nicknameInput" placeholder="e.g. Rahul, Amit..." maxlength="18"
                    class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 text-sm mb-4">
             <button onclick="saveNickname()" 
-                    class="w-full bg-gradient-to-r from-amber-400 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 text-stone-950 font-bold py-3 rounded-xl transition text-sm">
+                    class="w-full bg-gradient-to-r from-amber-400 to-yellow-600 text-stone-950 font-bold py-3 rounded-xl text-sm">
                 Join Chat Room
             </button>
         </div>
@@ -81,7 +50,6 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <!-- Live Counter -->
                 <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-full border border-amber-500/20">
                     <span class="relative flex h-2.5 w-2.5">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -92,10 +60,13 @@
             </div>
         </div>
 
+        <!-- On-Screen Debugger (Alerts if Firebase Rules are blocking access) -->
+        <div id="debugBox" class="hidden bg-red-900/50 border border-red-500/50 text-red-200 text-xs p-2.5 rounded-xl my-2 text-center font-medium"></div>
+
         <!-- Chat Container -->
         <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1 scroll-smooth-ios"></div>
 
-        <!-- Replying To Preview Indicator -->
+        <!-- Reply Preview Banner -->
         <div id="replyPreview" class="hidden bg-black/60 border-l-2 border-amber-400 px-3 py-1.5 text-xs text-amber-200/80 flex justify-between items-center rounded-r-lg mb-1">
             <span id="replyText" class="truncate">Replying to...</span>
             <button onclick="cancelReply()" class="text-amber-500/70 hover:text-amber-300 ml-2 font-bold">✕</button>
@@ -103,11 +74,10 @@
 
         <!-- Input Box -->
         <div class="pt-2 border-t border-amber-500/20 flex gap-2 z-10">
-            <input type="text" id="messageInput" placeholder="Write a message..." 
-                   autocomplete="off"
+            <input type="text" id="messageInput" placeholder="Write a message..." autocomplete="off"
                    class="flex-1 bg-black/50 border border-amber-500/30 rounded-xl px-4 py-3 text-white placeholder-amber-900/50 focus:outline-none focus:border-amber-400 text-sm">
             <button onclick="sendMessage()" 
-                    class="bg-gradient-to-r from-amber-400 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 active:scale-95 text-stone-950 font-bold px-5 py-3 rounded-xl transition text-sm flex items-center justify-center shadow-lg">
+                    class="bg-gradient-to-r from-amber-400 to-yellow-600 active:scale-95 text-stone-950 font-bold px-5 py-3 rounded-xl transition text-sm flex items-center justify-center shadow-lg">
                 Send
             </button>
         </div>
@@ -129,11 +99,17 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. Client Identifier & Nickname Handling
-        let clientId = localStorage.getItem('chat_client_id');
+        function showError(msg) {
+            const box = document.getElementById('debugBox');
+            box.innerText = msg;
+            box.classList.remove('hidden');
+        }
+
+        // Unique session identifier per tab/browser
+        let clientId = sessionStorage.getItem('chat_client_id');
         if (!clientId) {
             clientId = 'usr_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('chat_client_id', clientId);
+            sessionStorage.setItem('chat_client_id', clientId);
         }
 
         let userNickname = localStorage.getItem('chat_nickname');
@@ -160,7 +136,7 @@
             document.getElementById('currentUserBadge').innerText = `You are: ${userNickname}`;
         }
 
-        // 2. Robust Real-Time Heartbeat Presence Counter
+        // Real-Time Heartbeat Tracker
         function startHeartbeat() {
             const statusRef = db.ref('/status/' + clientId);
             
@@ -168,35 +144,32 @@
                 statusRef.set({
                     nickname: userNickname || 'Guest',
                     lastPing: Date.now()
+                }).catch((err) => {
+                    showError("⚠️ Database Rules Error! Please complete Step 1 to set rules to true.");
                 });
             }
 
-            // Send ping every 5 seconds
             updateStatus();
-            setInterval(updateStatus, 5000);
+            setInterval(updateStatus, 4000);
 
-            // Remove on window close
-            window.addEventListener('beforeunload', () => {
-                statusRef.remove();
-            });
+            window.addEventListener('beforeunload', () => { statusRef.remove(); });
 
-            // Listen for active users (pinged in last 12 seconds)
             db.ref('/status').on('value', (snapshot) => {
                 const now = Date.now();
                 let activeCount = 0;
-                
                 snapshot.forEach((child) => {
                     const data = child.val();
-                    if (data && data.lastPing && (now - data.lastPing < 12000)) {
+                    if (data && data.lastPing && (now - data.lastPing < 10000)) {
                         activeCount++;
                     }
                 });
-
                 document.getElementById('onlineCount').innerText = `${Math.max(1, activeCount)} Online`;
+            }, (err) => {
+                showError("Read Error: " + err.message);
             });
         }
 
-        // 3. Reply Feature Variables
+        // Reply System
         let replyingTo = null;
 
         function setReply(sender, text) {
@@ -210,7 +183,7 @@
             document.getElementById('replyPreview').classList.add('hidden');
         }
 
-        // 4. Send Message Function
+        // Send Message
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
@@ -233,7 +206,9 @@
                 msgData.replyTo = replyingTo;
             }
 
-            db.ref('/messages').push(msgData);
+            db.ref('/messages').push(msgData).catch((err) => {
+                showError("Send Failed: Check Firebase Database Rules.");
+            });
 
             input.value = '';
             cancelReply();
@@ -243,7 +218,7 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // 5. Render Messages with Replies & Nicknames
+        // Listen for Real-Time Messages
         function listenToMessages() {
             const chatBox = document.getElementById('chatBox');
             const messagesRef = db.ref('/messages').limitToLast(60);
@@ -268,7 +243,7 @@
                     <div class="flex items-center gap-1.5 mb-0.5 px-1">
                         <span class="text-[10px] text-amber-500/70 font-semibold">${isMe ? 'You (' + escapeHtml(data.sender) + ')' : escapeHtml(data.sender)}</span>
                     </div>
-                    <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words relative group">
+                    <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words relative">
                         ${replyHTML}
                         <div>${escapeHtml(data.text)}</div>
                     </div>
@@ -288,7 +263,6 @@
             return div.innerHTML;
         }
 
-        // Initialize App
         startHeartbeat();
         listenToMessages();
     </script>
