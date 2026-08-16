@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Community Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top, #800c1b 0%, #380209 100%);
+            min-height: 100vh;
+        }
+
+        .chat-card {
+            background: linear-gradient(145deg, rgba(40, 3, 7, 0.9) 0%, rgba(20, 1, 3, 0.95) 100%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                        0 0 40px rgba(212, 163, 89, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        #chatBox::-webkit-scrollbar {
+            width: 5px;
+        }
+        #chatBox::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        #chatBox::-webkit-scrollbar-thumb {
+            background: rgba(212, 163, 89, 0.4);
+            border-radius: 4px;
+        }
+    </style>
+
+    <!-- Firebase SDK (v9 Compatibility Mode) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body class="flex items-center justify-center p-2 sm:p-4">
+
+    <!-- App Container -->
+    <div class="w-full max-w-md chat-card rounded-3xl p-4 sm:p-6 border border-amber-500/30 flex flex-col h-[92vh]">
+        
+        <!-- Header with Live Counter -->
+        <div class="pb-3 border-b border-amber-500/20 flex items-center justify-between">
+            <div>
+                <h1 class="text-amber-300 text-lg font-semibold tracking-wide">जकेरियाचा विघ्नहर्ता Chat</h1>
+                <p class="text-xs text-amber-500/70">Public Community Room</p>
+            </div>
+            
+            <!-- Online Users Indicator -->
+            <div class="flex items-center space-x-2 bg-black/40 px-3 py-1.5 rounded-full border border-amber-500/20">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span id="onlineCount" class="text-xs text-emerald-400 font-medium">0 Online</span>
+            </div>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chatBox" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
+            <div class="text-center text-xs text-amber-400/50 my-2">
+                Connecting to room...
+            </div>
+        </div>
+
+        <!-- Input Box & Actions -->
+        <div class="pt-3 border-t border-amber-500/20 flex gap-2">
+            <input type="text" id="messageInput" placeholder="Type a message..." 
+                   class="flex-1 bg-black/40 border border-amber-500/30 rounded-xl px-4 py-2.5 text-white placeholder-amber-900/50 focus:outline-none focus:border-amber-400 text-sm">
+            <button onclick="sendMessage()" 
+                    class="bg-gradient-to-r from-amber-400 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 text-stone-950 font-bold px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center">
+                Send
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Your exact Firebase configuration integrated
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
+            authDomain: "ultron-85fba.firebaseapp.com",
+            databaseURL: "https://ultron-85fba-default-rtdb.firebaseio.com",
+            projectId: "ultron-85fba",
+            storageBucket: "ultron-85fba.firebasestorage.app",
+            messagingSenderId: "727225448009",
+            appId: "1:727225448009:web:e827bd0a819ddae42d3198",
+            measurementId: "G-EEDR5XX34M"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let currentUser = null;
+        let randomDevoteeId = "Devotee_" + Math.floor(1000 + Math.random() * 9000);
+
+        // Anonymous Auth (No user login needed)
+        auth.signInAnonymously().catch(console.error);
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                setupPresence(user.uid);
+                listenToMessages();
+            }
+        });
+
+        // Real-time Presence Counter
+        function setupPresence(uid) {
+            const userStatusRef = db.ref('/status/' + uid);
+            const connectedRef = db.ref('.info/connected');
+            const allStatusRef = db.ref('/status');
+
+            connectedRef.on('value', (snapshot) => {
+                if (snapshot.val() === false) return;
+
+                userStatusRef.onDisconnect().remove().then(() => {
+                    userStatusRef.set({ online: true });
+                });
+            });
+
+            allStatusRef.on('value', (snapshot) => {
+                const count = snapshot.numChildren();
+                document.getElementById('onlineCount').innerText = `${count} Online`;
+            });
+        }
+
+        // Send Message
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message || !currentUser) return;
+
+            db.ref('/messages').push({
+                uid: currentUser.uid,
+                sender: randomDevoteeId,
+                text: message,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            input.value = '';
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Listen for Real-Time Messages
+        function listenToMessages() {
+            const chatBox = document.getElementById('chatBox');
+            const messagesRef = db.ref('/messages').limitToLast(50);
+
+            messagesRef.on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                const isMe = data.uid === (currentUser ? currentUser.uid : null);
+                
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2`;
+
+                msgDiv.innerHTML = `
+                    <span class="text-[10px] text-amber-500/60 mb-0.5 px-1">${isMe ? 'You' : data.sender}</span>
+                    <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/50 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[80%] text-xs shadow-md break-words">
+                        ${escapeHtml(data.text)}
+                    </div>
+                `;
+
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
