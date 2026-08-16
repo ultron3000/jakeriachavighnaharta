@@ -102,6 +102,22 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Pulsing Floating Chat Button Animation */
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(212, 163, 89, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(212, 163, 89, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(212, 163, 89, 0);
+            }
+        }
+        .chat-pulse {
+            animation: pulse-glow 2s infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased selection:bg-amber-500 selection:text-black">
@@ -318,6 +334,55 @@
 
     </main>
 
+    <!-- Floating Bottom-Right Animated Chat Icon & Resizable Popup Window -->
+    <div id="floatingChatWrapper" class="fixed bottom-5 right-5 z-50 flex flex-col items-end">
+        
+        <!-- Hover Tooltip Hint Bubble -->
+        <div id="chatTooltip" class="mb-2 bg-[#2d0206] text-amber-300 border border-amber-500/40 text-xs font-medium py-1.5 px-3 rounded-xl shadow-xl backdrop-blur-md opacity-0 translate-y-2 pointer-events-none transition-all duration-300 flex items-center space-x-2">
+            <span class="marathi-font">समुदाय चर्चा करा!</span>
+            <i class="fas fa-comment-dots text-amber-400"></i>
+        </div>
+
+        <!-- Floating Trigger Button -->
+        <button id="chatToggleBtn" aria-label="Open Community Chat" class="h-14 w-14 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border-2 border-amber-200/60 text-black flex items-center justify-center shadow-2xl chat-pulse hover:scale-110 active:scale-95 transition-all">
+            <i id="chatToggleIcon" class="fas fa-comments text-2xl text-black"></i>
+        </button>
+
+        <!-- Resizable / Pop-up Chat Window Frame -->
+        <div id="chatPopupContainer" class="hidden absolute bottom-16 right-0 w-[92vw] sm:w-[420px] h-[550px] max-h-[80vh] bg-[#1c0205] border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 resize-y">
+            
+            <!-- Popup Header Bar (Drag / Title / Controls) -->
+            <div class="bg-gradient-to-r from-[#2d0206] to-[#45050a] px-4 py-3 border-b border-amber-500/20 flex items-center justify-between select-none">
+                <div class="flex items-center space-x-2">
+                    <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="marathi-font text-sm text-amber-300 font-semibold tracking-wide">समुदाय चर्चा (Chat)</span>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <!-- Expand/Fullscreen Toggle Button -->
+                    <button id="chatExpandBtn" title="Maximize / Restore Size" class="text-stone-400 hover:text-amber-300 p-1.5 transition">
+                        <i class="fas fa-expand-alt text-xs"></i>
+                    </button>
+                    <!-- Close Popup Button -->
+                    <button id="chatCloseBtn" title="Close Chat" class="text-stone-400 hover:text-red-400 p-1.5 transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Content Iframe Loader (Pointing directly to your working GitHub chat URL) -->
+            <div class="flex-1 w-full bg-black/50 relative">
+                <iframe src="https://ultron3000.github.io/jakeriachavighnaharta/chat" class="w-full h-full border-0" title="Community Chat Window"></iframe>
+            </div>
+
+            <!-- Resize Handle Helper Indicator Note -->
+            <div class="bg-[#120102] py-1 px-3 text-[10px] text-stone-500 flex justify-between items-center border-t border-white/5">
+                <span>Drag bottom corner or border to resize</span>
+                <i class="fas fa-arrows-alt text-[9px] text-amber-500/50"></i>
+            </div>
+        </div>
+    </div>
+
     <!-- Global Layout System Footer Element -->
     <footer class="bg-gradient-to-b from-[#1f0205] to-[#0a0001] text-white py-8 border-t border-amber-500/20 text-center">
         <div class="container mx-auto px-4 space-y-3">
@@ -327,8 +392,9 @@
         </div>
     </footer>
 
-    <!-- Hamburger Toggle Script -->
+    <!-- Hamburger & Floating Chat Window Controller Script -->
     <script>
+        // Hamburger Menu Toggle Logic
         const menuBtn = document.getElementById('menuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
         const menuIcon = document.getElementById('menuIcon');
@@ -348,8 +414,65 @@
         window.addEventListener('click', (e) => {
             if (!menuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
                 mobileMenu.classList.add('hidden');
-                menuIcon.classList.remove('fa-times');
-                menuIcon.classList.add('fa-bars');
+                menuIcon.className = 'fas fa-bars text-xl';
+            }
+        });
+
+        // Floating Chat Popup & Hover Tooltip Logic
+        const chatToggleBtn = document.getElementById('chatToggleBtn');
+        const chatPopupContainer = document.getElementById('chatPopupContainer');
+        const chatCloseBtn = document.getElementById('chatCloseBtn');
+        const chatToggleIcon = document.getElementById('chatToggleIcon');
+        const chatTooltip = document.getElementById('chatTooltip');
+        const chatExpandBtn = document.getElementById('chatExpandBtn');
+
+        // Show tooltip on hover
+        chatToggleBtn.addEventListener('mouseenter', () => {
+            if (chatPopupContainer.classList.contains('hidden')) {
+                chatTooltip.classList.remove('opacity-0', 'translate-y-2');
+                chatTooltip.classList.add('opacity-100', 'translate-y-0');
+            }
+        });
+        chatToggleBtn.addEventListener('mouseleave', () => {
+            chatTooltip.classList.remove('opacity-100', 'translate-y-0');
+            chatTooltip.classList.add('opacity-0', 'translate-y-2');
+        });
+
+        // Toggle Chat Popup Window
+        chatToggleBtn.addEventListener('click', () => {
+            chatTooltip.classList.remove('opacity-100', 'translate-y-0');
+            chatTooltip.classList.add('opacity-0', 'translate-y-2');
+            
+            chatPopupContainer.classList.toggle('hidden');
+            if (chatPopupContainer.classList.contains('hidden')) {
+                chatToggleIcon.className = 'fas fa-comments text-2xl text-black';
+            } else {
+                chatToggleIcon.className = 'fas fa-times text-2xl text-black';
+            }
+        });
+
+        // Close Chat Window Button
+        chatCloseBtn.addEventListener('click', () => {
+            chatPopupContainer.classList.add('hidden');
+            chatToggleIcon.className = 'fas fa-comments text-2xl text-black';
+        });
+
+        // Expand / Maximize Chat Window Toggle
+        let isExpanded = false;
+        chatExpandBtn.addEventListener('click', () => {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                chatPopupContainer.style.width = '96vw';
+                chatPopupContainer.style.height = '85vh';
+                chatPopupContainer.style.bottom = '10px';
+                chatPopupContainer.style.right = '2vw';
+                chatExpandBtn.innerHTML = '<i class="fas fa-compress-alt text-xs"></i>';
+            } else {
+                chatPopupContainer.style.width = '';
+                chatPopupContainer.style.height = '550px';
+                chatPopupContainer.style.bottom = '';
+                chatPopupContainer.style.right = '';
+                chatExpandBtn.innerHTML = '<i class="fas fa-expand-alt text-xs"></i>';
             }
         });
     </script>
@@ -367,239 +490,6 @@
         });
     </script>
     <!-- Disable DevTools + View Source Protection -->
-<script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
-
-<script>
-/* =========================
-   Mobile Detection
-========================= */
-const isMobile =
-    /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-
-/* =========================
-   Disable DevTools
-========================= */
-DisableDevtool({
-    disable: true,
-    disableMenu: true,
-    clearLog: true,
-    disableSelect: true,
-    disableCopy: true,
-    disableCut: true,
-    disablePaste: true,
-
-    /* FIXED */
-    disableMobile: false,
-
-    interval: 100,
-
-    ondevtoolopen: function () {
-
-        /* ONLY DESKTOP */
-        if (!isMobile) {
-            document.body.innerHTML = "";
-            window.location.replace("about:blank");
-        }
-    }
-});
-
-/* =========================
-   Block View Source Shortcuts
-========================= */
-document.addEventListener("keydown", function (e) {
-
-    // F12
-    if (e.key === "F12") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+U
-    if (e.ctrlKey && e.key.toLowerCase() === "u") {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-
-    // Ctrl+Shift+I
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+Shift+J
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "j") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+Shift+C
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+S
-    if (e.ctrlKey && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+P
-    if (e.ctrlKey && e.key.toLowerCase() === "p") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+A
-    if (e.ctrlKey && e.key.toLowerCase() === "a") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+C
-    if (e.ctrlKey && e.key.toLowerCase() === "c") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+X
-    if (e.ctrlKey && e.key.toLowerCase() === "x") {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl+V
-    if (e.ctrlKey && e.key.toLowerCase() === "v") {
-        e.preventDefault();
-        return false;
-    }
-});
-
-/* =========================
-   Disable Right Click
-========================= */
-document.addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-});
-
-/* =========================
-   Disable Dragging
-========================= */
-document.addEventListener("dragstart", function (e) {
-    e.preventDefault();
-});
-
-/* =========================
-   Disable Selection
-========================= */
-document.addEventListener("selectstart", function (e) {
-    e.preventDefault();
-});
-
-/* =========================
-   Disable Copy Actions
-========================= */
-["copy", "cut", "paste"].forEach(function(evt) {
-
-    document.addEventListener(evt, function(e) {
-        e.preventDefault();
-    });
-
-});
-
-/* =========================
-   Detect DevTools Window
-   (Desktop ONLY - FIXED)
-========================= */
-if (!isMobile) {
-
-    setInterval(function () {
-
-        const widthThreshold =
-            window.outerWidth - window.innerWidth > 220;
-
-        const heightThreshold =
-            window.outerHeight - window.innerHeight > 220;
-
-        if (widthThreshold || heightThreshold) {
-
-            document.body.innerHTML = "";
-            window.location.replace("about:blank");
-        }
-
-    }, 1500);
-
-}
-
-/* =========================
-   Disable Console
-========================= */
-(function () {
-
-    console.clear();
-
-    function block() {
-        return false;
-    }
-
-    console.log = block;
-    console.warn = block;
-    console.error = block;
-    console.info = block;
-    console.debug = block;
-    console.table = block;
-
-})();
-
-/* =========================
-   Block "view-source:"
-========================= */
-if (window.location.href.startsWith("view-source:")) {
-
-    document.body.innerHTML = "";
-    window.location.replace("about:blank");
-
-}
-
-/* =========================
-   Prevent iframe inspection
-========================= */
-if (window.top !== window.self) {
-
-    try {
-        window.top.location = window.self.location;
-    } catch (e) {}
-
-}
-</script>
-
-<style>
-html, body {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    overflow-x: hidden;
-}
-
-/* Disable image dragging */
-img {
-    pointer-events: none;
-    -webkit-user-drag: none;
-}
-
-/* Hide selection */
-::selection {
-    background: transparent;
-}
-</style>
-
-
-
-<!-- Disable DevTools + View Source Protection -->
 <script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
 
 <script>
