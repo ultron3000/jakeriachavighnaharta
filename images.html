@@ -194,16 +194,96 @@
 
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 py-8 max-w-5xl flex-grow">
+    <main class="container mx-auto px-4 sm:px-6 py-8 max-w-5xl flex-grow space-y-8">
 
 
        
+        <!-- Year Selection Tabs / Buttons (Ascending Order: 2020, then 2024) -->
+        <div class="flex justify-center items-center gap-3 flex-wrap">
+            <button id="btn-2020" onclick="switchYear('2020')" class="tab-btn active px-6 py-2.5 rounded-xl text-sm font-semibold marathi-font">
+                २०२०
+            </button>
+            <button id="btn-2024" onclick="switchYear('2024')" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold marathi-font text-amber-400/80 hover:text-white bg-white/5 border border-amber-500/20">
+                २०२४
+            </button>
+        </div>
+
+
+        <!-- 2020 Gallery (Default visible in ascending order) -->
+        <div
+            id="gallery-2020"
+            class="year-gallery"
+        >
+
+            <div class="premium-card p-6 sm:p-8 relative max-w-2xl mx-auto">
+
+                <!-- Corner Decorations -->
+                <div class="corner-accent tl"></div>
+                <div class="corner-accent tr"></div>
+                <div class="corner-accent bl"></div>
+                <div class="corner-accent br"></div>
+
+
+                <!-- Icon -->
+                <div class="text-center mb-6">
+
+                    <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-amber-500/10 border border-amber-400/30">
+
+                        <i class="fas fa-images text-3xl text-amber-400"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Title -->
+                <h1 class="marathi-font text-2xl sm:text-3xl text-center text-amber-300 mb-3">
+                    उत्सव २०२०
+                </h1>
+
+
+                <p class="text-center text-stone-400 text-sm mb-8">
+                    २०२० सालातील उत्सवाची छायाचित्रे पाहण्यासाठी खालील बटणावर क्लिक करा.
+                </p>
+
+
+                <!-- Google Drive Button -->
+                <div class="flex justify-center">
+
+                    <a
+                        href="https://drive.google.com/drive/folders/15jwenaz2rsLR5MX2yrqfQGeFhE3Pmukv"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="drive-button inline-flex items-center justify-center gap-3 px-7 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-600 text-[#170103] font-semibold shadow-lg shadow-orange-900/30"
+                    >
+
+                        <i class="fab fa-google-drive text-xl"></i>
+
+                        <span class="marathi-font">
+                            २०२० चे फोटो पहा
+                        </span>
+
+                        <i class="fas fa-external-link-alt text-sm"></i>
+
+                    </a>
+
+                </div>
+
+
+                <!-- Small Note -->
+                <p class="text-center text-stone-500 text-[10px] mt-6">
+                    Google Drive मध्ये छायाचित्रे उघडतील
+                </p>
+
+            </div>
+
+        </div>
 
 
         <!-- 2024 Gallery -->
         <div
             id="gallery-2024"
-            class="year-gallery"
+            class="year-gallery hidden"
         >
 
             <div class="premium-card p-6 sm:p-8 relative max-w-2xl mx-auto">
@@ -312,7 +392,10 @@
 
                 el.classList.add(
                     'text-amber-400/80',
-                    'hover:text-white'
+                    'hover:text-white',
+                    'bg-white/5',
+                    'border',
+                    'border-amber-500/20'
                 );
 
             });
@@ -335,7 +418,10 @@
 
                 activeBtn.classList.remove(
                     'text-amber-400/80',
-                    'hover:text-white'
+                    'hover:text-white',
+                    'bg-white/5',
+                    'border',
+                    'border-amber-500/20'
                 );
 
             }
