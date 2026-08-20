@@ -80,11 +80,25 @@
         .br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
     </style>
 
-    <!-- Firebase SDKs (Compat v9 matching chat.html) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="flex flex-col justify-between min-h-screen">
+
+    <!-- ADMIN PIN LOGIN MODAL -->
+    <div id="adminModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="premium-card p-6 w-full max-w-sm text-center relative">
+            <h2 class="text-amber-300 text-base font-bold mb-1">Admin Authentication</h2>
+            <p class="text-xs text-stone-400 mb-4">Enter admin passcode to manage live events.</p>
+            <input type="password" id="adminPinInput" placeholder="Enter PIN (e.g. 1964)" class="w-full px-4 py-3 text-sm festive-input text-center mb-3">
+            <div id="pinError" class="text-xs text-red-400 mb-2 hidden">Incorrect PIN.</div>
+            <div class="flex gap-2">
+                <button onclick="verifyAdminPin()" class="flex-1 btn-3d py-2.5 rounded-xl text-xs font-semibold">Login</button>
+                <button onclick="closeAdminModal()" class="flex-1 bg-stone-800 text-stone-300 py-2.5 rounded-xl text-xs border border-amber-500/20">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- NAVIGATION BAR -->
     <nav class="w-full bg-black/60 backdrop-blur-md border-b border-amber-500/20 fixed top-0 left-0 z-40 px-4 py-3">
@@ -101,6 +115,9 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <button onclick="openAdminModal()" class="text-xs text-amber-300 hover:text-amber-400 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                    <i class="fas fa-lock mr-1"></i> Admin
+                </button>
                 <a href="https://jakeriachavighnaharta.site.je/" class="text-xs text-stone-300 hover:text-amber-400 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
                     <i class="fas fa-home mr-1"></i> Home
                 </a>
@@ -129,15 +146,34 @@
             </p>
         </section>
 
+        <!-- ADMIN ADD EVENT PANEL (Hidden by default) -->
+        <section id="adminPanel" class="premium-card p-5 mb-6 relative hidden border-amber-400/60">
+            <div class="corner-detail tl"></div>
+            <div class="corner-detail tr"></div>
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xs font-bold text-amber-300 uppercase tracking-wide"><i class="fas fa-plus-circle text-amber-500 mr-1"></i> Add New Event (Admin Mode)</h2>
+                <button onclick="logoutAdmin()" class="text-[10px] text-red-400 hover:underline">Logout Admin</button>
+            </div>
+            <form id="addEventForm" onsubmit="handleAddNewEvent(event)" class="space-y-3">
+                <input type="text" id="newEventTitle" required placeholder="Event Title (e.g. Maha Aarti)" class="w-full px-3.5 py-2 text-xs festive-input">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="newEventDate" required placeholder="Date (e.g. Sept 08)" class="w-full px-3 py-2 text-xs festive-input">
+                    <input type="text" id="newEventTime" required placeholder="Time (e.g. 08:00 PM)" class="w-full px-3 py-2 text-xs festive-input">
+                </div>
+                <input type="text" id="newEventLocation" required placeholder="Location (e.g. Main Mandap)" class="w-full px-3.5 py-2 text-xs festive-input">
+                <textarea id="newEventDesc" rows="2" required placeholder="Short description..." class="w-full px-3.5 py-2 text-xs festive-input resize-none"></textarea>
+                <button type="submit" class="w-full btn-3d font-semibold py-2.5 rounded-xl text-xs">Publish Event to Database</button>
+            </form>
+        </section>
+
         <!-- EVENT LIST SECTION -->
         <div id="eventsList" class="space-y-4 mb-8">
-            <!-- Dynamic events injected here -->
             <div class="premium-card p-6 text-center text-amber-400/80 text-xs">
                 <i class="fas fa-spinner fa-spin mr-2"></i> Loading festival schedule...
             </div>
         </div>
 
-        <!-- EVENT RSVP / REGISTRATION MODAL TRIGGER CARD -->
+        <!-- EVENT RSVP / REGISTRATION FORM -->
         <section class="premium-card p-6 relative">
             <div class="corner-detail tl"></div>
             <div class="corner-detail tr"></div>
@@ -188,7 +224,7 @@
 
     <!-- SCRIPT LOGIC -->
     <script>
-        const WEB3FORMS_KEY = "4f470081-e8f6-4d78-b4ff-f4e08095fed4"; // Matching your submit-media key
+        const WEB3FORMS_KEY = "4f470081-e8f6-4d78-b4ff-f4e08095fed4";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
@@ -204,44 +240,131 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Load Events from Firebase Realtime Database (falling back to default sample items if empty)
+        let isAdminLoggedIn = sessionStorage.getItem('isAdminAuth') === 'true';
+
+        function checkAdminState() {
+            if (isAdminLoggedIn) {
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                document.getElementById('adminPanel').classList.add('hidden');
+            }
+        }
+
+        function openAdminModal() {
+            if (isAdminLoggedIn) {
+                if (confirm("Already logged in as admin. Logout?")) {
+                    logoutAdmin();
+                }
+            } else {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminModal').classList.add('flex');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('adminModal').classList.remove('flex');
+            document.getElementById('pinError').classList.add('hidden');
+            document.getElementById('adminPinInput').value = '';
+        }
+
+        function verifyAdminPin() {
+            const pin = document.getElementById('adminPinInput').value.trim();
+            // Default establishment year passcode: 1964
+            if (pin === "1964") {
+                isAdminLoggedIn = true;
+                sessionStorage.setItem('isAdminAuth', 'true');
+                closeAdminModal();
+                checkAdminState();
+                loadEvents();
+                alert("Admin access granted!");
+            } else {
+                document.getElementById('pinError').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            sessionStorage.removeItem('isAdminAuth');
+            checkAdminState();
+            loadEvents();
+        }
+
         function loadEvents() {
             const container = document.getElementById('eventsList');
-            db.ref('/events').once('value').then(snapshot => {
+            db.ref('/events').on('value', snapshot => {
                 const data = snapshot.val();
                 if (!data) {
-                    // Default fallback events if none created in Firebase console yet
-                    renderEvents([
-                        { title: "गणपती आगमन सोहळा (Aagman)", date: "As per schedule", time: "04:00 PM onwards", location: "Main Mandap", desc: "Welcoming Bappa with traditional Dhol-Tasha and devotional fervor." },
-                        { title: "महाप्रसाद आणि महाआरती", date: "Festival Days", time: "12:30 PM & 08:00 PM", location: "Mandap Premises", desc: "Daily community aarti followed by Mahaprasad distribution." },
-                        { title: "विसर्जन मिरवणूक व सोहळा", date: "Anant Chaturdashi", time: "02:00 PM onwards", location: "Mandap to Immersion Ghat", desc: "Grand procession bidding emotional farewell with 'Pudhchya Varshi Lavkar Ya'." }
-                    ]);
+                    const defaultEvents = {
+                        ev1: { title: "गणपती आगमन सोहळा (Aagman)", date: "As per schedule", time: "04:00 PM onwards", location: "Main Mandap", desc: "Welcoming Bappa with traditional Dhol-Tasha and devotional fervor." },
+                        ev2: { title: "महाप्रसाद आणि महाआरती", date: "Festival Days", time: "12:30 PM & 08:00 PM", location: "Mandap Premises", desc: "Daily community aarti followed by Mahaprasad distribution." },
+                        ev3: { title: "विसर्जन मिरवणूक व सोहळा", date: "Anant Chaturdashi", time: "02:00 PM onwards", location: "Mandap to Immersion Ghat", desc: "Grand procession bidding emotional farewell with 'Pudhchya Varshi Lavkar Ya'." }
+                    };
+                    db.ref('/events').set(defaultEvents);
                 } else {
-                    const list = Object.values(data);
-                    renderEvents(list);
+                    renderEvents(data);
                 }
-            }).catch(err => {
-                container.innerHTML = `<div class="premium-card p-4 text-center text-red-400 text-xs">Failed to load schedule.</div>`;
             });
         }
 
-        function renderEvents(events) {
+        function renderEvents(eventsObj) {
             const container = document.getElementById('eventsList');
-            container.innerHTML = events.map(ev => `
-                <div class="premium-card p-4 relative">
-                    <div class="corner-detail tl"></div>
-                    <div class="corner-detail tr"></div>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-amber-300 text-sm font-semibold">${escapeHtml(ev.title)}</h3>
-                        <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">${escapeHtml(ev.date)}</span>
+            const keys = Object.keys(eventsObj);
+            
+            container.innerHTML = keys.map(key => {
+                const ev = eventsObj[key];
+                const deleteBtnHTML = isAdminLoggedIn 
+                    ? `<button onclick="deleteEvent('${key}')" class="mt-2 text-[10px] bg-red-900/40 border border-red-500/30 text-red-300 px-2.5 py-1 rounded hover:bg-red-600/30"><i class="fas fa-trash mr-1"></i> Delete Event</button>` 
+                    : '';
+
+                return `
+                    <div class="premium-card p-4 relative">
+                        <div class="corner-detail tl"></div>
+                        <div class="corner-detail tr"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-amber-300 text-sm font-semibold">${escapeHtml(ev.title)}</h3>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">${escapeHtml(ev.date)}</span>
+                        </div>
+                        <p class="text-xs text-stone-300 mb-2">${escapeHtml(ev.desc)}</p>
+                        <div class="flex items-center justify-between text-[11px] text-amber-500/80 border-t border-amber-500/10 pt-2">
+                            <div class="flex items-center gap-3">
+                                <span><i class="fas fa-clock mr-1"></i> ${escapeHtml(ev.time)}</span>
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> ${escapeHtml(ev.location)}</span>
+                            </div>
+                        </div>
+                        ${deleteBtnHTML}
                     </div>
-                    <p class="text-xs text-stone-300 mb-2">${escapeHtml(ev.desc)}</p>
-                    <div class="flex items-center gap-4 text-[11px] text-amber-500/80 border-t border-amber-500/10 pt-2">
-                        <span><i class="fas fa-clock mr-1"></i> ${escapeHtml(ev.time)}</span>
-                        <span><i class="fas fa-map-marker-alt mr-1"></i> ${escapeHtml(ev.location)}</span>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+
+        function handleAddNewEvent(e) {
+            e.preventDefault();
+            if (!isAdminLoggedIn) return;
+
+            const newEvent = {
+                title: document.getElementById('newEventTitle').value.trim(),
+                date: document.getElementById('newEventDate').value.trim(),
+                time: document.getElementById('newEventTime').value.trim(),
+                location: document.getElementById('newEventLocation').value.trim(),
+                desc: document.getElementById('newEventDesc').value.trim()
+            };
+
+            db.ref('/events').push(newEvent).then(() => {
+                document.getElementById('addEventForm').reset();
+                alert("Event published successfully!");
+            }).catch(err => {
+                alert("Failed to add event: " + err.message);
+            });
+        }
+
+        function deleteEvent(key) {
+            if (!isAdminLoggedIn) return;
+            if (confirm("Are you sure you want to delete this event?")) {
+                db.ref(`/events/${key}`).remove().catch(err => {
+                    alert("Delete failed: " + err.message);
+                });
+            }
         }
 
         function escapeHtml(text) {
@@ -310,6 +433,7 @@
             document.getElementById('rsvpBtn').innerHTML = '<i class="fas fa-paper-plane mr-1.5"></i> Submit Registration';
         }
 
+        checkAdminState();
         loadEvents();
     </script>
 </body>
