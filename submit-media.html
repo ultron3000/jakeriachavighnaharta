@@ -432,7 +432,6 @@ Submitted At: ${new Date().toLocaleString()}
             disableSelect: true,
             disableCopy: true,
             disableCut: true,
-            disablePaste: true,
             disableMobile: false,
             interval: 100,
             ondevtoolopen: function () {
@@ -444,7 +443,7 @@ Submitted At: ${new Date().toLocaleString()}
         });
 
         document.addEventListener("keydown", function (e) {
-            if (e.key === "F12" || (e.ctrlKey && ['u','i','j','c','s','p','a','x','v'].includes(e.key.toLowerCase()))) {
+            if (e.key === "F12" || (e.ctrlKey && ['u','i','j','c','s','p','a','x'].includes(e.key.toLowerCase()))) {
                 e.preventDefault();
                 return false;
             }
@@ -477,7 +476,6 @@ DisableDevtool({
     disableSelect: true,
     disableCopy: true,
     disableCut: true,
-    disablePaste: true,
 
     /* FIXED */
     disableMobile: false,
@@ -584,16 +582,7 @@ document.addEventListener("selectstart", function (e) {
     e.preventDefault();
 });
 
-/* =========================
-   Disable Copy Actions
-========================= */
-["copy", "cut", "paste"].forEach(function(evt) {
 
-    document.addEventListener(evt, function(e) {
-        e.preventDefault();
-    });
-
-});
 
 /* =========================
    Detect DevTools Window
