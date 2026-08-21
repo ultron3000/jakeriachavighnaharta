@@ -114,6 +114,32 @@
         .calendar-day.active-date.has-event::after {
             background-color: #fff;
         }
+
+        /* 24-Hour Timeline Grid */
+        .time-slot-row {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(212, 163, 89, 0.15);
+            min-height: 44px;
+            transition: background 0.2s ease;
+        }
+        .time-slot-row:hover {
+            background: rgba(217, 119, 6, 0.05);
+        }
+        .slot-booked {
+            background: rgba(194, 24, 91, 0.25) !important;
+            border-left: 3px solid #f59e0b;
+        }
+        .slot-conflict {
+            background: rgba(220, 38, 38, 0.35) !important;
+            border-left: 3px solid #ef4444;
+            animation: pulse-border 1.5s infinite;
+        }
+        @keyframes pulse-border {
+            0% { border-color: rgba(239, 68, 68, 0.4); }
+            50% { border-color: rgba(239, 68, 68, 1); }
+            100% { border-color: rgba(239, 68, 68, 0.4); }
+        }
     </style>
 
     <!-- Firebase SDKs -->
@@ -127,7 +153,7 @@
         <div class="premium-card p-6 w-full max-w-sm text-center relative">
             <h2 class="text-amber-300 text-base font-bold mb-1">Admin Authentication</h2>
             <p class="text-xs text-stone-400 mb-4">Enter admin passcode to manage live events.</p>
-            <input type="password" id="adminPinInput" placeholder="Enter PIN (e.g. 1234)" class="w-full px-4 py-3 text-sm festive-input text-center mb-3">
+            <input type="password" id="adminPinInput" placeholder="Enter PIN" class="w-full px-4 py-3 text-sm festive-input text-center mb-3">
             <div id="pinError" class="text-xs text-red-400 mb-2 hidden">Incorrect PIN.</div>
             <div class="flex gap-2">
                 <button onclick="verifyAdminPin()" class="flex-1 btn-3d py-2.5 rounded-xl text-xs font-semibold">Login</button>
@@ -178,7 +204,7 @@
                 आगामी उत्सव कार्यक्रम व पंचांग
             </h1>
             <p class="text-xs text-stone-300">
-                Select any date on the calendar below to view scheduled rituals, timings, or manage events (Admin).
+                Explore the 24-hour timeline per date to check ritual timings and prevent schedule collisions.
             </p>
         </section>
 
@@ -187,7 +213,6 @@
             <div class="corner-detail tl"></div>
             <div class="corner-detail tr"></div>
             
-            <!-- Calendar Header Controls -->
             <div class="flex items-center justify-between mb-4">
                 <button onclick="changeMonth(-1)" class="p-2 rounded-lg bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 border border-amber-500/30 text-xs">
                     <i class="fas fa-chevron-left"></i>
@@ -198,14 +223,35 @@
                 </button>
             </div>
 
-            <!-- Days of Week Header -->
             <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-amber-500 mb-2 uppercase">
                 <div>सोम</div><div>मंगळ</div><div>बुध</div><div>गुरु</div><div>शुक्र</div><div>शनी</div><div>रवि</div>
             </div>
 
-            <!-- Calendar Grid Days Container -->
             <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5">
-                <!-- Populated dynamically via script -->
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- 24-HOUR AVAILABILITY TIMELINE VISUALIZER -->
+        <section class="premium-card p-5 mb-6 relative">
+            <div class="corner-detail tl"></div>
+            <div class="corner-detail tr"></div>
+            
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-amber-500/20">
+                <div>
+                    <h2 class="text-xs font-bold text-amber-300 uppercase tracking-wide">
+                        <i class="fas fa-clock text-amber-500 mr-1"></i> 24-Hour Slot Availability
+                    </h2>
+                    <p class="text-[10px] text-stone-400" id="timelineSublabel">Showing schedules for selected date</p>
+                </div>
+                <span id="collisionBadge" class="hidden text-[10px] bg-red-950 text-red-300 px-2.5 py-1 rounded-full border border-red-500/40 animate-pulse">
+                    <i class="fas fa-triangle-exclamation mr-1"></i> Time Collision Detected!
+                </span>
+            </div>
+
+            <!-- Scrollable 24-Hour Slot Matrix -->
+            <div id="hourlyTimelineContainer" class="max-h-64 overflow-y-auto pr-1 space-y-1">
+                <!-- Filled dynamically with hours 00:00 to 23:00 -->
             </div>
         </section>
 
@@ -215,14 +261,13 @@
             <div class="corner-detail tr"></div>
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-xs font-bold text-amber-300 uppercase tracking-wide">
-                    <i class="fas fa-plus-circle text-amber-500 mr-1"></i> Manage Event for <span id="selectedDateBadge" class="text-amber-400 underline">Selected Date</span>
+                    <i class="fas fa-plus-circle text-amber-500 mr-1"></i> Add Event for <span id="selectedDateBadge" class="text-amber-400 underline">Selected Date</span>
                 </h2>
                 <button onclick="logoutAdmin()" class="text-[10px] text-red-400 hover:underline">Logout Admin</button>
             </div>
             <form id="addEventForm" onsubmit="handleSaveEvent(event)" class="space-y-3">
                 <input type="hidden" id="eventDateKey">
                 
-                <!-- Sanskrit/Marathi Preset Dropdown or Custom Input Option -->
                 <div>
                     <label class="block text-[11px] text-amber-300/80 mb-1">Select Ritual / Festive Occasion (समारंभ)</label>
                     <select id="eventPresetSelect" onchange="onPresetSelectChange(this)" class="w-full px-3.5 py-2 text-xs festive-input">
@@ -240,27 +285,36 @@
                 </div>
 
                 <div id="customTitleWrapper" class="hidden">
-                    <input type="text" id="newEventTitle" placeholder="Enter Custom Event Title (उदा. विशेष पूजा)" class="w-full px-3.5 py-2 text-xs festive-input">
+                    <input type="text" id="newEventTitle" placeholder="Enter Custom Event Title" class="w-full px-3.5 py-2 text-xs festive-input">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] text-stone-400 mb-1">वेळ (Time)</label>
-                        <input type="text" id="newEventTime" required placeholder="उदा. सायंकाळी ७:०० वाजता" class="w-full px-3 py-2 text-xs festive-input">
+                        <label class="block text-[10px] text-stone-400 mb-1">Start Time Slot (प्रारंभ वेळ)</label>
+                        <select id="newEventStartHour" required class="w-full px-3 py-2 text-xs festive-input">
+                            <!-- Filled programmatically with 24 hours -->
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] text-stone-400 mb-1">स्थान (Location)</label>
-                        <input type="text" id="newEventLocation" required placeholder="मुख्य मंडप, जकेरिया बंदर" class="w-full px-3.5 py-2 text-xs festive-input">
+                        <label class="block text-[10px] text-stone-400 mb-1">End Time Slot (समाप्ती वेळ)</label>
+                        <select id="newEventEndHour" required class="w-full px-3 py-2 text-xs festive-input">
+                            <!-- Filled programmatically with 24 hours -->
+                        </select>
                     </div>
                 </div>
 
                 <div>
+                    <label class="block text-[10px] text-stone-400 mb-1">स्थान (Location)</label>
+                    <input type="text" id="newEventLocation" required placeholder="मुख्य मंडप, जकेरिया बंदर" class="w-full px-3.5 py-2 text-xs festive-input">
+                </div>
+
+                <div>
                     <label class="block text-[10px] text-stone-400 mb-1">तپسील / मंत्र / माहिती (Description)</label>
-                    <textarea id="newEventDesc" rows="2" required placeholder="कार्यक्रमाची सविस्तर माहिती..." class="w-full px-3.5 py-2 text-xs festive-input resize-none"></textarea>
+                    <textarea id="newEventDesc" rows="2" required placeholder="सुप्रसिद्ध धार्मिक विधीची सविस्तर माहिती..." class="w-full px-3.5 py-2 text-xs festive-input resize-none"></textarea>
                 </div>
 
                 <button type="submit" class="w-full btn-3d font-semibold py-2.5 rounded-xl text-xs">
-                    <i class="fas fa-save mr-1"></i> Save Event to Calendar Date
+                    <i class="fas fa-save mr-1"></i> Save Event & Verify Collisions
                 </button>
             </form>
         </section>
@@ -349,10 +403,9 @@
         let isAdminLoggedIn = sessionStorage.getItem('isAdminAuth') === 'true';
         let allEventsCache = {};
         
-        // Calendar State Variables
         let currentDateObj = new Date();
         let currentYear = currentDateObj.getFullYear();
-        let currentMonth = currentDateObj.getMonth(); // 0 - 11
+        let currentMonth = currentDateObj.getMonth();
         let selectedDateKey = formatDateKey(currentDateObj);
 
         const marathiMonths = [
@@ -365,6 +418,23 @@
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
             const d = String(dateObj.getDate()).padStart(2, '0');
             return `${y}-${m}-${d}`;
+        }
+
+        // Initialize 24-hour options in admin dropdowns
+        function populateHourDropdowns() {
+            const startSel = document.getElementById('newEventStartHour');
+            const endSel = document.getElementById('newEventEndHour');
+            if (!startSel || !endSel) return;
+
+            let htmlOptions = '';
+            for (let h = 0; h < 24; h++) {
+                const hourFormatted = String(h).padStart(2, '0') + ":00";
+                const displayLabel = h === 0 ? "12:00 AM (Midnight)" : h < 12 ? `${h}:00 AM` : h === 12 ? "12:00 PM (Noon)" : `${h - 12}:00 PM`;
+                htmlOptions += `<option value="${hourFormatted}">${displayLabel} (${hourFormatted})</option>`;
+            }
+            startSel.innerHTML = htmlOptions;
+            endSel.innerHTML = htmlOptions;
+            if (endSel.options.length > 1) endSel.selectedIndex = 1; // Default 1 hour later
         }
 
         function checkAdminState() {
@@ -395,7 +465,6 @@
 
         function verifyAdminPin() {
             const pin = document.getElementById('adminPinInput').value.trim();
-            // Default establishment year passcode: 1964
             if (pin === "1964") {
                 isAdminLoggedIn = true;
                 sessionStorage.setItem('isAdminAuth', 'true');
@@ -403,6 +472,7 @@
                 checkAdminState();
                 renderCalendar();
                 filterAndRenderEvents();
+                render24HourTimeline();
                 alert("Admin access granted!");
             } else {
                 document.getElementById('pinError').classList.remove('hidden');
@@ -415,9 +485,9 @@
             checkAdminState();
             renderCalendar();
             filterAndRenderEvents();
+            render24HourTimeline();
         }
 
-        // Calendar Navigation & Rendering
         function changeMonth(direction) {
             currentMonth += direction;
             if (currentMonth > 11) {
@@ -438,19 +508,15 @@
             gridContainer.innerHTML = '';
 
             const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
-            // Adjust Sunday (0) to index 6 for Mon-start grid, or standard Mon=1 -> Sun=0
-            // Let's format Mon=0 to Sun=6 standard:
             let startingDay = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
             const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-            // Blank padding slots for previous month overflow
             for (let i = 0; i < startingDay; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.className = "opacity-25 cursor-default";
                 gridContainer.appendChild(emptyCell);
             }
 
-            // Days of the month
             for (let day = 1; day <= totalDaysInMonth; day++) {
                 const dKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const cell = document.createElement('div');
@@ -460,7 +526,6 @@
                     classes += " active-date";
                 }
                 
-                // Check if this date has events in cache
                 let hasEv = false;
                 if (allEventsCache) {
                     for (let k in allEventsCache) {
@@ -486,15 +551,88 @@
             document.getElementById('eventDateKey').value = dKey;
             document.getElementById('selectedDateBadge').innerText = dKey;
             document.getElementById('activeDateHeading').innerHTML = `<i class="fas fa-calendar-day text-amber-500 mr-1"></i> Events for ${dKey}`;
+            document.getElementById('timelineSublabel').innerText = `24-hour schedule status for ${dKey}`;
             renderCalendar();
             filterAndRenderEvents();
+            render24HourTimeline();
         }
 
         function showAllEvents() {
             selectedDateKey = null;
             document.getElementById('activeDateHeading').innerHTML = `<i class="fas fa-calendar-day text-amber-500 mr-1"></i> All Scheduled Events`;
+            document.getElementById('timelineSublabel').innerText = `Select a specific date from calendar to view hourly timeline`;
             renderCalendar();
             renderEvents(allEventsCache);
+            render24HourTimeline();
+        }
+
+        // Render 24-Hour Timeline Grid with Collision Detection
+        function render24HourTimeline() {
+            const container = document.getElementById('hourlyTimelineContainer');
+            const collisionBadge = document.getElementById('collisionBadge');
+            if (!container) return;
+
+            // Gather events for the selected date
+            let dateEvents = [];
+            if (allEventsCache && selectedDateKey) {
+                for (let k in allEventsCache) {
+                    if (allEventsCache[k].dateKey === selectedDateKey) {
+                        dateEvents.push(allEventsCache[k]);
+                    }
+                }
+            }
+
+            // Map hours 0 to 23 to events occupying them
+            let hourOccupancy = {};
+            for (let i = 0; i < 24; i++) hourOccupancy[i] = [];
+
+            dateEvents.forEach(ev => {
+                let startH = 0, endH = 23;
+                if (ev.startTime) startH = parseInt(ev.startTime.split(':')[0]) || 0;
+                if (ev.endTime) endH = parseInt(ev.endTime.split(':')[0]) || 23;
+                if (startH > endH) endH = 23; // fallback for overnight wrap
+
+                for (let h = startH; h <= endH; h++) {
+                    if (hourOccupancy[h]) {
+                        hourOccupancy[h].push(ev.title);
+                    }
+                }
+            });
+
+            let hasCollision = false;
+            let timelineHtml = '';
+
+            for (let h = 0; h < 24; h++) {
+                const hourFormatted = String(h).padStart(2, '0') + ":00";
+                const displayLabel = h === 0 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`;
+                const occupants = hourOccupancy[h];
+                
+                let rowClass = "time-slot-row px-3 py-2 text-xs ";
+                let badgeHtml = '<span class="text-[10px] text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">Available</span>';
+                
+                if (occupants.length === 1) {
+                    rowClass += " slot-booked";
+                    badgeHtml = `<span class="text-[10px] text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/40 truncate max-w-[200px]" title="${escapeHtml(occupants[0])}"><i class="fas fa-check-circle mr-1"></i> ${escapeHtml(occupants[0])}</span>`;
+                } else if (occupants.length > 1) {
+                    rowClass += " slot-conflict";
+                    hasCollision = true;
+                    badgeHtml = `<span class="text-[10px] text-red-200 bg-red-900/80 px-2 py-0.5 rounded border border-red-500 font-bold truncate max-w-[200px]" title="Collision: ${escapeHtml(occupants.join(', '))}">⚠️ Collision (${occupants.length} events)</span>`;
+                }
+
+                timelineHtml += `
+                    <div class="${rowClass} flex items-center justify-between rounded-lg">
+                        <div class="font-mono text-amber-200 text-xs w-16 shrink-0">${displayLabel}</div>
+                        <div class="flex-1 text-right">${badgeHtml}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = timelineHtml;
+            if (hasCollision && selectedDateKey) {
+                collisionBadge.classList.remove('hidden');
+            } else {
+                collisionBadge.classList.add('hidden');
+            }
         }
 
         function onPresetSelectChange(sel) {
@@ -514,14 +652,15 @@
                 if (!data) {
                     const todayStr = formatDateKey(new Date());
                     const defaultEvents = {
-                        ev1: { title: "श्री गणेश आगमन सोहळा (Shri Ganesh Aagman Sohala)", dateKey: todayStr, time: "04:00 PM onwards", location: "Main Mandap", desc: "Welcoming Bappa with traditional Dhol-Tasha and devotional fervor." },
-                        ev2: { title: "महाप्रसाद आणि महाआरती", dateKey: todayStr, time: "12:30 PM & 08:00 PM", location: "Mandap Premises", desc: "Daily community aarti followed by Mahaprasad distribution." }
+                        ev1: { title: "श्री गणेश आगमन सोहळा (Shri Ganesh Aagman Sohala)", dateKey: todayStr, startTime: "16:00", endTime: "19:00", time: "16:00 - 19:00", location: "Main Mandap", desc: "Welcoming Bappa with traditional Dhol-Tasha and devotional fervor." },
+                        ev2: { title: "महाप्रसाद आणि महाआरती", dateKey: todayStr, startTime: "12:00", endTime: "14:00", time: "12:00 - 14:00", location: "Mandap Premises", desc: "Daily community aarti followed by Mahaprasad distribution." }
                     };
                     db.ref('/events').set(defaultEvents);
                 } else {
                     allEventsCache = data;
                     renderCalendar();
                     filterAndRenderEvents();
+                    render24HourTimeline();
                 }
             });
         }
@@ -564,6 +703,8 @@
                     ? `<button onclick="deleteEvent('${key}')" class="mt-2 text-[10px] bg-red-900/40 border border-red-500/30 text-red-300 px-2.5 py-1 rounded hover:bg-red-600/30"><i class="fas fa-trash mr-1"></i> Delete Event</button>` 
                     : '';
 
+                const displayTimeStr = ev.time || `${ev.startTime || '00:00'} - ${ev.endTime || '23:00'}`;
+
                 return `
                     <div class="premium-card p-4 relative">
                         <div class="corner-detail tl"></div>
@@ -575,7 +716,7 @@
                         <p class="text-xs text-stone-300 mb-2">${escapeHtml(ev.desc)}</p>
                         <div class="flex items-center justify-between text-[11px] text-amber-500/80 border-t border-amber-500/10 pt-2">
                             <div class="flex items-center gap-3">
-                                <span><i class="fas fa-clock mr-1"></i> ${escapeHtml(ev.time)}</span>
+                                <span><i class="fas fa-clock mr-1"></i> ${escapeHtml(displayTimeStr)}</span>
                                 <span><i class="fas fa-map-marker-alt mr-1"></i> ${escapeHtml(ev.location)}</span>
                             </div>
                         </div>
@@ -591,16 +732,26 @@
 
             const titleVal = document.getElementById('newEventTitle').value.trim();
             const dateKeyValue = document.getElementById('eventDateKey').value.trim() || selectedDateKey;
+            const startH = document.getElementById('newEventStartHour').value;
+            const endH = document.getElementById('newEventEndHour').value;
 
             if (!titleVal) {
                 alert("Please select or enter an event title.");
                 return;
             }
 
+            if (startH >= endH) {
+                if (!confirm("Warning: End time is equal to or earlier than start time. Proceed anyway?")) {
+                    return;
+                }
+            }
+
             const newEvent = {
                 title: titleVal,
                 dateKey: dateKeyValue,
-                time: document.getElementById('newEventTime').value.trim(),
+                startTime: startH,
+                endTime: endH,
+                time: `${startH} - ${endH}`,
                 location: document.getElementById('newEventLocation').value.trim(),
                 desc: document.getElementById('newEventDesc').value.trim()
             };
@@ -609,7 +760,8 @@
                 document.getElementById('addEventForm').reset();
                 document.getElementById('customTitleWrapper').classList.add('hidden');
                 document.getElementById('eventDateKey').value = selectedDateKey;
-                alert("Event published successfully to calendar!");
+                populateHourDropdowns();
+                alert("Event published successfully to calendar and timeline!");
             }).catch(err => {
                 alert("Failed to add event: " + err.message);
             });
@@ -693,6 +845,7 @@
         // Initialize state
         document.getElementById('eventDateKey').value = selectedDateKey;
         document.getElementById('selectedDateBadge').innerText = selectedDateKey;
+        populateHourDropdowns();
         checkAdminState();
         loadEvents();
     </script>
