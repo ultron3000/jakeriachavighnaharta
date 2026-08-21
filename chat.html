@@ -543,11 +543,12 @@
             closeCallTypeModal();
             const provider = new firebase.auth.GoogleAuthProvider();
 
-            auth.signInWithPopup(provider).then((result) => {
-                authenticatedUserGoogleName = result.user.displayName || "Google User";
-                initiateWebRTCCall(pendingCallTargetId, pendingCallTargetName, callType);
-            }).catch((error) => {
-                alert("Google Sign-In required to verify call session: " + error.message);
+            // Store intent so we can resume the call after the redirect returns
+            localStorage.setItem('pending_call_type', callType);
+            localStorage.setItem('pending_call_target', pendingCallTargetId);
+
+            auth.signInWithRedirect(provider).catch((error) => {
+                alert("Google Sign-In error: " + error.message);
             });
         }
 
@@ -759,6 +760,30 @@
                 activeCallRef = null;
             }
         }
+
+        // Handle returning from Google Sign-In Redirect on mobile
+        window.addEventListener('DOMContentLoaded', () => {
+            auth.getRedirectResult().then((result) => {
+                if (result.user) {
+                    authenticatedUserGoogleName = result.user.displayName || "Google User";
+                    const savedCallType = localStorage.getItem('pending_call_type');
+                    const savedTargetId = localStorage.getItem('pending_call_target');
+
+                    if (savedCallType && savedTargetId) {
+                        localStorage.removeItem('pending_call_type');
+                        localStorage.removeItem('pending_call_target');
+                        initiateWebRTCCall(savedTargetId, "Peer", savedCallType);
+                    }
+                }
+            }).catch((error) => {
+                console.error("Redirect login error:", error);
+            });
+        });
+
+        // Start Core Services
+        startHeartbeat();
+        listenToMessages();
+        listenForIncomingCalls();
 
         // Start Core Services
         startHeartbeat();
