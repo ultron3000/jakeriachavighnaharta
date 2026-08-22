@@ -180,6 +180,32 @@
         <!-- Chat Stream -->
         <div id="messages" class="flex-1 min-h-0 overflow-y-auto p-3 space-y-3"></div>
 
+        <!-- Popovers for Emoji and GIF Picker -->
+        <div id="emojiPicker" class="hidden absolute bottom-16 left-3 z-40 bg-black/90 border border-amber-500/40 rounded-2xl p-3 shadow-2xl max-w-xs grid grid-cols-6 gap-2 text-xl glass">
+          <button type="button" onclick="insertEmoji('😀')">😀</button>
+          <button type="button" onclick="insertEmoji('😂')">😂</button>
+          <button type="button" onclick="insertEmoji('❤️')">❤️</button>
+          <button type="button" onclick="insertEmoji('🙏')">🙏</button>
+          <button type="button" onclick="insertEmoji('🔥')">🔥</button>
+          <button type="button" onclick="insertEmoji('👍')">👍</button>
+          <button type="button" onclick="insertEmoji('🎉')">🎉</button>
+          <button type="button" onclick="insertEmoji('😍')">😍</button>
+          <button type="button" onclick="insertEmoji('😎')">😎</button>
+          <button type="button" onclick="insertEmoji('🙌')">🙌</button>
+          <button type="button" onclick="insertEmoji('✨')">✨</button>
+          <button type="button" onclick="insertEmoji('💯')">💯</button>
+        </div>
+
+        <div id="gifPicker" class="hidden absolute bottom-16 left-3 z-40 bg-black/95 border border-amber-500/40 rounded-2xl p-3 shadow-2xl w-72 max-h-60 overflow-y-auto glass flex flex-col gap-2">
+          <div class="text-xs text-amber-300 font-bold mb-1">Select a GIF</div>
+          <div class="grid grid-cols-2 gap-2">
+            <img src="https://media.giphy.com/media/l0AMJl250f2XJDFO8/giphy.gif" onclick="sendGif('https://media.giphy.com/media/l0AMJl250f2XJDFO8/giphy.gif')" class="rounded-lg cursor-pointer h-20 w-full object-cover border border-amber-500/20 hover:scale-105 transition-transform" />
+            <img src="https://media.giphy.com/media/3o7TKm15iJz34L0jba/giphy.gif" onclick="sendGif('https://media.giphy.com/media/3o7TKm15iJz34L0jba/giphy.gif')" class="rounded-lg cursor-pointer h-20 w-full object-cover border border-amber-500/20 hover:scale-105 transition-transform" />
+            <img src="https://media.giphy.com/media/26UvO1Bw22JjI7m52/giphy.gif" onclick="sendGif('https://media.giphy.com/media/26UvO1Bw22JjI7m52/giphy.gif')" class="rounded-lg cursor-pointer h-20 w-full object-cover border border-amber-500/20 hover:scale-105 transition-transform" />
+            <img src="https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif" onclick="sendGif('https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif')" class="rounded-lg cursor-pointer h-20 w-full object-cover border border-amber-500/20 hover:scale-105 transition-transform" />
+          </div>
+        </div>
+
         <!-- Composer -->
         <div class="shrink-0 p-2 border-t border-amber-500/20 glass relative w-full pb-safe z-20">
 
@@ -204,8 +230,10 @@
           <form id="messageForm" class="flex items-center gap-1.5 w-full">
             <input type="file" id="imageInput" accept="image/*" class="hidden" />
 
-            <button type="button" id="attachImgBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-center">📷</button>
-            <button type="button" id="voiceNoteBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-center">🎙️</button>
+            <button type="button" id="emojiBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-center" title="Emoji">😀</button>
+            <button type="button" id="gifBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-center" title="GIF">GIF</button>
+            <button type="button" id="attachImgBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-center" title="Image">📷</button>
+            <button type="button" id="voiceNoteBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-center" title="Voice Note">🎙️</button>
 
             <div class="flex-1 min-w-0">
               <textarea id="messageInput" rows="1" maxlength="2000" placeholder="Type a message..." class="w-full resize-none rounded-xl bg-black/50 border border-amber-500/30 focus:border-amber-400 outline-none px-3 py-2 text-xs md:text-sm text-white block max-h-20 placeholder-amber-900/50"></textarea>
@@ -489,25 +517,41 @@ function renderMessages(data) {
 
   container.innerHTML = list.map(m => {
     const mine = m.clientId === clientId;
+    const reactions = m.reactions || {};
+    const rxHtml = Object.entries(reactions).map(([emoji, count]) => `<span class="px-1.5 py-0.5 rounded-full bg-black/40 border border-amber-500/20 text-[10px] text-amber-300">${emoji} ${count}</span>`).join('');
+
     return `
       <div class="message-bubble flex ${mine ? 'justify-end' : 'justify-start'}">
         <div class="max-w-[85%] md:max-w-[70%] space-y-1">
           <div class="flex items-center gap-2 text-[10px] text-amber-500/70 ${mine ? 'justify-end' : ''}">
             <span class="font-bold ${mine ? 'text-amber-400' : 'text-amber-300'}">${escapeHtml(m.name)}</span>
             <span>${m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
+            ${!mine ? `
+              <button onclick="initiateCall('${m.clientId}', '${escapeHtml(m.name)}', 'audio')" class="hover:text-amber-300 ml-1" title="Call User">☎</button>
+              <button onclick="initiateCall('${m.clientId}', '${escapeHtml(m.name)}', 'video')" class="hover:text-amber-300" title="Video Call User">▣</button>
+            ` : ''}
           </div>
 
-          <div class="p-2.5 rounded-2xl ${mine ? 'bg-amber-500 text-stone-950 rounded-br-none' : 'bg-black/60 border border-amber-500/20 text-amber-100 rounded-bl-none'} text-xs space-y-2 shadow-md">
-            ${m.text ? `<div class="break-words">${escapeHtml(m.text)}</div>` : ''}
+          <div onclick="copyMessageText(this)" class="p-2.5 rounded-2xl ${mine ? 'bg-amber-500 text-stone-950 rounded-br-none' : 'bg-black/60 border border-amber-500/20 text-amber-100 rounded-bl-none'} text-xs space-y-2 shadow-md cursor-pointer relative group">
+            ${m.text ? `<div class="break-words message-content">${escapeHtml(m.text)}</div>` : ''}
             ${m.image ? `<img src="${m.image}" class="max-h-56 rounded-lg object-cover w-full" />` : ''}
             ${m.audio ? `<audio controls src="${m.audio}" class="w-full h-8"></audio>` : ''}
+            ${m.gif ? `<img src="${m.gif}" class="max-h-56 rounded-lg object-cover w-full" />` : ''}
           </div>
 
+          ${rxHtml ? `<div class="flex flex-wrap gap-1 mt-1 ${mine ? 'justify-end' : ''}">${rxHtml}</div>` : ''}
+
           <div class="flex items-center gap-2 text-[10px] ${mine ? 'justify-end' : ''}">
+            <div class="flex gap-1 text-xs">
+              <button onclick="reactToMessage('${m.id}', '❤️')" class="hover:scale-125 transition-transform">❤️</button>
+              <button onclick="reactToMessage('${m.id}', '👍')" class="hover:scale-125 transition-transform">👍</button>
+              <button onclick="reactToMessage('${m.id}', '🔥')" class="hover:scale-125 transition-transform">🔥</button>
+              <button onclick="reactToMessage('${m.id}', '😂')" class="hover:scale-125 transition-transform">😂</button>
+            </div>
             ${mine ? `
-              <button onclick="deleteMessage('${m.id}')" class="text-red-400 hover:underline">Delete</button>
+              <button onclick="deleteMessage('${m.id}')" class="text-red-400 hover:underline ml-2">Delete</button>
             ` : `
-              <button onclick="hideMessage('${m.id}')" class="text-amber-500/50 hover:underline">Hide</button>
+              <button onclick="hideMessage('${m.id}')" class="text-amber-500/50 hover:underline ml-2">Hide</button>
             `}
           </div>
         </div>
@@ -517,6 +561,19 @@ function renderMessages(data) {
 
   container.scrollTop = container.scrollHeight;
 }
+
+window.copyMessageText = function(el) {
+  const content = el.querySelector('.message-content');
+  if (content && content.innerText) {
+    navigator.clipboard.writeText(content.innerText);
+    toast("Message copied!");
+  }
+};
+
+window.reactToMessage = function(msgId, emoji) {
+  const ref = db.ref(`/rooms/${currentRoom}/messages/${msgId}/reactions/${emoji}`);
+  ref.transaction(current => (current || 0) + 1);
+};
 
 window.deleteMessage = function(msgId) {
   db.ref(`/rooms/${currentRoom}/messages/${msgId}`).remove();
@@ -531,7 +588,7 @@ window.hideMessage = function(msgId) {
 
 async function sendCurrentMessage(extraPayload = {}) {
   const text = $("messageInput").value.trim();
-  if (!text && !pendingImageData && !extraPayload.audio) return;
+  if (!text && !pendingImageData && !extraPayload.audio && !extraPayload.gif) return;
 
   const payload = {
     clientId,
@@ -546,6 +603,27 @@ async function sendCurrentMessage(extraPayload = {}) {
   $("messageInput").value = "";
   clearImageAttachment();
 }
+
+/* Emoji and GIF Pickers */
+$("emojiBtn").onclick = () => {
+  $("emojiPicker").classList.toggle("hidden");
+  $("gifPicker").classList.add("hidden");
+};
+
+$("gifBtn").onclick = () => {
+  $("gifPicker").classList.toggle("hidden");
+  $("emojiPicker").classList.add("hidden");
+};
+
+window.insertEmoji = function(emoji) {
+  $("messageInput").value += emoji;
+  $("emojiPicker").classList.add("hidden");
+};
+
+window.sendGif = function(url) {
+  sendCurrentMessage({ gif: url });
+  $("gifPicker").classList.add("hidden");
+};
 
 $("attachImgBtn").onclick = () => $("imageInput").click();
 $("imageInput").onchange = e => {
