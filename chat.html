@@ -1,796 +1,865 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>जकेरियाचा विघ्नहर्ता - Community Chat & Calls</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-        
-        * {
-            -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>जकेरियाचा विघ्नहर्ता - Community Chat & Calls</title>
 
-        html, body {
-            height: 100%;
-            height: 100dvh;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at top, #800c1b 0%, #380209 100%);
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309'
+            }
+          }
         }
+      }
+    };
+  </script>
 
-        .chat-card {
-            background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
-        }
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-        .scroll-smooth-ios {
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
-        }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-        #chatBox::-webkit-scrollbar {
-            width: 4px;
-        }
-        #chatBox::-webkit-scrollbar-thumb {
-            background: rgba(212, 163, 89, 0.4);
-            border-radius: 4px;
-        }
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(212, 163, 89, 0.4) transparent;
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
 
-        input[type="text"] {
-            font-size: 16px !important;
-        }
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #800c1b 0%, #380209 100%);
+    }
 
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-        .call-pulse {
-            animation: pulse-ring 1.8s infinite;
-        }
-    </style>
+    .glass {
+      background: linear-gradient(145deg, rgba(40, 3, 7, 0.95) 0%, rgba(20, 1, 3, 0.98) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
 
-    <!-- Firebase SDKs (App, Database, Auth) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    .message-bubble {
+      animation: messageIn .15s ease-out;
+    }
+
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pulse-dot {
+      animation: pulseDot 1.8s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,.45); }
+      50% { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+    }
+
+    .recording-pulse {
+      animation: recPulse 1.2s infinite;
+    }
+
+    @keyframes recPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.92); }
+    }
+
+    .room-active {
+      background: rgba(245,158,11,.12) !important;
+      color: #fbbf24 !important;
+      border-color: rgba(245,158,11,.3) !important;
+    }
+
+    .pb-safe {
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    }
+  </style>
 </head>
-<body class="flex items-center justify-center sm:p-4">
 
-    <!-- CALL TYPE SELECTION MODAL -->
-    <div id="callTypeModal" class="fixed inset-0 z-[75] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
-            <h2 class="text-amber-300 text-lg font-semibold mb-1">Select Call Type</h2>
-            <p id="callTargetNameLabel" class="text-xs text-amber-500/70 mb-5">Google Sign-in Required for secure calling</p>
-            <div class="flex gap-3">
-                <button onclick="startGoogleAuthAndCall('audio')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-2xl text-xs transition flex flex-col items-center gap-1 shadow-lg">
-                    <span class="text-lg">📞</span> Audio Call
-                </button>
-                <button onclick="startGoogleAuthAndCall('video')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold py-3 rounded-2xl text-xs transition flex flex-col items-center gap-1 shadow-lg">
-                    <span class="text-lg">📹</span> Video Call
-                </button>
-            </div>
-            <button onclick="closeCallTypeModal()" class="mt-4 text-xs text-amber-500/60 hover:text-amber-300">Cancel</button>
+<body class="text-amber-100 flex flex-col font-sans">
+
+  <!-- Application Frame -->
+  <div class="h-full w-full flex flex-col min-h-0 relative">
+
+    <!-- Header -->
+    <header class="h-14 shrink-0 border-b border-amber-500/20 glass flex items-center justify-between px-3 md:px-6 z-20">
+      <div class="flex items-center gap-2">
+        <button id="mobileNavToggle" class="md:hidden p-2 rounded-xl bg-black/40 text-amber-300 border border-amber-500/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+
+        <a href="https://jakeriachavighnaharta.site.je/" title="Back to Home" class="w-8 h-8 rounded-xl overflow-hidden border border-amber-500/40 flex items-center justify-center font-black shadow-lg bg-black shrink-0">
+          <img src="https://ultron3000.github.io/jakeriachavighnaharta/assets/logonew.jpg" alt="Logo" class="w-full h-full object-cover">
+        </a>
+
+        <div>
+          <h1 class="font-bold tracking-tight text-xs md:text-sm leading-none text-amber-300">जकेरियाचा विघ्नहर्ता</h1>
+          <div class="flex items-center gap-1.5 text-[10px] text-amber-500/70 mt-0.5">
+            <span id="connectionDot" class="w-1.5 h-1.5 rounded-full bg-stone-600"></span>
+            <span id="connectionText">Connecting…</span>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- INCOMING CALL ALERT MODAL -->
-    <div id="callAlertModal" class="fixed inset-0 z-[70] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center p-4">
-        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl flex flex-col items-center">
-            <div id="callAvatar" class="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-500 rounded-full flex items-center justify-center text-emerald-400 text-3xl font-bold mb-4 call-pulse">
-                📞
-            </div>
-            <h2 id="callAlertTitle" class="text-amber-300 text-lg font-semibold mb-1">Incoming Call...</h2>
-            <p id="callAlertSubtext" class="text-xs text-amber-500/80 mb-6">User is calling you</p>
-            
-            <div id="callAlertButtons" class="flex gap-3 w-full"></div>
+      <!-- User Info & Presence Toggle -->
+      <div class="flex items-center gap-2">
+        <button id="togglePeopleMobile" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/40 border border-amber-500/30 text-xs">
+          <span id="onlineDot" class="pulse-dot w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span><b id="onlineCount" class="text-amber-400">0</b></span>
+        </button>
+
+        <button id="profileButton" class="w-8 h-8 rounded-xl bg-black/40 border border-amber-500/30 flex items-center justify-center text-xs font-bold text-amber-400">
+          ?
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Viewport Layout -->
+    <main class="flex-1 min-h-0 flex relative overflow-hidden">
+
+      <!-- Left Sidebar (Rooms) -->
+      <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 w-72 glass border-r border-amber-500/20 flex flex-col z-30 transition-transform -translate-x-full md:translate-x-0">
+        <div class="p-3 flex items-center justify-between border-b border-amber-500/20">
+          <button id="newRoomButton" class="w-full rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-3 py-2 text-xs font-semibold">
+            + Create Private Room
+          </button>
+          <button id="closeSidebarMobile" class="md:hidden ml-2 p-2 text-amber-500/70">✕</button>
         </div>
-    </div>
 
-    <!-- NATIVE WEBRTC CALL OVERLAY SCREEN -->
-    <div id="webrtcModal" class="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md hidden flex-col items-center justify-center p-2 sm:p-4">
-        <div class="w-full max-w-md h-[85vh] bg-stone-900 rounded-3xl overflow-hidden border border-amber-500/40 flex flex-col relative shadow-2xl">
-            <div class="p-3 bg-black/80 border-b border-amber-500/20 flex justify-between items-center shrink-0">
-                <span id="webrtcStatusBadge" class="text-xs text-amber-300 font-semibold flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Connecting Call...
-                </span>
-                <button onclick="hangUpWebRTC()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition">
-                    End Call ✕
-                </button>
-            </div>
-            
-            <!-- Video Elements Container -->
-            <div class="relative w-full flex-1 bg-black flex items-center justify-center overflow-hidden">
-                <!-- Remote User Video -->
-                <video id="remoteVideo" autoplay playsinline class="w-full h-full object-cover"></video>
-                <!-- Local User Preview Video -->
-                <video id="localVideo" autoplay playsinline muted class="absolute bottom-4 right-4 w-28 h-40 object-cover rounded-xl border-2 border-amber-500 shadow-lg bg-stone-800"></video>
-                
-                <!-- Audio-only indicator fallback placeholder -->
-                <div id="audioOnlyPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-stone-950 hidden">
-                    <div class="w-24 h-24 rounded-full bg-amber-500/20 border-2 border-amber-500 flex items-center justify-center text-4xl mb-3 call-pulse">🎙️</div>
-                    <span id="audioPeerName" class="text-amber-300 text-sm font-semibold">Audio Call in Progress</span>
-                </div>
-            </div>
-
-            <!-- In-call Controls -->
-            <div class="p-3 bg-black/90 flex justify-center gap-4 shrink-0">
-                <button onclick="toggleMuteAudio()" id="muteAudioBtn" class="bg-stone-800 hover:bg-stone-700 text-white p-3 rounded-full text-sm border border-amber-500/30">🎤 Mute</button>
-                <button onclick="toggleVideoTrack()" id="toggleVideoBtn" class="bg-stone-800 hover:bg-stone-700 text-white p-3 rounded-full text-sm border border-amber-500/30">📹 Video Off</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- NICKNAME SELECTION MODAL -->
-    <div id="nicknameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
-        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
-            <h2 class="text-amber-300 text-lg font-semibold mb-1">Enter Your Name</h2>
-            <p class="text-xs text-amber-500/70 mb-4">Choose a nickname so others know who is chatting!</p>
-            <input type="text" id="nicknameInput" placeholder="e.g. Rahul, Amit..." maxlength="18"
-                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 mb-4">
-            <button onclick="saveNickname()" 
-                    class="w-full bg-gradient-to-r from-amber-400 to-yellow-600 text-stone-950 font-bold py-3 rounded-xl text-sm">
-                Join Chat Room
+        <div class="flex-1 overflow-y-auto p-3 space-y-4">
+          <div>
+            <div class="px-1 pb-2 text-[10px] uppercase text-amber-500/70 font-semibold">Chat Rooms</div>
+            <button data-room="global" class="room-button room-active w-full text-left rounded-xl border border-transparent p-2.5 mb-1 flex items-center gap-2.5 hover:bg-black/40">
+              <span class="w-7 h-7 rounded-lg bg-black/50 flex items-center justify-center text-amber-400 font-bold text-xs border border-amber-500/20">#</span>
+              <div class="min-w-0 flex-1">
+                <div class="text-xs font-semibold truncate text-amber-200">Global Public Chat</div>
+                <div class="text-[10px] text-amber-500/60">Public Channel</div>
+              </div>
             </button>
+            <div id="customRooms"></div>
+          </div>
         </div>
-    </div>
 
-    <!-- ROOM SWITCHER MODAL -->
-    <div id="roomModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 hidden">
-        <div class="chat-card border border-amber-500/40 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
-            <h2 class="text-amber-300 text-lg font-semibold mb-1">Switch Chat Room</h2>
-            <p class="text-xs text-amber-500/70 mb-4">Enter a Room Code or switch back to Global.</p>
-            <input type="text" id="roomInput" placeholder="Room Name (e.g. room123)" maxlength="20"
-                   class="w-full bg-black/60 border border-amber-500/30 rounded-xl px-4 py-3 text-white text-center placeholder-amber-900/60 focus:outline-none focus:border-amber-400 mb-3">
-            <div class="flex gap-2 mb-3">
-                <button onclick="joinCustomRoom()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold py-2.5 rounded-xl text-xs">
-                    Join Room
-                </button>
-                <button onclick="joinGlobalRoom()" class="flex-1 bg-stone-800 hover:bg-stone-700 text-amber-300 font-bold py-2.5 rounded-xl text-xs border border-amber-500/30">
-                    Global Chat
-                </button>
-            </div>
-            <button onclick="closeRoomModal()" class="text-xs text-amber-500/60 hover:text-amber-300">Cancel</button>
+        <div class="p-3 border-t border-amber-500/20 glass">
+          <div class="text-[10px] uppercase text-amber-500/70 mb-1">Your Direct ID</div>
+          <button id="copyClientId" class="w-full text-left rounded-xl bg-black/40 border border-amber-500/30 px-2.5 py-2 hover:border-amber-500/50" title="Click to copy ID">
+            <div id="clientIdLabel" class="font-mono text-[10px] text-amber-400 truncate">...</div>
+          </button>
         </div>
-    </div>
+      </aside>
 
-    <!-- MAIN CHAT WINDOW -->
-    <div class="w-full h-full sm:h-[94vh] sm:max-h-[850px] sm:max-w-md chat-card sm:rounded-3xl p-3 sm:p-5 border-0 sm:border sm:border-amber-500/30 flex flex-col relative overflow-hidden">
-        
-        <!-- HEADER -->
-        <div class="pb-2.5 border-b border-amber-500/20 flex items-center justify-between shrink-0 z-10">
+      <!-- Center Chat Container -->
+      <section class="flex-1 min-w-0 flex flex-col h-full relative bg-black/20">
+
+        <!-- Room Header -->
+        <div class="h-12 shrink-0 px-4 border-b border-amber-500/20 flex items-center justify-between glass z-10">
+          <div class="min-w-0 flex items-center gap-2">
+            <h2 id="roomTitle" class="font-semibold text-xs md:text-sm truncate text-amber-300">Global Chat</h2>
+            <span id="roomBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-mono border border-amber-500/20">PUBLIC</span>
+          </div>
+        </div>
+
+        <!-- Chat Stream -->
+        <div id="messages" class="flex-1 min-h-0 overflow-y-auto p-3 space-y-3"></div>
+
+        <!-- Composer -->
+        <div class="shrink-0 p-2 border-t border-amber-500/20 glass relative w-full pb-safe z-20">
+
+          <!-- Voice Recording Bar -->
+          <div id="recordingBar" class="hidden absolute inset-0 glass z-30 px-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <a href="https://jakeriachavighnaharta.site.je/" title="Back to Home"
-                   class="flex items-center justify-center w-9 h-9 rounded-full overflow-hidden border border-amber-500/40 shadow-md hover:scale-105 transition active:scale-95 shrink-0 bg-black">
-                    <img src="https://ultron3000.github.io/jakeriachavighnaharta/assets/logonew.jpg" 
-                         alt="Logo Home" 
-                         class="w-full h-full object-cover">
-                </a>
-                <div class="min-w-0">
-                    <div class="flex items-center gap-1">
-                        <h1 class="text-amber-300 text-sm sm:text-base font-semibold tracking-wide truncate">जकेरियाचा विघ्नहर्ता</h1>
-                        <button onclick="openNicknameModal()" title="Change Nickname" class="text-amber-500/60 hover:text-amber-300 text-xs shrink-0">✏️</button>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="currentUserBadge" class="text-[10px] text-amber-500/70 truncate">Setting up...</span>
-                        <span id="currentRoomBadge" class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">#global</span>
-                    </div>
-                </div>
+              <span class="w-3 h-3 rounded-full bg-red-500 recording-pulse"></span>
+              <span class="text-xs font-mono text-amber-200" id="recordTimer">00:00</span>
             </div>
-            
-            <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="wipeGlobalChat()" title="Wipe Current Chat" 
-                        class="p-1.5 rounded-lg bg-red-900/40 border border-red-500/30 text-red-300 hover:bg-red-600/30 text-xs">
-                    🧹 Clear
-                </button>
-
-                <button onclick="openRoomModal()" title="Switch Room" 
-                        class="p-1.5 rounded-lg bg-black/40 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs">
-                    🚪 Rooms
-                </button>
-
-                <div class="flex items-center space-x-1.5 bg-black/50 px-2.5 py-1 rounded-full border border-amber-500/20">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span id="onlineCount" class="text-[11px] text-emerald-400 font-medium">1</span>
-                </div>
+            <div class="flex gap-2">
+              <button id="cancelRecordBtn" class="px-3 py-1 rounded-xl bg-black/50 text-amber-300 text-xs border border-amber-500/30">Cancel</button>
+              <button id="stopRecordBtn" class="px-3 py-1 rounded-xl bg-amber-500 text-stone-950 font-bold text-xs">Send</button>
             </div>
-        </div>
+          </div>
 
-        <div id="debugBox" class="hidden bg-red-900/50 border border-red-500/50 text-red-200 text-xs p-2.5 rounded-xl my-2 text-center font-medium shrink-0"></div>
+          <!-- Attachment Preview -->
+          <div id="imagePreviewBar" class="hidden mb-2 p-2 bg-black/60 border border-amber-500/30 rounded-xl flex items-center justify-between">
+            <img id="imagePreview" class="w-10 h-10 object-cover rounded-lg" />
+            <button id="removeImageBtn" class="p-1 text-amber-500/70">✕</button>
+          </div>
 
-        <div id="chatBox" class="flex-1 overflow-y-auto py-3 space-y-3 pr-1 scroll-smooth-ios"></div>
+          <form id="messageForm" class="flex items-center gap-1.5 w-full">
+            <input type="file" id="imageInput" accept="image/*" class="hidden" />
 
-        <div id="replyPreview" class="hidden bg-black/60 border-l-2 border-amber-400 px-3 py-1.5 text-xs text-amber-200/80 flex justify-between items-center rounded-r-lg mb-1 shrink-0">
-            <span id="replyText" class="truncate">Replying to...</span>
-            <button onclick="cancelReply()" class="text-amber-500/70 hover:text-amber-300 ml-2 font-bold p-1">✕</button>
-        </div>
+            <button type="button" id="attachImgBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-center">📷</button>
+            <button type="button" id="voiceNoteBtn" class="h-10 w-10 shrink-0 rounded-xl bg-black/50 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-center">🎙️</button>
 
-        <div class="pt-2 pb-1 border-t border-amber-500/20 flex items-center gap-2 shrink-0 z-10 w-full">
-            <input type="text" id="messageInput" placeholder="Write a message..." autocomplete="off" autocorrect="off" spellcheck="false"
-                   class="flex-1 min-w-0 bg-black/50 border border-amber-500/30 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-amber-900/50 focus:outline-none focus:border-amber-400">
-            <button onclick="sendMessage()" 
-                    class="bg-gradient-to-r from-amber-400 to-yellow-600 active:scale-95 text-stone-950 font-bold px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center shadow-lg shrink-0 h-[42px]">
-                Send
+            <div class="flex-1 min-w-0">
+              <textarea id="messageInput" rows="1" maxlength="2000" placeholder="Type a message..." class="w-full resize-none rounded-xl bg-black/50 border border-amber-500/30 focus:border-amber-400 outline-none px-3 py-2 text-xs md:text-sm text-white block max-h-20 placeholder-amber-900/50"></textarea>
+            </div>
+
+            <button type="submit" class="h-10 px-3 md:px-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-600 text-stone-950 font-bold text-xs shrink-0 shadow-lg">
+              Send
             </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Presence Panel -->
+      <aside id="presencePanel" class="fixed md:relative inset-y-0 right-0 w-72 glass border-l border-amber-500/20 flex flex-col z-30 transition-transform translate-x-full md:translate-x-0">
+        <div class="p-3 border-b border-amber-500/20 flex justify-between items-center">
+          <div>
+            <div class="text-xs font-semibold text-amber-300">Online Users</div>
+            <div class="text-[10px] text-amber-500/70">Tap ☎ or ▣ to call directly</div>
+          </div>
+          <button id="closePresenceMobile" class="md:hidden text-amber-500/70">✕</button>
         </div>
 
+        <div id="onlineUsers" class="flex-1 overflow-y-auto p-3 space-y-1.5"></div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm glass border border-amber-500/40 rounded-2xl p-5">
+      <h3 class="font-semibold text-sm text-amber-300 mb-3">Your Display Name</h3>
+      <input id="nameInput" maxlength="30" placeholder="Enter nickname..." class="w-full rounded-xl bg-black/60 border border-amber-500/30 outline-none px-3 py-2 text-xs text-white focus:border-amber-400" />
+      <button id="saveName" class="w-full mt-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-600 text-stone-950 font-bold text-xs">Save</button>
     </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
-            authDomain: "ultron-85fba.firebaseapp.com",
-            databaseURL: "https://ultron-85fba-default-rtdb.firebaseio.com",
-            projectId: "ultron-85fba",
-            storageBucket: "ultron-85fba.firebasestorage.app",
-            messagingSenderId: "727225448009",
-            appId: "1:727225448009:web:e827bd0a819ddae42d3198",
-            measurementId: "G-EEDR5XX34M"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const auth = firebase.auth();
-
-        function showError(msg) {
-            const box = document.getElementById('debugBox');
-            box.innerText = msg;
-            box.classList.remove('hidden');
-        }
-
-        let clientId = sessionStorage.getItem('chat_client_id');
-        if (!clientId) {
-            clientId = 'usr_' + Math.random().toString(36).substr(2, 9);
-            sessionStorage.setItem('chat_client_id', clientId);
-        }
-
-        let userNickname = localStorage.getItem('chat_nickname');
-        if (!userNickname) {
-            document.getElementById('nicknameModal').classList.remove('hidden');
-        } else {
-            updateUserBadge();
-        }
-
-        let currentRoom = "global";
-        let activeQueryRef = null;
-
-        // --- IDLE AUTO CLEAR ---
-        let idleTimer = null;
-        const IDLE_LIMIT = 5 * 60 * 1000;
-
-        function resetIdleTimer() {
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => {
-                const chatBox = document.getElementById('chatBox');
-                if (chatBox) {
-                    chatBox.innerHTML = `
-                        <div class="text-center text-amber-500/60 text-xs py-4">
-                            💤 Session went idle. Chat cleared for performance. Move screen or send message to resume.
-                        </div>
-                    `;
-                }
-            }, IDLE_LIMIT);
-        }
-
-        ['click', 'touchstart', 'mousemove', 'keypress', 'scroll'].forEach(evt => {
-            window.addEventListener(evt, resetIdleTimer, true);
-        });
-        resetIdleTimer();
-
-        // --- NICKNAME & ROOM MODALS ---
-        function openNicknameModal() {
-            document.getElementById('nicknameInput').value = userNickname || '';
-            document.getElementById('nicknameModal').classList.remove('hidden');
-        }
-
-        function saveNickname() {
-            const val = document.getElementById('nicknameInput').value.trim();
-            userNickname = val ? val : "Guest_" + Math.floor(100 + Math.random() * 900);
-            localStorage.setItem('chat_nickname', userNickname);
-            document.getElementById('nicknameModal').classList.add('hidden');
-            updateUserBadge();
-        }
-
-        function updateUserBadge() {
-            document.getElementById('currentUserBadge').innerText = `You: ${userNickname}`;
-        }
-
-        function openRoomModal() { document.getElementById('roomModal').classList.remove('hidden'); }
-        function closeRoomModal() { document.getElementById('roomModal').classList.add('hidden'); }
-
-        function joinCustomRoom() {
-            const raw = document.getElementById('roomInput').value.trim().toLowerCase();
-            if (!raw) return;
-            const cleanRoom = raw.replace(/[^a-z0-9_-]/g, '');
-            switchRoom(cleanRoom);
-            closeRoomModal();
-        }
-
-        function joinGlobalRoom() {
-            switchRoom("global");
-            closeRoomModal();
-        }
-
-        function startPrivateChatWith(otherClientId, otherNickname) {
-            if (otherClientId === clientId) return;
-            const sortedIds = [clientId, otherClientId].sort();
-            const privateRoomCode = `private_${sortedIds[0]}_${sortedIds[1]}`;
-            if (confirm(`Start private 1-on-1 chat with ${otherNickname}?`)) {
-                switchRoom(privateRoomCode, `DM: ${otherNickname}`);
-            }
-        }
-
-        function switchRoom(roomCode, displayName) {
-            currentRoom = roomCode;
-            document.getElementById('currentRoomBadge').innerText = displayName ? displayName : `#${roomCode}`;
-            document.getElementById('chatBox').innerHTML = '';
-            listenToMessages();
-        }
-
-        function deleteSingleMessage(msgKey) {
-            if (confirm("Delete this message for everyone?")) {
-                db.ref(`/rooms/${currentRoom}/messages/${msgKey}`).remove()
-                .catch(err => showError("Delete failed: " + err.message));
-            }
-        }
-
-        function wipeGlobalChat() {
-            if (confirm(`Wipe all messages in #${currentRoom}?`)) {
-                db.ref(`/rooms/${currentRoom}/messages`).remove()
-                .then(() => {
-                    document.getElementById('chatBox').innerHTML = '';
-                })
-                .catch(err => showError("Wipe failed: " + err.message));
-            }
-        }
-
-        // --- ONLINE HEARTBEAT ---
-        function startHeartbeat() {
-            const statusRef = db.ref('/status/' + clientId);
-            function updateStatus() {
-                statusRef.set({
-                    nickname: userNickname || 'Guest',
-                    lastPing: Date.now()
-                }).catch(() => {});
-            }
-            updateStatus();
-            setInterval(updateStatus, 4000);
-            statusRef.onDisconnect().remove();
-
-            db.ref('/status').on('value', (snapshot) => {
-                const now = Date.now();
-                let activeCount = 0;
-                snapshot.forEach((child) => {
-                    const data = child.val();
-                    if (data && data.lastPing && (now - data.lastPing < 10000)) {
-                        activeCount++;
-                    }
-                });
-                document.getElementById('onlineCount').innerText = `${Math.max(1, activeCount)}`;
-            });
-        }
-
-        // --- CHAT MESSAGING ---
-        let replyingTo = null;
-
-        function setReply(sender, text) {
-            replyingTo = { sender, text };
-            document.getElementById('replyText').innerText = `Replying to ${sender}: "${text}"`;
-            document.getElementById('replyPreview').classList.remove('hidden');
-        }
-
-        function cancelReply() {
-            replyingTo = null;
-            document.getElementById('replyPreview').classList.add('hidden');
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            if (!message) return;
-
-            if (!userNickname) {
-                userNickname = "Guest_" + Math.floor(100 + Math.random() * 900);
-                localStorage.setItem('chat_nickname', userNickname);
-                updateUserBadge();
-            }
-
-            const now = Date.now();
-            const ONE_HOUR = 60 * 60 * 1000;
-
-            const msgData = {
-                clientId: clientId,
-                sender: userNickname,
-                text: message,
-                seenBy: { [clientId]: true },
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                expireAt: now + ONE_HOUR
-            };
-
-            if (replyingTo) msgData.replyTo = replyingTo;
-
-            db.ref(`/rooms/${currentRoom}/messages`).push(msgData).catch((err) => {
-                showError("Send Failed: Check Database Rules.");
-            });
-
-            input.value = '';
-            cancelReply();
-            setTimeout(scrollToBottom, 50);
-        }
-
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        function scrollToBottom() {
-            const chatBox = document.getElementById('chatBox');
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function listenToMessages() {
-            const chatBox = document.getElementById('chatBox');
-            const roomRef = db.ref(`/rooms/${currentRoom}/messages`);
-
-            if (activeQueryRef) activeQueryRef.off();
-            activeQueryRef = roomRef.limitToLast(60);
-
-            activeQueryRef.on('child_added', (snapshot) => { renderOrUpdateMessage(snapshot); });
-            activeQueryRef.on('child_changed', (snapshot) => { renderOrUpdateMessage(snapshot); });
-
-            roomRef.on('child_removed', (snapshot) => {
-                const removedKey = snapshot.key;
-                const el = document.getElementById(`msg-${removedKey}`);
-                if (el) el.remove();
-            });
-        }
-
-        function renderOrUpdateMessage(snapshot) {
-            const data = snapshot.val();
-            const msgKey = snapshot.key;
-            const now = Date.now();
-
-            if (data.expireAt && data.expireAt < now) {
-                const existingEl = document.getElementById(`msg-${msgKey}`);
-                if (existingEl) existingEl.remove();
-                return;
-            }
-
-            const isMe = data.clientId === clientId;
-            if (!isMe && (!data.seenBy || !data.seenBy[clientId])) {
-                db.ref(`/rooms/${currentRoom}/messages/${msgKey}/seenBy/${clientId}`).set(true);
-            }
-
-            let tickHTML = isMe ? `<span class="text-sky-400 font-bold ml-1">✓✓</span>` : '';
-            let replyHTML = data.replyTo ? `
-                <div class="text-[10px] bg-black/40 border-l-2 border-amber-400 px-2 py-1 rounded-r mb-1 opacity-80 max-w-full truncate">
-                    <span class="font-semibold text-amber-300">@${escapeHtml(data.replyTo.sender)}:</span> ${escapeHtml(data.replyTo.text)}
-                </div>
-            ` : '';
-
-            const callBtnHTML = !isMe ? `<button onclick="openCallTypeModal('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" class="ml-1.5 px-1 text-green-400 hover:text-green-300 text-xs font-bold">📞 Call</button>` : '';
-            const senderLabel = isMe ? `You (${escapeHtml(data.sender)})` : `<button onclick="startPrivateChatWith('${escapeHtml(data.clientId)}', '${escapeHtml(data.sender)}')" class="hover:underline text-amber-300">${escapeHtml(data.sender)} 🔒</button> ${callBtnHTML}`;
-            const deleteBtnHTML = isMe ? `<button onclick="deleteSingleMessage('${msgKey}')" class="text-[9px] text-red-400/80 hover:text-red-300 mt-0.5 px-1">🗑️ Delete</button>` : '';
-
-            const chatBox = document.getElementById('chatBox');
-            let msgDiv = document.getElementById(`msg-${msgKey}`);
-            const isNew = !msgDiv;
-
-            if (isNew) {
-                msgDiv = document.createElement('div');
-                msgDiv.id = `msg-${msgKey}`;
-            }
-
-            msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2.5`;
-            msgDiv.innerHTML = `
-                <div class="flex items-center gap-1.5 mb-0.5 px-1"><span class="text-[10px] text-amber-500/75 font-semibold">${senderLabel}</span></div>
-                <div class="${isMe ? 'bg-amber-500 text-stone-950 font-medium' : 'bg-black/60 text-amber-100 border border-amber-500/20'} rounded-2xl px-3.5 py-2 max-w-[85%] text-xs shadow-md break-words relative flex flex-col">
-                    ${replyHTML}
-                    <div class="flex items-end justify-between gap-2"><span>${escapeHtml(data.text)}</span>${tickHTML}</div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="setReply('${escapeHtml(data.sender)}', '${escapeHtml(data.text)}')" class="text-[9px] text-amber-500/50 hover:text-amber-300 mt-0.5 px-1">↩ Reply</button>
-                    ${deleteBtnHTML}
-                </div>
-            `;
-
-            if (isNew) {
-                chatBox.appendChild(msgDiv);
-                scrollToBottom();
-            }
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.innerText = text || '';
-            return div.innerHTML;
-        }
-
-        // --- NATIVE P2P WEBRTC CALL SYSTEM + GOOGLE AUTH ---
-        let pendingCallTargetId = null;
-        let pendingCallTargetName = null;
-        let peerConnection = null;
-        let localStream = null;
-        let activeCallRef = null;
-        let authenticatedUserGoogleName = null;
-
-        const rtcConfig = {
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-        };
-
-        function openCallTypeModal(targetClientId, targetNickname) {
-            pendingCallTargetId = targetClientId;
-            pendingCallTargetName = targetNickname;
-            document.getElementById('callTargetNameLabel').innerText = `Connect with ${targetNickname} via Google Auth`;
-            document.getElementById('callTypeModal').classList.remove('hidden');
-            document.getElementById('callTypeModal').classList.add('flex');
-        }
-
-        function closeCallTypeModal() {
-            document.getElementById('callTypeModal').classList.add('hidden');
-            document.getElementById('callTypeModal').classList.remove('flex');
-        }
-
-        // 1-Tap Secure Verification (Bypasses mobile webview OAuth restrictions completely)
-        function startGoogleAuthAndCall(callType) {
-            closeCallTypeModal();
-            
-            // Instantly generate or retrieve a unique secure session identity for this device
-            let secureVerifier = localStorage.getItem('app_secure_caller_name');
-            if (!secureVerifier) {
-                const randomId = Math.floor(1000 + Math.random() * 9000);
-                secureVerifier = `Verified_User_${randomId}`;
-                localStorage.setItem('app_secure_caller_name', secureVerifier);
-            }
-            
-            authenticatedUserGoogleName = secureVerifier;
-            initiateWebRTCCall(pendingCallTargetId, pendingCallTargetName, callType);
-        }
-
-        async function initiateWebRTCCall(targetClientId, targetNickname, callType) {
-            if (!targetClientId || targetClientId === clientId) return;
-
-            activeCallRef = db.ref(`/calls/${targetClientId}`);
-            
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                    video: callType === 'video'
-                });
-            } catch (err) {
-                alert("Microphone/Camera permission denied.");
-                return;
-            }
-
-            openWebRTCUI(callType, `Calling ${targetNickname}...`);
-
-            peerConnection = new RTCPeerConnection(rtcConfig);
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-            peerConnection.ontrack = (event) => {
-                const remoteVideo = document.getElementById('remoteVideo');
-                if (remoteVideo.srcObject !== event.streams[0]) {
-                    remoteVideo.srcObject = event.streams[0];
-                }
-            };
-
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    db.ref(`/calls/${targetClientId}/candidates`).push(event.candidate.toJSON());
-                }
-            };
-
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-
-            activeCallRef.set({
-                callerId: clientId,
-                callerName: authenticatedUserGoogleName,
-                callType: callType,
-                status: 'ringing',
-                offer: { type: offer.type, sdp: offer.sdp },
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-
-            // Listen for answer/rejection
-            activeCallRef.on('value', async (snapshot) => {
-                const data = snapshot.val();
-                if (!data) return;
-
-                if (data.status === 'accepted' && data.answer && !peerConnection.currentRemoteDescription) {
-                    const remoteDesc = new RTCSessionDescription(data.answer);
-                    await peerConnection.setRemoteDescription(remoteDesc);
-                    document.getElementById('webrtcStatusBadge').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> ${callType === 'video' ? 'Video' : 'Audio'} Call Active`;
-                } else if (data.status === 'declined') {
-                    alert(`${targetNickname} declined the call.`);
-                    hangUpWebRTC();
-                }
-            });
-
-            db.ref(`/calls/${clientId}/candidates`).on('child_added', (snapshot) => {
-                const candidate = new RTCIceCandidate(snapshot.val());
-                if (peerConnection) peerConnection.addIceCandidate(candidate).catch(() => {});
-            });
-        }
-
-        function listenForIncomingCalls() {
-            db.ref(`/calls/${clientId}`).on('value', async (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.status === 'ringing') {
-                    document.getElementById('callAvatar').innerText = data.callType === 'video' ? '📹' : '📞';
-                    document.getElementById('callAlertTitle').innerText = `Incoming Google Verified Call`;
-                    document.getElementById('callAlertSubtext').innerText = `${data.callerName} is calling you...`;
-                    document.getElementById('callAlertButtons').innerHTML = `
-                        <button onclick="acceptIncomingCall('${data.callerId}', '${data.callType}', ${JSON.stringify(data.offer).replace(/"/g, '&quot;')})" class="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs shadow-lg">Accept</button>
-                        <button onclick="declineCall('${clientId}')" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl text-xs shadow-lg">Decline</button>
-                    `;
-                    document.getElementById('callAlertModal').classList.remove('hidden');
-                    document.getElementById('callAlertModal').classList.add('flex');
-                } else if (!data) {
-                    document.getElementById('callAlertModal').classList.add('hidden');
-                    document.getElementById('callAlertModal').classList.remove('flex');
-                }
-            });
-        }
-
-        async function acceptIncomingCall(callerId, callType, offerObj) {
-            document.getElementById('callAlertModal').classList.add('hidden');
-            document.getElementById('callAlertModal').classList.remove('flex');
-
-            // Authenticate receiver with Google too for symmetry
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                const result = await auth.signInWithPopup(provider);
-                authenticatedUserGoogleName = result.user.displayName || "Google User";
-            } catch (err) {
-                alert("Google Sign-In required to accept call.");
-                return;
-            }
-
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                    video: callType === 'video'
-                });
-            } catch (err) {
-                alert("Microphone/Camera permission needed.");
-                return;
-            }
-
-            openWebRTCUI(callType, "Connecting...");
-
-            peerConnection = new RTCPeerConnection(rtcConfig);
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-            peerConnection.ontrack = (event) => {
-                const remoteVideo = document.getElementById('remoteVideo');
-                if (remoteVideo.srcObject !== event.streams[0]) {
-                    remoteVideo.srcObject = event.streams[0];
-                }
-            };
-
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    db.ref(`/calls/${callerId}/candidates`).push(event.candidate.toJSON());
-                }
-            };
-
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(offerObj));
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-
-            await db.ref(`/calls/${clientId}`).update({
-                status: 'accepted',
-                answer: { type: answer.type, sdp: answer.sdp }
-            });
-
-            db.ref(`/calls/${clientId}/candidates`).on('child_added', (snapshot) => {
-                const candidate = new RTCIceCandidate(snapshot.val());
-                if (peerConnection) peerConnection.addIceCandidate(candidate).catch(() => {});
-            });
-
-            document.getElementById('webrtcStatusBadge').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> ${callType === 'video' ? 'Video' : 'Audio'} Call Active`;
-        }
-
-        function declineCall(targetId) {
-            db.ref(`/calls/${targetId}`).update({ status: 'declined' });
-            setTimeout(() => db.ref(`/calls/${targetId}`).remove(), 500);
-            document.getElementById('callAlertModal').classList.add('hidden');
-            document.getElementById('callAlertModal').classList.remove('flex');
-        }
-
-        function openWebRTCUI(callType, statusText) {
-            const modal = document.getElementById('webrtcModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.getElementById('webrtcStatusBadge').innerText = statusText;
-
-            if (callType === 'audio') {
-                document.getElementById('remoteVideo').classList.add('hidden');
-                document.getElementById('localVideo').classList.add('hidden');
-                document.getElementById('audioOnlyPlaceholder').classList.remove('hidden');
-            } else {
-                document.getElementById('remoteVideo').classList.remove('hidden');
-                document.getElementById('localVideo').classList.remove('hidden');
-                document.getElementById('audioOnlyPlaceholder').classList.add('hidden');
-                document.getElementById('localVideo').srcObject = localStream;
-            }
-        }
-
-        function toggleMuteAudio() {
-            if (!localStream) return;
-            const audioTrack = localStream.getAudioTracks()[0];
-            if (audioTrack) {
-                audioTrack.enabled = !audioTrack.enabled;
-                document.getElementById('muteAudioBtn').innerText = audioTrack.enabled ? "🎤 Mute" : "🔇 Unmute";
-            }
-        }
-
-        function toggleVideoTrack() {
-            if (!localStream) return;
-            const videoTrack = localStream.getVideoTracks()[0];
-            if (videoTrack) {
-                videoTrack.enabled = !videoTrack.enabled;
-                document.getElementById('toggleVideoBtn').innerText = videoTrack.enabled ? "📹 Video Off" : "📷 Video On";
-            }
-        }
-
-        function hangUpWebRTC() {
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            if (peerConnection) {
-                peerConnection.close();
-                peerConnection = null;
-            }
-            document.getElementById('webrtcModal').classList.add('hidden');
-            document.getElementById('webrtcModal').classList.remove('flex');
-            document.getElementById('remoteVideo').srcObject = null;
-            document.getElementById('localVideo').srcObject = null;
-
-            db.ref(`/calls/${clientId}`).remove();
-            if (activeCallRef) {
-                activeCallRef.remove();
-                activeCallRef = null;
-            }
-        }
-
-        // Handle returning from Google Sign-In Redirect on mobile
-        window.addEventListener('DOMContentLoaded', () => {
-            auth.getRedirectResult().then((result) => {
-                if (result.user) {
-                    authenticatedUserGoogleName = result.user.displayName || "Google User";
-                    const savedCallType = localStorage.getItem('pending_call_type');
-                    const savedTargetId = localStorage.getItem('pending_call_target');
-
-                    if (savedCallType && savedTargetId) {
-                        localStorage.removeItem('pending_call_type');
-                        localStorage.removeItem('pending_call_target');
-                        initiateWebRTCCall(savedTargetId, "Peer", savedCallType);
-                    }
-                }
-            }).catch((error) => {
-                console.error("Redirect login error:", error);
-            });
-        });
-
-        // Start Core Services
-        startHeartbeat();
-        listenToMessages();
-        listenForIncomingCalls();
-
-        // Start Core Services
-        startHeartbeat();
-        listenToMessages();
-        listenForIncomingCalls();
-    </script>
+  </div>
+
+  <!-- Room Modal -->
+  <div id="roomModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm glass border border-amber-500/40 rounded-2xl p-5">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-semibold text-sm text-amber-300">Create Private Room</h3>
+        <button id="closeRoomModal" class="text-amber-500/70">✕</button>
+      </div>
+      <input id="roomNameInput" maxlength="30" placeholder="Room Name..." class="w-full rounded-xl bg-black/60 border border-amber-500/30 px-3 py-2 text-xs text-white outline-none focus:border-amber-400" />
+      <button id="createRoom" class="w-full mt-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-600 text-stone-950 font-bold text-xs">Open Room</button>
+    </div>
+  </div>
+
+  <!-- Incoming Call Modal -->
+  <div id="incomingCallModal" class="hidden fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-xs rounded-3xl glass border border-amber-500/40 p-6 text-center">
+      <div class="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl">☎</div>
+      <div class="mt-4">
+        <div class="text-[10px] uppercase text-amber-500 font-semibold tracking-wider">Incoming Call</div>
+        <h3 id="incomingCallerName" class="text-lg font-bold mt-1 text-amber-300"></h3>
+        <p id="incomingCallType" class="text-xs text-amber-500/70 mt-0.5"></p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button id="declineCall" class="py-2.5 rounded-xl bg-red-600/30 border border-red-500/40 text-red-300 font-semibold text-xs">Decline</button>
+        <button id="acceptCall" class="py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-lg">Accept</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Video / Audio Call View -->
+  <div id="callModal" class="hidden fixed inset-0 z-[90] bg-black">
+    <div class="h-full w-full relative flex flex-col items-center justify-center">
+      <video id="remoteVideo" autoplay playsinline webkit-playsinline class="absolute inset-0 w-full h-full object-cover bg-black"></video>
+      
+      <div id="audioCallBackground" class="absolute inset-0 flex items-center justify-center bg-stone-950">
+        <div class="text-center">
+          <div id="activeCallAvatar" class="w-20 h-20 mx-auto rounded-full bg-amber-500/20 border-2 border-amber-500 text-amber-300 flex items-center justify-center text-2xl font-black">?</div>
+          <h3 id="activeCallerName" class="mt-3 text-base font-semibold text-amber-300"></h3>
+          <p id="callStatusText" class="text-xs text-amber-500/70 mt-1">Connecting...</p>
+        </div>
+      </div>
+
+      <div id="localVideoContainer" class="hidden absolute top-4 right-4 w-28 aspect-video rounded-xl overflow-hidden border border-amber-500/40 bg-stone-900 z-10">
+        <video id="localVideo" autoplay muted playsinline webkit-playsinline class="w-full h-full object-cover"></video>
+      </div>
+
+      <div class="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-4">
+        <button id="hangupButton" class="w-14 h-14 rounded-full bg-red-600 text-white flex items-center justify-center text-xl shadow-lg">☎</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[200] pointer-events-none opacity-0 translate-y-2 transition-all">
+    <div class="px-4 py-2 rounded-xl bg-black/80 border border-amber-500/30 shadow-2xl text-xs text-amber-300" id="toastText"></div>
+  </div>
+
+<script>
+"use strict";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA2Otc65Q_2bZRgLsxIZTJdk9TdlL4LfmI",
+    authDomain: "ultron-85fba.firebaseapp.com",
+    databaseURL: "https://ultron-85fba-default-rtdb.firebaseio.com",
+    projectId: "ultron-85fba",
+    storageBucket: "ultron-85fba.firebasestorage.app",
+    messagingSenderId: "727225448009",
+    appId: "1:727225448009:web:e827bd0a819ddae42d3198",
+    measurementId: "G-EEDR5XX34M"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+const CLIENT_ID_KEY = "chat_client_id_v4";
+const DISPLAY_NAME_KEY = "chat_display_name_v4";
+const ROOMS_KEY = "chat_private_rooms_v4";
+
+let clientId = localStorage.getItem(CLIENT_ID_KEY) || ("client_" + Math.random().toString(36).substring(2, 11));
+localStorage.setItem(CLIENT_ID_KEY, clientId);
+
+let displayName = localStorage.getItem(DISPLAY_NAME_KEY) || ("User-" + clientId.slice(-4));
+
+let currentRoom = "global";
+let currentRoomTitle = "Global Chat";
+let pendingImageData = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let recordInterval = null;
+let onlineUsers = {};
+let hiddenMessageIds = new Set();
+
+/* WebRTC Call Variables */
+let peerConnection = null;
+let localStream = null;
+let incomingCall = null;
+let currentCallTargetId = null;
+
+const $ = id => document.getElementById(id);
+
+function toast(msg) {
+  $("toastText").textContent = msg;
+  const el = $("toast");
+  el.classList.remove("opacity-0", "translate-y-2");
+  el.classList.add("opacity-100", "translate-y-0");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => {
+    el.classList.add("opacity-0", "translate-y-2");
+    el.classList.remove("opacity-100", "translate-y-0");
+  }, 2200);
+}
+
+function escapeHtml(val) {
+  return String(val || '').replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+
+/* Ensure Google Authentication On-Demand for Calls */
+async function ensureGoogleAuth() {
+  const currentUser = auth.currentUser;
+  if (currentUser && !currentUser.isAnonymous) {
+    return true;
+  }
+  
+  try {
+    toast("Authenticating with Google for Call...");
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await auth.signInWithPopup(provider);
+    if (result.user) {
+      if (result.user.displayName) {
+        displayName = result.user.displayName;
+        localStorage.setItem(DISPLAY_NAME_KEY, displayName);
+      }
+      updatePresence();
+      updateProfileUI();
+      toast("Google Authentication Successful!");
+      return true;
+    }
+  } catch (err) {
+    toast("Google Sign-In failed: " + err.message);
+    return false;
+  }
+  return false;
+}
+
+async function initApp() {
+  auth.onAuthStateChanged(user => {
+    if (user && !user.isAnonymous && user.displayName) {
+      displayName = user.displayName;
+      localStorage.setItem(DISPLAY_NAME_KEY, displayName);
+    } else if (!user) {
+      auth.signInAnonymously();
+    }
+    updateProfileUI();
+    setupPresence();
+  });
+
+  renderRooms();
+  switchRoom("global", "Global Chat");
+  setupCallListener();
+
+  db.ref(".info/connected").on("value", snap => {
+    if (snap.val()) {
+      $("connectionDot").className = "w-1.5 h-1.5 rounded-full bg-emerald-500";
+      $("connectionText").textContent = "Connected";
+    } else {
+      $("connectionDot").className = "w-1.5 h-1.5 rounded-full bg-red-500";
+      $("connectionText").textContent = "Offline";
+    }
+  });
+}
+
+function setupPresence() {
+  const userStatusRef = db.ref("/status/" + clientId);
+  db.ref(".info/connected").on("value", snap => {
+    if (!snap.val()) return;
+    userStatusRef.onDisconnect().set({ online: false, name: displayName, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+    updatePresence();
+  });
+
+  db.ref("/status").on("value", snap => {
+    onlineUsers = snap.val() || {};
+    renderOnlineUsers();
+  });
+}
+
+function updatePresence() {
+  db.ref("/status/" + clientId).set({
+    online: true,
+    clientId,
+    name: displayName,
+    lastSeen: firebase.database.ServerValue.TIMESTAMP
+  });
+}
+
+function renderOnlineUsers() {
+  const active = Object.entries(onlineUsers)
+    .filter(([id, u]) => u && u.online)
+    .map(([id, u]) => ({ id, ...u }));
+
+  $("onlineCount").textContent = active.length;
+
+  $("onlineUsers").innerHTML = active.map(u => `
+    <div class="flex items-center justify-between p-2 rounded-xl bg-black/40 border border-amber-500/20">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+        <span class="text-xs truncate font-medium text-amber-100">${escapeHtml(u.name)}</span>
+      </div>
+      ${u.id !== clientId ? `
+        <div class="flex gap-1 shrink-0">
+          <button onclick="initiateCall('${u.id}', '${escapeHtml(u.name)}', 'audio')" class="p-1.5 rounded-lg bg-black/50 border border-amber-500/20 hover:bg-amber-500 hover:text-stone-950 text-xs font-bold text-amber-300" title="Audio Call">☎</button>
+          <button onclick="initiateCall('${u.id}', '${escapeHtml(u.name)}', 'video')" class="p-1.5 rounded-lg bg-black/50 border border-amber-500/20 hover:bg-amber-500 hover:text-stone-950 text-xs font-bold text-amber-300" title="Video Call">▣</button>
+        </div>
+      ` : '<span class="text-[9px] text-amber-400 font-mono">YOU</span>'}
+    </div>
+  `).join('');
+}
+
+function switchRoom(key, title) {
+  currentRoom = key;
+  currentRoomTitle = title;
+  $("roomTitle").textContent = title;
+  $("roomBadge").textContent = key === "global" ? "PUBLIC" : "PRIVATE";
+
+  db.ref("/rooms/" + currentRoom + "/messages").off();
+  db.ref("/rooms/" + currentRoom + "/messages").on("value", snap => {
+    renderMessages(snap.val() || {});
+  });
+
+  document.querySelectorAll('.room-button').forEach(btn => {
+    btn.classList.toggle('room-active', btn.dataset.room === key);
+  });
+}
+
+function renderMessages(data) {
+  const list = Object.entries(data)
+    .map(([id, m]) => ({ id, ...m }))
+    .filter(m => !hiddenMessageIds.has(m.id))
+    .sort((a,b) => (a.timestamp||0)-(b.timestamp||0));
+
+  const container = $("messages");
+
+  if (!list.length) {
+    container.innerHTML = `<div class="h-full flex items-center justify-center text-xs text-amber-500/60">No messages in ${escapeHtml(currentRoomTitle)}.</div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(m => {
+    const mine = m.clientId === clientId;
+    return `
+      <div class="message-bubble flex ${mine ? 'justify-end' : 'justify-start'}">
+        <div class="max-w-[85%] md:max-w-[70%] space-y-1">
+          <div class="flex items-center gap-2 text-[10px] text-amber-500/70 ${mine ? 'justify-end' : ''}">
+            <span class="font-bold ${mine ? 'text-amber-400' : 'text-amber-300'}">${escapeHtml(m.name)}</span>
+            <span>${m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
+          </div>
+
+          <div class="p-2.5 rounded-2xl ${mine ? 'bg-amber-500 text-stone-950 rounded-br-none' : 'bg-black/60 border border-amber-500/20 text-amber-100 rounded-bl-none'} text-xs space-y-2 shadow-md">
+            ${m.text ? `<div class="break-words">${escapeHtml(m.text)}</div>` : ''}
+            ${m.image ? `<img src="${m.image}" class="max-h-56 rounded-lg object-cover w-full" />` : ''}
+            ${m.audio ? `<audio controls src="${m.audio}" class="w-full h-8"></audio>` : ''}
+          </div>
+
+          <div class="flex items-center gap-2 text-[10px] ${mine ? 'justify-end' : ''}">
+            ${mine ? `
+              <button onclick="deleteMessage('${m.id}')" class="text-red-400 hover:underline">Delete</button>
+            ` : `
+              <button onclick="hideMessage('${m.id}')" class="text-amber-500/50 hover:underline">Hide</button>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+}
+
+window.deleteMessage = function(msgId) {
+  db.ref(`/rooms/${currentRoom}/messages/${msgId}`).remove();
+  toast("Message deleted!");
+};
+
+window.hideMessage = function(msgId) {
+  hiddenMessageIds.add(msgId);
+  db.ref(`/rooms/${currentRoom}/messages`).once('value', snap => renderMessages(snap.val() || {}));
+  toast("Message hidden locally.");
+};
+
+async function sendCurrentMessage(extraPayload = {}) {
+  const text = $("messageInput").value.trim();
+  if (!text && !pendingImageData && !extraPayload.audio) return;
+
+  const payload = {
+    clientId,
+    name: displayName,
+    text: text || null,
+    image: pendingImageData || null,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    ...extraPayload
+  };
+
+  await db.ref("/rooms/" + currentRoom + "/messages").push(payload);
+  $("messageInput").value = "";
+  clearImageAttachment();
+}
+
+$("attachImgBtn").onclick = () => $("imageInput").click();
+$("imageInput").onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    pendingImageData = ev.target.result;
+    $("imagePreview").src = pendingImageData;
+    $("imagePreviewBar").classList.remove("hidden");
+  };
+  reader.readAsDataURL(file);
+};
+$("removeImageBtn").onclick = clearImageAttachment;
+
+function clearImageAttachment() {
+  pendingImageData = null;
+  $("imageInput").value = "";
+  $("imagePreviewBar").classList.add("hidden");
+}
+
+$("voiceNoteBtn").onclick = async () => {
+  if (!navigator.mediaDevices) return toast("Audio recording unsupported.");
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const reader = new FileReader();
+      reader.onloadend = () => sendCurrentMessage({ audio: reader.result });
+      reader.readAsDataURL(blob);
+    };
+    mediaRecorder.start();
+    $("recordingBar").classList.remove("hidden");
+    let seconds = 0;
+    recordInterval = setInterval(() => {
+      seconds++;
+      $("recordTimer").textContent = `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+    }, 1000);
+  } catch (err) {
+    toast("Microphone access denied.");
+  }
+};
+
+$("stopRecordBtn").onclick = () => {
+  if (mediaRecorder) mediaRecorder.stop();
+  clearInterval(recordInterval);
+  $("recordingBar").classList.add("hidden");
+};
+$("cancelRecordBtn").onclick = () => {
+  if (mediaRecorder) mediaRecorder.stop();
+  audioChunks = [];
+  clearInterval(recordInterval);
+  $("recordingBar").classList.add("hidden");
+};
+
+/* Unified Call Flow with Instant End-State Sync */
+window.initiateCall = async function(targetId, targetName, type) {
+  const authenticated = await ensureGoogleAuth();
+  if (!authenticated) return;
+  startCall(targetId, targetName, type);
+};
+
+async function startCall(targetId, targetName, type) {
+  currentCallTargetId = targetId;
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'video' });
+    peerConnection = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+    
+    localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+
+    peerConnection.onicecandidate = e => {
+      if (e.candidate) db.ref(`/calls/${targetId}/callerCandidates`).push(e.candidate.toJSON());
+    };
+
+    peerConnection.ontrack = e => {
+      const rv = $("remoteVideo");
+      rv.srcObject = e.streams[0];
+      rv.play().catch(()=>{});
+    };
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+
+    const callRef = db.ref("/calls/" + targetId);
+    callRef.onDisconnect().remove();
+
+    await callRef.set({
+      callerId: clientId,
+      callerName: displayName,
+      callType: type,
+      status: "ringing",
+      offer: { type: offer.type, sdp: offer.sdp }
+    });
+
+    openCallUI(targetName, type, "Ringing...");
+
+    callRef.on('value', snap => {
+      const val = snap.val();
+      if (!val || val.status === "ended" || val.status === "declined") {
+        closeCallUI("Call ended");
+        return;
+      }
+
+      if (val.answer && !peerConnection.currentRemoteDescription) {
+        peerConnection.setRemoteDescription(new RTCSessionDescription(val.answer));
+        $("callStatusText").textContent = "Connected";
+      }
+    });
+
+    callRef.child("receiverCandidates").on('child_added', snap => {
+      if (snap.val()) peerConnection.addIceCandidate(new RTCIceCandidate(snap.val()));
+    });
+  } catch(err) {
+    toast("Camera/Mic Permission Denied!");
+    cleanupMedia();
+  }
+}
+
+function setupCallListener() {
+  db.ref("/calls/" + clientId).on("value", snap => {
+    const call = snap.val();
+    if (!call) {
+      if (!$("incomingCallModal").classList.contains("hidden")) {
+        $("incomingCallModal").classList.add("hidden");
+      }
+      if (!$("callModal").classList.contains("hidden")) {
+        closeCallUI("Call ended");
+      }
+      return;
+    }
+
+    if (call.status === "ringing") {
+      incomingCall = call;
+      $("incomingCallerName").textContent = call.callerName;
+      $("incomingCallType").textContent = `${call.callType.toUpperCase()} Call`;
+      $("incomingCallModal").classList.remove("hidden");
+    } else if (call.status === "ended") {
+      closeCallUI("Call ended");
+    }
+  });
+}
+
+$("acceptCall").onclick = async () => {
+  const authenticated = await ensureGoogleAuth();
+  if (!authenticated) {
+    db.ref("/calls/" + clientId).update({ status: "declined" });
+    $("incomingCallModal").classList.add("hidden");
+    return;
+  }
+
+  $("incomingCallModal").classList.add("hidden");
+  const callRef = db.ref("/calls/" + clientId);
+  callRef.onDisconnect().remove();
+
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: incomingCall.callType === 'video' });
+    peerConnection = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+    localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+
+    peerConnection.onicecandidate = e => {
+      if (e.candidate) callRef.child("receiverCandidates").push(e.candidate.toJSON());
+    };
+
+    peerConnection.ontrack = e => {
+      const rv = $("remoteVideo");
+      rv.srcObject = e.streams[0];
+      rv.play().catch(()=>{});
+    };
+
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingCall.offer));
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+
+    await callRef.update({ status: "accepted", answer: { type: answer.type, sdp: answer.sdp } });
+    
+    callRef.child("callerCandidates").on('child_added', snap => {
+      if (snap.val()) peerConnection.addIceCandidate(new RTCIceCandidate(snap.val()));
+    });
+
+    openCallUI(incomingCall.callerName, incomingCall.callType, "Connected");
+  } catch(err) {
+    toast("Could not access camera/microphone.");
+    db.ref("/calls/" + clientId).update({ status: "ended" });
+  }
+};
+
+$("declineCall").onclick = () => {
+  db.ref("/calls/" + clientId).update({ status: "declined" });
+  setTimeout(() => db.ref("/calls/" + clientId).remove(), 500);
+  $("incomingCallModal").classList.add("hidden");
+};
+
+$("hangupButton").onclick = () => {
+  if (currentCallTargetId) {
+    db.ref("/calls/" + currentCallTargetId).update({ status: "ended" });
+    setTimeout(() => db.ref("/calls/" + currentCallTargetId).remove(), 500);
+  }
+  db.ref("/calls/" + clientId).update({ status: "ended" });
+  setTimeout(() => db.ref("/calls/" + clientId).remove(), 500);
+  
+  closeCallUI("Call ended");
+};
+
+function openCallUI(name, type, status) {
+  $("activeCallerName").textContent = name;
+  $("activeCallAvatar").textContent = name ? name.charAt(0).toUpperCase() : '?';
+  $("callStatusText").textContent = status;
+  $("callModal").classList.remove("hidden");
+
+  if (type === 'video') {
+    $("localVideoContainer").classList.remove("hidden");
+    $("audioCallBackground").classList.add("hidden");
+    const lv = $("localVideo");
+    lv.srcObject = localStream;
+    lv.play().catch(()=>{});
+  } else {
+    $("localVideoContainer").classList.add("hidden");
+    $("audioCallBackground").classList.remove("hidden");
+  }
+}
+
+function closeCallUI(msg) {
+  cleanupMedia();
+  $("callModal").classList.add("hidden");
+  $("incomingCallModal").classList.add("hidden");
+  if (msg) toast(msg);
+}
+
+function cleanupMedia() {
+  if (peerConnection) {
+    peerConnection.close();
+    peerConnection = null;
+  }
+  if (localStream) {
+    localStream.getTracks().forEach(t => t.stop());
+    localStream = null;
+  }
+  currentCallTargetId = null;
+}
+
+function renderRooms() {
+  const rooms = JSON.parse(localStorage.getItem(ROOMS_KEY) || "[]");
+  $("customRooms").innerHTML = rooms.map(r => `
+    <button data-room="${r.key}" class="room-button w-full text-left rounded-xl border border-transparent p-2.5 mb-1 flex items-center gap-2.5 hover:bg-black/40">
+      <span class="w-7 h-7 rounded-lg bg-black/50 flex items-center justify-center text-amber-400 font-bold text-xs border border-amber-500/20">#</span>
+      <div class="min-w-0 flex-1">
+        <div class="text-xs font-semibold truncate text-amber-200">${escapeHtml(r.name)}</div>
+        <div class="text-[10px] text-amber-500/60">Private</div>
+      </div>
+    </button>
+  `).join('');
+
+  document.querySelectorAll('.room-button').forEach(btn => {
+    btn.onclick = () => switchRoom(btn.dataset.room, btn.querySelector('.font-semibold').textContent);
+  });
+}
+
+$("newRoomButton").onclick = () => $("roomModal").classList.remove("hidden");
+$("closeRoomModal").onclick = () => $("roomModal").classList.add("hidden");
+$("createRoom").onclick = () => {
+  const name = $("roomNameInput").value.trim();
+  if (!name) return;
+  const key = "room_" + name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const rooms = JSON.parse(localStorage.getItem(ROOMS_KEY) || "[]");
+  if (!rooms.some(r => r.key === key)) {
+    rooms.push({ key, name });
+    localStorage.setItem(ROOMS_KEY, JSON.stringify(rooms));
+  }
+  renderRooms();
+  switchRoom(key, name);
+  $("roomModal").classList.add("hidden");
+};
+
+$("profileButton").onclick = () => {
+  $("nameInput").value = displayName;
+  $("profileModal").classList.remove("hidden");
+};
+
+$("saveName").onclick = () => {
+  const val = $("nameInput").value.trim();
+  if (val) {
+    displayName = val;
+    localStorage.setItem(DISPLAY_NAME_KEY, displayName);
+    updatePresence();
+    updateProfileUI();
+    $("profileModal").classList.add("hidden");
+    toast("Name updated!");
+  }
+};
+
+function updateProfileUI() {
+  $("profileButton").textContent = displayName.charAt(0).toUpperCase();
+  $("clientIdLabel").textContent = clientId;
+}
+
+$("mobileNavToggle").onclick = () => $("sidebar").classList.remove("-translate-x-full");
+$("closeSidebarMobile").onclick = () => $("sidebar").classList.add("-translate-x-full");
+$("togglePeopleMobile").onclick = () => $("presencePanel").classList.toggle("translate-x-full");
+$("closePresenceMobile").onclick = () => $("presencePanel").classList.add("translate-x-full");
+
+$("copyClientId").onclick = () => {
+  navigator.clipboard.writeText(clientId);
+  toast("ID Copied!");
+};
+
+$("messageForm").onsubmit = e => {
+  e.preventDefault();
+  sendCurrentMessage();
+};
+
+initApp();
+</script>
 </body>
 </html>
