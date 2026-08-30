@@ -263,7 +263,12 @@
                 <h2 class="text-xs font-bold text-amber-300 uppercase tracking-wide">
                     <i class="fas fa-plus-circle text-amber-500 mr-1"></i> Add Event for <span id="selectedDateBadge" class="text-amber-400 underline">Selected Date</span>
                 </h2>
-                <button onclick="logoutAdmin()" class="text-[10px] text-red-400 hover:underline">Logout Admin</button>
+                <div class="flex gap-2 items-center">
+                    <button onclick="clearAllEvents()" class="text-[10px] text-red-400 hover:text-red-300 bg-red-950/60 px-2 py-1 rounded border border-red-500/30">
+                        <i class="fas fa-trash-alt mr-1"></i> Clear All Database Events
+                    </button>
+                    <button onclick="logoutAdmin()" class="text-[10px] text-stone-400 hover:underline">Logout Admin</button>
+                </div>
             </div>
             <form id="addEventForm" onsubmit="handleSaveEvent(event)" class="space-y-3">
                 <input type="hidden" id="eventDateKey">
@@ -292,13 +297,13 @@
                     <div>
                         <label class="block text-[10px] text-stone-400 mb-1">Start Time Slot (प्रारंभ वेळ)</label>
                         <select id="newEventStartHour" required class="w-full px-3 py-2 text-xs festive-input">
-                            <!-- Filled programmatically with 24 hours -->
+                            <!-- Filled programmatically -->
                         </select>
                     </div>
                     <div>
                         <label class="block text-[10px] text-stone-400 mb-1">End Time Slot (समाप्ती वेळ)</label>
                         <select id="newEventEndHour" required class="w-full px-3 py-2 text-xs festive-input">
-                            <!-- Filled programmatically with 24 hours -->
+                            <!-- Filled programmatically -->
                         </select>
                     </div>
                 </div>
@@ -309,7 +314,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] text-stone-400 mb-1">तپسील / मंत्र / माहिती (Description)</label>
+                    <label class="block text-[10px] text-stone-400 mb-1">तपशील / मंत्र / माहिती (Description)</label>
                     <textarea id="newEventDesc" rows="2" required placeholder="सुप्रसिद्ध धार्मिक विधीची सविस्तर माहिती..." class="w-full px-3.5 py-2 text-xs festive-input resize-none"></textarea>
                 </div>
 
@@ -402,6 +407,15 @@
 
         let isAdminLoggedIn = sessionStorage.getItem('isAdminAuth') === 'true';
         let allEventsCache = {};
+
+        function formatDateKey(dateObj) {
+            const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' };
+            const parts = new Intl.DateTimeFormat('en-CA', options).formatToParts(dateObj);
+            const y = parts.find(p => p.type === 'year').value;
+            const m = parts.find(p => p.type === 'month').value;
+            const d = parts.find(p => p.type === 'day').value;
+            return `${y}-${m}-${d}`;
+        }
         
         let currentDateObj = new Date();
         let currentYear = currentDateObj.getFullYear();
@@ -413,14 +427,6 @@
             "जुलै", "ऑगस्ट", "सप्टेंबर", "ऑक्टोबर", "नोव्हेंबर", "डिसेंबर"
         ];
 
-        function formatDateKey(dateObj) {
-            const y = dateObj.getFullYear();
-            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const d = String(dateObj.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
-        }
-
-        // Initialize 24-hour options in admin dropdowns
         function populateHourDropdowns() {
             const startSel = document.getElementById('newEventStartHour');
             const endSel = document.getElementById('newEventEndHour');
@@ -430,11 +436,11 @@
             for (let h = 0; h < 24; h++) {
                 const hourFormatted = String(h).padStart(2, '0') + ":00";
                 const displayLabel = h === 0 ? "12:00 AM (Midnight)" : h < 12 ? `${h}:00 AM` : h === 12 ? "12:00 PM (Noon)" : `${h - 12}:00 PM`;
-                htmlOptions += `<option value="${hourFormatted}">${displayLabel} (${hourFormatted})</option>`;
+                htmlOptions += `<option value="${hourFormatted}">${displayLabel} (${hourFormatted}) IST</option>`;
             }
             startSel.innerHTML = htmlOptions;
             endSel.innerHTML = htmlOptions;
-            if (endSel.options.length > 1) endSel.selectedIndex = 1; // Default 1 hour later
+            if (endSel.options.length > 1) endSel.selectedIndex = 1;
         }
 
         function checkAdminState() {
@@ -566,13 +572,11 @@
             render24HourTimeline();
         }
 
-        // Render 24-Hour Timeline Grid with Collision Detection
         function render24HourTimeline() {
             const container = document.getElementById('hourlyTimelineContainer');
             const collisionBadge = document.getElementById('collisionBadge');
             if (!container) return;
 
-            // Gather events for the selected date
             let dateEvents = [];
             if (allEventsCache && selectedDateKey) {
                 for (let k in allEventsCache) {
@@ -582,7 +586,6 @@
                 }
             }
 
-            // Map hours 0 to 23 to events occupying them
             let hourOccupancy = {};
             for (let i = 0; i < 24; i++) hourOccupancy[i] = [];
 
@@ -590,7 +593,7 @@
                 let startH = 0, endH = 23;
                 if (ev.startTime) startH = parseInt(ev.startTime.split(':')[0]) || 0;
                 if (ev.endTime) endH = parseInt(ev.endTime.split(':')[0]) || 23;
-                if (startH > endH) endH = 23; // fallback for overnight wrap
+                if (startH > endH) endH = 23;
 
                 for (let h = startH; h <= endH; h++) {
                     if (hourOccupancy[h]) {
@@ -621,7 +624,7 @@
 
                 timelineHtml += `
                     <div class="${rowClass} flex items-center justify-between rounded-lg">
-                        <div class="font-mono text-amber-200 text-xs w-16 shrink-0">${displayLabel}</div>
+                        <div class="font-mono text-amber-200 text-xs w-16 shrink-0">${displayLabel} IST</div>
                         <div class="flex-1 text-right">${badgeHtml}</div>
                     </div>
                 `;
@@ -646,22 +649,14 @@
             }
         }
 
+        // STRICTLY LOAD DATABASE WITHOUT AUTO-CREATING ANYTHING
         function loadEvents() {
             db.ref('/events').on('value', snapshot => {
                 const data = snapshot.val();
-                if (!data) {
-                    const todayStr = formatDateKey(new Date());
-                    const defaultEvents = {
-                        ev1: { title: "श्री गणेश आगमन सोहळा (Shri Ganesh Aagman Sohala)", dateKey: todayStr, startTime: "16:00", endTime: "19:00", time: "16:00 - 19:00", location: "Main Mandap", desc: "Welcoming Bappa with traditional Dhol-Tasha and devotional fervor." },
-                        ev2: { title: "महाप्रसाद आणि महाआरती", dateKey: todayStr, startTime: "12:00", endTime: "14:00", time: "12:00 - 14:00", location: "Mandap Premises", desc: "Daily community aarti followed by Mahaprasad distribution." }
-                    };
-                    db.ref('/events').set(defaultEvents);
-                } else {
-                    allEventsCache = data;
-                    renderCalendar();
-                    filterAndRenderEvents();
-                    render24HourTimeline();
-                }
+                allEventsCache = data || {};
+                renderCalendar();
+                filterAndRenderEvents();
+                render24HourTimeline();
             });
         }
 
@@ -700,10 +695,10 @@
             container.innerHTML = keys.map(key => {
                 const ev = eventsObj[key];
                 const deleteBtnHTML = isAdminLoggedIn 
-                    ? `<button onclick="deleteEvent('${key}')" class="mt-2 text-[10px] bg-red-900/40 border border-red-500/30 text-red-300 px-2.5 py-1 rounded hover:bg-red-600/30"><i class="fas fa-trash mr-1"></i> Delete Event</button>` 
+                    ? `<button onclick="deleteEvent('${key}')" class="mt-2 text-[10px] bg-red-900/40 border border-red-500/30 text-red-300 px-2.5 py-1 rounded hover:bg-red-600/30 cursor-pointer"><i class="fas fa-trash mr-1"></i> Delete Event</button>` 
                     : '';
 
-                const displayTimeStr = ev.time || `${ev.startTime || '00:00'} - ${ev.endTime || '23:00'}`;
+                const displayTimeStr = (ev.time || `${ev.startTime || '00:00'} - ${ev.endTime || '23:00'}`) + " IST";
 
                 return `
                     <div class="premium-card p-4 relative">
@@ -740,12 +735,6 @@
                 return;
             }
 
-            if (startH >= endH) {
-                if (!confirm("Warning: End time is equal to or earlier than start time. Proceed anyway?")) {
-                    return;
-                }
-            }
-
             const newEvent = {
                 title: titleVal,
                 dateKey: dateKeyValue,
@@ -761,17 +750,33 @@
                 document.getElementById('customTitleWrapper').classList.add('hidden');
                 document.getElementById('eventDateKey').value = selectedDateKey;
                 populateHourDropdowns();
-                alert("Event published successfully to calendar and timeline!");
+                alert("Event published successfully!");
             }).catch(err => {
                 alert("Failed to add event: " + err.message);
             });
         }
 
         function deleteEvent(key) {
-            if (!isAdminLoggedIn) return;
+            if (!isAdminLoggedIn) {
+                alert("Admin authorization required to delete events.");
+                return;
+            }
             if (confirm("Are you sure you want to delete this event?")) {
-                db.ref(`/events/${key}`).remove().catch(err => {
+                db.ref(`/events/${key}`).remove().then(() => {
+                    alert("Event deleted successfully!");
+                }).catch(err => {
                     alert("Delete failed: " + err.message);
+                });
+            }
+        }
+
+        function clearAllEvents() {
+            if (!isAdminLoggedIn) return;
+            if (confirm("Are you sure you want to clear ALL database events?")) {
+                db.ref('/events').remove().then(() => {
+                    alert("Database cleared!");
+                }).catch(err => {
+                    alert("Failed to clear database: " + err.message);
                 });
             }
         }
@@ -799,7 +804,7 @@
                 const phone = document.getElementById('rsvpPhone').value.trim();
                 const eventName = document.getElementById('rsvpEventSelect').value;
                 const note = document.getElementById('rsvpNote').value.trim() || "No additional note";
-                const submittedAt = new Date().toLocaleString("en-IN");
+                const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
                 const payload = {
                     access_key: WEB3FORMS_KEY,
@@ -810,7 +815,7 @@
                     event: eventName,
                     note: note,
                     submitted_at: submittedAt,
-                    message: `NEW EVENT REGISTRATION / RSVP\n=========================\nName: ${name}\nPhone: ${phone}\nEvent: ${eventName}\nNote: ${note}\nSubmitted At: ${submittedAt}`
+                    message: `NEW EVENT REGISTRATION / RSVP\n=========================\nName: ${name}\nPhone: ${phone}\nEvent: ${eventName}\nNote: ${note}\nSubmitted At: ${submittedAt} (IST)`
                 };
 
                 const res = await fetch("https://api.web3forms.com/submit", {
