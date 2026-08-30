@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>अधिकृत जाहिरातदार व प्रायोजक | जकेरियाचा विघ्नहर्ता</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Yatra+One&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --primary: #c2185b;
+            --festive-gold: #d4a359;
+            --dark-maroon: #2d0206;
+            --gold-gradient: linear-gradient(135deg, #fde68a 0%, #d97706 100%);
+        }
+        
+        body {
+            font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif;
+            background-color: #170103;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .marathi-font {
+            font-family: 'Yatra One', 'Tiro Devanagari Hindi', serif;
+        }
+        
+        /* Premium 3D Layering Cards */
+        .premium-card {
+            background: linear-gradient(145deg, rgba(50, 4, 9, 0.85) 0%, rgba(26, 1, 4, 0.95) 100%);
+            border: 1px solid rgba(212, 163, 89, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-radius: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: perspective(1000px) translateZ(0);
+        }
+        
+        .premium-card:hover {
+            transform: perspective(1000px) translateY(-4px) translateZ(5px);
+            border-color: rgba(212, 163, 89, 0.4);
+            box-shadow: 0 20px 40px rgba(212, 163, 89, 0.12), 0 25px 50px rgba(0, 0, 0, 0.6);
+        }
+        
+        /* 3D Interactive Buttons */
+        .btn-3d {
+            background: linear-gradient(135deg, #d97706 0%, #9a3412 100%);
+            color: #fff !important;
+            border: 1px solid rgba(253, 230, 138, 0.3);
+            box-shadow: 0 4px 0 #7c2d12, 0 8px 16px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-3d:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #7c2d12, 0 12px 20px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+        }
+
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #7c2d12, 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Form Input Styling */
+        .form-input {
+            background: rgba(10, 1, 2, 0.7);
+            border: 1px solid rgba(212, 163, 89, 0.3);
+            color: #f3f4f6;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+        }
+
+        /* Traditional Corner Details */
+        .corner-detail {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--festive-gold);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; }
+        .tr { top: 12px; right: 12px; border-left: 0; border-bottom: 0; }
+        .bl { bottom: 12px; left: 12px; border-right: 0; border-top: 0; }
+        .br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; }
+
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #f59e0b;
+            width: 45px;
+            height: 45px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(212, 163, 89, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(212, 163, 89, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 163, 89, 0); }
+        }
+        .chat-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-500 selection:text-black pt-20">
+
+    <div id="loading" class="fixed inset-0 bg-[#2d0206] z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="loader mb-4"></div>
+        <p class="text-amber-400 font-medium tracking-widest marathi-font text-xl">जकेरियाचा विघ्नहर्ता</p>
+    </div>
+
+    <nav class="w-full bg-black/60 backdrop-blur-md border-b border-amber-500/20 fixed top-0 left-0 z-40 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between relative">
+            <div class="flex items-center space-x-3">
+                <div class="h-12 w-12 rounded-full border-2 border-amber-400 shadow-lg overflow-hidden bg-amber-900/50">
+                    <img alt="JB Logo" class="w-full h-full object-cover" src="https://ultron3000.github.io/jakeriachavighnaharta/assets/logonew.jpg"/>
+                </div>
+                <div>
+                    <span class="marathi-font text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400 tracking-wide block">जकेरियाचा विघ्नहर्ता</span>
+                    <span class="text-[9px] text-amber-500/70 tracking-widest block uppercase font-medium">|| स्थापना १९६४ ||</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/" class="text-stone-300 hover:text-amber-400 transition">Home</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/images.html" class="text-stone-300 hover:text-amber-400 transition">Images</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/videos.html" class="text-stone-300 hover:text-amber-400 transition">Videos</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/events.html" class="text-stone-300 hover:text-amber-400 transition">Events</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/partners.html" class="text-amber-300 border-b border-amber-400 pb-0.5 font-semibold">Partners</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/submit-media.html" class="text-stone-300 hover:text-amber-400 transition">Submit Media</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/upi.html" class="text-stone-300 hover:text-amber-400 transition">UPI</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/info.html" class="text-stone-300 hover:text-amber-400 transition">Info</a>
+                    <a href="https://ultron3000.github.io/jakeriachavighnaharta/chat" class="text-stone-300 hover:text-amber-400 transition">Chat</a>
+                </div>
+
+                <button id="menuBtn" aria-label="Toggle Navigation Menu" class="h-11 w-11 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center hover:bg-amber-500/20 active:scale-95 transition">
+                    <i id="menuIcon" class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobileMenu" class="hidden absolute top-full left-0 w-full bg-[#1c0205]/95 backdrop-blur-xl border-b border-amber-500/30 shadow-2xl py-4 px-6 transition-all duration-300 z-50">
+            <div class="max-w-6xl mx-auto flex flex-col space-y-3">
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-home w-8 text-amber-400"></i> Home | मुख्यपृष्ठ
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/images.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-camera-retro w-8 text-orange-500"></i> Images | छायाचित्र संग्रह
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/videos.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-video w-8 text-orange-500"></i> Videos | चित्रफित संग्रह
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/events.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-calendar-alt w-8 text-orange-500"></i> Events | कार्यक्रम
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/partners.html" class="flex items-center py-2.5 px-4 rounded-xl text-amber-300 bg-amber-500/10 border border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-handshake w-8 text-amber-400"></i> Partners | प्रायोजक व जाहिरातदार
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/submit-media.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-upload w-8 text-orange-500"></i> Submit Media | प्रसारमाध्यमाी
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/upi.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-rupee-sign w-8 text-amber-400"></i> UPI | भक्तिपूर्वक योगदान
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/info.html" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-info-circle w-8 text-amber-400"></i> Info | माहिती पत्रक
+                </a>
+                <a href="https://ultron3000.github.io/jakeriachavighnaharta/chat" class="flex items-center py-2.5 px-4 rounded-xl text-stone-200 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition text-sm font-medium">
+                    <i class="fas fa-comments w-8 text-emerald-400"></i> Chat | समुदाय चर्चा
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 sm:px-6 py-8 max-w-5xl relative z-30">
+        
+        <section class="premium-card p-6 md:p-10 mb-8 text-center relative overflow-hidden">
+            <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+            <div class="corner-detail bl"></div><div class="corner-detail br"></div>
+            
+            <div class="inline-flex bg-amber-500/10 p-3 rounded-full mb-3 border border-amber-500/30 text-amber-400">
+                <i class="fas fa-handshake text-3xl"></i>
+            </div>
+
+            <h1 class="marathi-font text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-amber-200 via-amber-400 to-amber-600 mb-2 drop-shadow-md">
+                अधिकृत प्रायोजक व जाहिरातदार
+            </h1>
+            <h2 class="text-sm md:text-base text-amber-300 font-medium tracking-wide mb-4">Official Partners & Advertisers</h2>
+            
+            <div class="w-24 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto my-4"></div>
+            
+            <p class="text-xs md:text-sm text-stone-300 font-light max-w-2xl mx-auto tracking-wide leading-relaxed">
+                जकेरीया बंदर रोड सार्वजनिक गणेशोत्सव मंडळाच्या कार्यात मोलाचे सहकार्य करणाऱ्या सर्व सन्माननीय प्रायोजक, व्यावसायिक आणि देणगीदारांचे सहर्ष आभार!
+            </p>
+        </section>
+
+        <section class="premium-card p-6 md:p-8 relative mb-10">
+            <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+
+            <h3 class="text-lg font-semibold text-amber-400 mb-6 flex items-center border-b border-amber-500/20 pb-3 marathi-font">
+                <i class="fas fa-building mr-3 text-amber-500"></i>
+                <span>सर्व प्रायोजक व जाहिरातदार (Our Esteemed Partners)</span>
+            </h3>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div class="bg-black/50 border border-amber-500/20 rounded-xl p-4 flex flex-col items-center justify-center hover:border-amber-400/50 transition">
+                    <img src="https://i.postimg.cc/gcKYVQXL/LIC-Logo-500x281.png" alt="LIC Logo" class="h-14 w-auto object-contain mb-2">
+                    <span class="text-[11px] text-stone-300 font-medium text-center">L.I.C. India</span>
+                </div>
+
+                <div class="bg-black/40 border border-amber-500/10 rounded-xl p-4 flex flex-col items-center justify-center text-stone-500">
+                    <i class="fas fa-handshake text-3xl mb-2 text-amber-500/40"></i>
+                    <span class="text-[11px] text-stone-400 font-medium text-center">Your Business Here</span>
+                </div>
+
+                <div class="bg-black/40 border border-amber-500/10 rounded-xl p-4 flex flex-col items-center justify-center text-stone-500">
+                    <i class="fas fa-store text-3xl mb-2 text-amber-500/40"></i>
+                    <span class="text-[11px] text-stone-400 font-medium text-center">Your Business Here</span>
+                </div>
+
+                <div class="bg-black/40 border border-amber-500/10 rounded-xl p-4 flex flex-col items-center justify-center text-stone-500">
+                    <i class="fas fa-bullhorn text-3xl mb-2 text-amber-500/40"></i>
+                    <span class="text-[11px] text-stone-400 font-medium text-center">Your Business Here</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="premium-card p-6 md:p-10 relative mb-10" id="partnerFormSection">
+            <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+            <div class="corner-detail bl"></div><div class="corner-detail br"></div>
+
+            <div class="text-center mb-8">
+                <span class="px-3 py-1 bg-amber-500/20 border border-amber-500/40 rounded-full text-xs font-semibold text-amber-300 uppercase tracking-widest inline-block mb-3">Partner With Us</span>
+                <h3 class="marathi-font text-2xl md:text-3xl font-bold text-amber-300">जाहिरात व सहभागासाठी नोंदणी</h3>
+                <p class="text-xs md:text-sm text-stone-300 mt-2 max-w-xl mx-auto">
+                    Fill out the details below to submit your business logo, PDF brochure, or advertisement proposal to the Mandal's official email.
+                </p>
+            </div>
+
+            <form id="partnerSubmitForm" class="space-y-6 max-w-3xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-2">
+                            <i class="fas fa-building text-amber-400 mr-1.5"></i> Business / Sponsor Name *
+                        </label>
+                        <input type="text" id="businessName" required placeholder="e.g., L.I.C. / Local Store / Organization" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-2">
+                            <i class="fas fa-user text-amber-400 mr-1.5"></i> Contact Person Name *
+                        </label>
+                        <input type="text" id="contactName" required placeholder="Your Full Name" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-2">
+                            <i class="fas fa-phone text-amber-400 mr-1.5"></i> Contact Phone / WhatsApp *
+                        </label>
+                        <input type="tel" id="contactPhone" required placeholder="+91 9876543210" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-2">
+                            <i class="fas fa-envelope text-amber-400 mr-1.5"></i> Email Address *
+                        </label>
+                        <input type="email" id="contactEmail" required placeholder="yourname@domain.com" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-2">
+                            <i class="fas fa-photo-video text-amber-400 mr-1.5"></i> Advertisement Format *
+                        </label>
+                        <select id="adFormat" required class="w-full px-4 py-3 rounded-xl form-input text-sm bg-[#120103]">
+                            <option value="Logo Image (PNG/JPG)">Logo Image (PNG / JPG)</option>
+                            <option value="PDF Pamphlet / Brochure">PDF Pamphlet / Souvenir Brochure</option>
+                            <option value="Digital Banner Image">Digital Banner Image</option>
+                            <option value="General Sponsorship Inquiry">General Sponsorship Inquiry</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-2">
+                            <i class="fas fa-link text-amber-400 mr-1.5"></i> Image / PDF Web URL (Optional)
+                        </label>
+                        <input type="url" id="mediaUrl" placeholder="https://i.postimg.cc/your-image.png" class="w-full px-4 py-3 rounded-xl form-input text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-2">
+                        <i class="fas fa-comment-alt text-amber-400 mr-1.5"></i> Advertisement Details / Note
+                    </label>
+                    <textarea id="adMessage" rows="4" placeholder="Mention size specifications, sponsorship amount, or special instructions..." class="w-full px-4 py-3 rounded-xl form-input text-sm"></textarea>
+                </div>
+
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-start space-x-3 text-xs text-amber-200">
+                    <i class="fas fa-info-circle text-amber-400 text-base mt-0.5"></i>
+                    <div>
+                        Submissions will be routed directly to the Mandal's official address: 
+                        <strong class="text-amber-300">jakeriachavighnaharta1964@gmail.com</strong>. 
+                        If you have raw files/documents to send, you can also attach them directly via email.
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button type="submit" class="btn-3d py-3.5 px-8 rounded-xl font-semibold text-sm flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i> Submit Proposal to Mandal
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="premium-card p-6 md:p-8 text-center relative overflow-hidden">
+            <div class="corner-detail tl"></div><div class="corner-detail tr"></div>
+            <div class="corner-detail bl"></div><div class="corner-detail br"></div>
+            
+            <h3 class="text-base font-bold text-amber-400/90 tracking-widest uppercase mb-6 marathi-font">आमच्याशी जोडून रहा | Connect With Us</h3>
+            
+            <div class="grid grid-cols-4 gap-4 max-w-sm mx-auto justify-items-center">
+                <a class="h-14 w-14 rounded-full bg-red-600/10 hover:bg-red-600 border border-red-600/30 text-red-500 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://www.youtube.com/@jakeriacha.vighnaharta" target="_blank" aria-label="YouTube" title="YouTube">
+                    <i class="fab fa-youtube text-2xl"></i>
+                </a>
+                <a class="h-14 w-14 rounded-full bg-pink-600/10 hover:bg-gradient-to-tr hover:from-pink-500 hover:to-yellow-500 border border-pink-600/30 text-pink-400 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://www.instagram.com/jakeriacha.vighnaharta/" target="_blank" aria-label="Instagram" title="Instagram">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+                <a class="h-14 w-14 rounded-full bg-blue-600/10 hover:bg-blue-600 border border-blue-600/30 text-blue-500 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://www.facebook.com/share/1DVBVVozSh/" target="_blank" aria-label="Facebook" title="Facebook">
+                    <i class="fab fa-facebook-f text-2xl"></i>
+                </a>
+                <a class="h-14 w-14 rounded-full bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-600/30 text-emerald-500 hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg shadow-black/40" 
+                   href="https://maps.app.glo/zPG3i64hxMwcKQzy8" target="_blank" aria-label="Location" title="Location">
+                    <i class="fas fa-map-marker-alt text-2xl"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="floatingChatWrapper" class="fixed bottom-5 right-5 z-50 flex flex-col items-end">
+        <div id="chatTooltip" class="mb-2 bg-[#2d0206] text-amber-300 border border-amber-500/40 text-xs font-medium py-1.5 px-3 rounded-xl shadow-xl backdrop-blur-md opacity-0 translate-y-2 pointer-events-none transition-all duration-300 flex items-center space-x-2">
+            <span class="marathi-font">समुदाय चर्चा करा!</span>
+            <i class="fas fa-comment-dots text-amber-400"></i>
+        </div>
+
+        <button id="chatToggleBtn" aria-label="Open Community Chat" class="h-14 w-14 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border-2 border-amber-200/60 text-black flex items-center justify-center shadow-2xl chat-pulse hover:scale-110 active:scale-95 transition-all">
+            <i id="chatToggleIcon" class="fas fa-comments text-2xl text-black"></i>
+        </button>
+
+        <div id="chatPopupContainer" class="hidden absolute bottom-16 right-0 w-[92vw] sm:w-[420px] h-[550px] max-h-[80vh] bg-[#1c0205] border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 resize-y">
+            <div class="bg-gradient-to-r from-[#2d0206] to-[#45050a] px-4 py-3 border-b border-amber-500/20 flex items-center justify-between select-none">
+                <div class="flex items-center space-x-2">
+                    <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="marathi-font text-sm text-amber-300 font-semibold tracking-wide">समुदाय चर्चा (Chat)</span>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <button id="chatExpandBtn" title="Maximize / Restore Size" class="text-stone-400 hover:text-amber-300 p-1.5 transition">
+                        <i class="fas fa-expand-alt text-xs"></i>
+                    </button>
+                    <button id="chatCloseBtn" title="Close Chat" class="text-stone-400 hover:text-red-400 p-1.5 transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 w-full bg-black/50 relative">
+                <iframe src="https://ultron3000.github.io/jakeriachavighnaharta/chat" class="w-full h-full border-0" title="Community Chat Window"></iframe>
+            </div>
+
+            <div class="bg-[#120102] py-1 px-3 text-[10px] text-stone-500 flex justify-between items-center border-t border-white/5">
+                <span>Drag bottom corner or border to resize</span>
+                <i class="fas fa-arrows-alt text-[9px] text-amber-500/50"></i>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-b from-[#1f0205] to-[#0a0001] text-white py-8 border-t border-amber-500/20 text-center">
+        <div class="container mx-auto px-4 space-y-3">
+            <i class="fas fa-om text-2xl text-amber-400/60"></i>
+            <p class="marathi-font text-base text-amber-300">जकेरीया बंदर रोड सार्वजनिक गणेशोत्सव मंडळ</p>
+            <p class="text-stone-500 text-xs"><span class="italic text-amber-500/80 font-medium">गणपती बाप्पा मोरया! मंगलमूर्ती मोरया!</span></p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('partnerSubmitForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const business = document.getElementById('businessName').value;
+            const person = document.getElementById('contactName').value;
+            const phone = document.getElementById('contactPhone').value;
+            const email = document.getElementById('contactEmail').value;
+            const format = document.getElementById('adFormat').value;
+            const mediaUrl = document.getElementById('mediaUrl').value || 'N/A';
+            const message = document.getElementById('adMessage').value || 'N/A';
+
+            const mandalEmail = "jakeriachavighnaharta1964@gmail.com";
+            const subject = encodeURIComponent(`Partner/Advertisement Submission: ${business}`);
+            
+            const bodyText = `Official Partner Advertisement Request%0D%0A` +
+                             `----------------------------------------%0D%0A` +
+                             `Business / Sponsor Name: ${business}%0D%0A` +
+                             `Contact Person: ${person}%0D%0A` +
+                             `Phone / WhatsApp: ${phone}%0D%0A` +
+                             `Email: ${email}%0D%0A` +
+                             `Format: ${format}%0D%0A` +
+                             `Media / Image URL: ${mediaUrl}%0D%0A` +
+                             `Additional Details: ${message}%0D%0A` +
+                             `----------------------------------------%0D%0A`;
+
+            // Trigger mailto link directly to user's mail app pre-filled to mandal email
+            window.location.href = `mailto:${mandalEmail}?subject=${subject}&body=${bodyText}`;
+        });
+    </script>
+
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.className = 'fas fa-bars text-xl';
+            } else {
+                menuIcon.className = 'fas fa-times text-xl';
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+                menuIcon.className = 'fas fa-bars text-xl';
+            }
+        });
+
+        const chatToggleBtn = document.getElementById('chatToggleBtn');
+        const chatPopupContainer = document.getElementById('chatPopupContainer');
+        const chatCloseBtn = document.getElementById('chatCloseBtn');
+        const chatToggleIcon = document.getElementById('chatToggleIcon');
+        const chatTooltip = document.getElementById('chatTooltip');
+        const chatExpandBtn = document.getElementById('chatExpandBtn');
+
+        chatToggleBtn.addEventListener('mouseenter', () => {
+            if (chatPopupContainer.classList.contains('hidden')) {
+                chatTooltip.classList.remove('opacity-0', 'translate-y-2');
+                chatTooltip.classList.add('opacity-100', 'translate-y-0');
+            }
+        });
+        chatToggleBtn.addEventListener('mouseleave', () => {
+            chatTooltip.classList.remove('opacity-100', 'translate-y-0');
+            chatTooltip.classList.add('opacity-0', 'translate-y-2');
+        });
+
+        chatToggleBtn.addEventListener('click', () => {
+            chatTooltip.classList.remove('opacity-100', 'translate-y-0');
+            chatTooltip.classList.add('opacity-0', 'translate-y-2');
+            
+            chatPopupContainer.classList.toggle('hidden');
+            if (chatPopupContainer.classList.contains('hidden')) {
+                chatToggleIcon.className = 'fas fa-comments text-2xl text-black';
+            } else {
+                chatToggleIcon.className = 'fas fa-times text-2xl text-black';
+            }
+        });
+
+        chatCloseBtn.addEventListener('click', () => {
+            chatPopupContainer.classList.add('hidden');
+            chatToggleIcon.className = 'fas fa-comments text-2xl text-black';
+        });
+
+        let isExpanded = false;
+        chatExpandBtn.addEventListener('click', () => {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                chatPopupContainer.style.width = '96vw';
+                chatPopupContainer.style.height = '85vh';
+                chatPopupContainer.style.bottom = '10px';
+                chatPopupContainer.style.right = '2vw';
+                chatExpandBtn.innerHTML = '<i class="fas fa-compress-alt text-xs"></i>';
+            } else {
+                chatPopupContainer.style.width = '';
+                chatPopupContainer.style.height = '550px';
+                chatPopupContainer.style.bottom = '';
+                chatPopupContainer.style.right = '';
+                chatExpandBtn.innerHTML = '<i class="fas fa-expand-alt text-xs"></i>';
+            }
+        });
+    </script>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingOverlay = document.getElementById('loading');
+                loadingOverlay.style.opacity = '0';
+                setTimeout(function() {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 600);
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
+    <script>
+        const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+        DisableDevtool({
+            disable: true,
+            disableMenu: true,
+            clearLog: true,
+            disableSelect: true,
+            disableCopy: true,
+            disableCut: true,
+            disablePaste: true,
+            disableMobile: false,
+            interval: 100,
+            ondevtoolopen: function () {
+                if (!isMobile) {
+                    document.body.innerHTML = "";
+                    window.location.replace("about:blank");
+                }
+            }
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "F12" || 
+               (e.ctrlKey && e.key.toLowerCase() === "u") ||
+               (e.ctrlKey && e.shiftKey && ["i","j","c"].includes(e.key.toLowerCase())) ||
+               (e.ctrlKey && ["s","p","a","c","x","v"].includes(e.key.toLowerCase()))) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+        document.addEventListener("dragstart", function (e) { e.preventDefault(); });
+        document.addEventListener("selectstart", function (e) { e.preventDefault(); });
+        ["copy", "cut", "paste"].forEach(function(evt) {
+            document.addEventListener(evt, function(e) { e.preventDefault(); });
+        });
+
+        if (!isMobile) {
+            setInterval(function () {
+                if (window.outerWidth - window.innerWidth > 220 || window.outerHeight - window.innerHeight > 220) {
+                    document.body.innerHTML = "";
+                    window.location.replace("about:blank");
+                }
+            }, 1500);
+        }
+
+        (function () {
+            console.clear();
+            function block() { return false; }
+            console.log = console.warn = console.error = console.info = console.debug = console.table = block;
+        })();
+    </script>
+
+    <style>
+        html, body {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overflow-x: hidden;
+        }
+        img {
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+        ::selection {
+            background: transparent;
+        }
+    </style>
+</body>
+</html>
