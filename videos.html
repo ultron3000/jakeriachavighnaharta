@@ -58,6 +58,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            border: 0;
         }
 
         /* Custom Interactive Tab Controls */
@@ -128,46 +129,49 @@
     <!-- Main Dynamic Section Layout Container -->
     <main class="container mx-auto px-4 sm:px-6 py-8 max-w-5xl flex-grow">
         
-        <!-- Tab Control System (Changed to Ascending Order) -->
-        <div class="flex justify-center space-x-2 sm:space-x-4 mb-8 bg-black/30 p-1.5 rounded-2xl border border-white/5 max-w-md mx-auto">
-            <button onclick="switchYear('2022')" id="btn-2022" class="tab-btn active flex-1 py-2.5 text-center font-semibold text-sm rounded-xl tracking-wider">
+        <!-- Tab Control System with Marathi Numerals -->
+        <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 bg-black/30 p-1.5 rounded-2xl border border-white/5 max-w-lg mx-auto">
+            <button onclick="switchYear('2022')" id="btn-2022" class="tab-btn active flex-1 min-w-[70px] py-2.5 text-center font-semibold text-sm rounded-xl tracking-wider marathi-font">
                 २०२२
             </button>
-            <button onclick="switchYear('2023')" id="btn-2023" class="tab-btn flex-1 py-2.5 text-center font-semibold text-sm rounded-xl tracking-wider text-amber-400/80 hover:text-white">
+            <button onclick="switchYear('2023')" id="btn-2023" class="tab-btn flex-1 min-w-[70px] py-2.5 text-center font-semibold text-sm rounded-xl tracking-wider text-amber-400/80 hover:text-white marathi-font">
                 २०२३
             </button>
-            <button onclick="switchYear('2024')" id="btn-2024" class="tab-btn flex-1 py-2.5 text-center font-semibold text-sm rounded-xl tracking-wider text-amber-400/80 hover:text-white">
+            <button onclick="switchYear('2024')" id="btn-2024" class="tab-btn flex-1 min-w-[70px] py-2.5 text-center font-semibold text-sm rounded-xl tracking-wider text-amber-400/80 hover:text-white marathi-font">
                 २०२४
+            </button>
+            <button onclick="switchYear('2026')" id="btn-2026" class="tab-btn flex-1 min-w-[70px] py-2.5 text-center font-semibold text-sm rounded-xl tracking-wider text-amber-400/80 hover:text-white marathi-font">
+                २०२६
             </button>
         </div>
 
-        <!-- ====== YEAR 2022 GALLERY WRAPPER (Now Visible First) ====== -->
+        <!-- ====== YEAR 2022 GALLERY WRAPPER ====== -->
         <div id="gallery-2022" class="year-gallery grid sm:grid-cols-2 gap-6">
             <div class="premium-card p-4 relative">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/1Eb-C5IwydPbscwWMCYXxCgrgPFvncafF/preview" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/YrYyBZqB#kw91l_NVX4P2cw-UrD06G6ZXB9Hl_-OGTHHDTul7d7U" allowfullscreen></iframe>
                 </div>
                 <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२२ - व्हिडिओ १</p>
             </div>
             <div class="premium-card p-4 relative">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/1NBx-wNKN9TSiQ5WOxzwbvOm_5L6tAjow/preview" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/FiJQjLTC#3Tuu-1KNrUh-QSZizbpzmzUrQsboUhOTTT08vhu6c9o" allowfullscreen></iframe>
                 </div>
                 <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२२ - व्हिडिओ २</p>
             </div>
             <div class="premium-card p-4 relative">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/1uSsygHc_zIdzZ3N4typtLrSi2Kiw7xam/preview" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/JvBHnIwJ#NqLrxWPMiGw1RAHuQzTwJ5j4p5nVRpK99fLyO9lJ0HM" allowfullscreen></iframe>
                 </div>
                 <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२२ - व्हिडिओ ३</p>
             </div>
             <div class="premium-card p-4 relative">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/1OD6UT4lryxFOP-rNnNHTnbuDoylu-rUG/preview" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/VvAhyb7B#q2yHye1eU_LEzGrx9_lDPwRH4g7Vi9XFQAwToJF_CkI" allowfullscreen></iframe>
                 </div>
                 <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२२ - व्हिडिओ ४</p>
             </div>
@@ -178,7 +182,7 @@
             <div class="premium-card p-4 relative mx-auto sm:col-span-2 w-full max-w-xl">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/16rXUtiNeF3yBrHtfkqVabCU7hqW3kGFv/preview" loading="lazy" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/9i52BLyI#-_iV-57KyrT8SR-jgwnvx4Bmu4dFraxtgUgedC0VQ8I" loading="lazy" allowfullscreen></iframe>
                 </div>
                 <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">आगमन सोहळा २०२३ उत्सव क्षणचित्रे</p>
             </div>
@@ -189,23 +193,62 @@
             <div class="premium-card p-4 relative">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/16cdXYF5CE36vSxPFxCheObq0vBQ2y6tj/preview" loading="lazy" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/hv5ETRgI#KY4cBGRt5KD38gYk8xLQzsg_cx9TMd5pPi6ua4Gb0E4" loading="lazy" allowfullscreen></iframe>
                 </div>
                 <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">आगमन सोहळा २०२४ - भाग १</p>
             </div>
             <div class="premium-card p-4 relative">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/1V-TeXR4CEksnORKjf9WYmTJYvuFm6mGS/preview" loading="lazy" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/Qv4wCaQT#BA-VpYLTPl1yB90cResLTUvW1Q2x99LhxIVQTbKWGOQ" loading="lazy" allowfullscreen></iframe>
                 </div>
                 <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">आगमन सोहळा २०२४ - भाग २</p>
+            </div>
+            <div class="premium-card p-4 relative sm:col-span-2 max-w-xl mx-auto w-full">
+                <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
+                <div class="video-container">
+                    <iframe src="https://mega.nz/embed/E7QzyZQL#hfXTe7LhqHlDDiijcAgEiaLLgensek2h8xdLnbuqJgQ" loading="lazy" allowfullscreen></iframe>
+                </div>
+                <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">आगमन सोहळा २०२४ - भाग ३</p>
+            </div>
+        </div>
+
+        <!-- ====== YEAR 2026 GALLERY WRAPPER ====== -->
+        <div id="gallery-2026" class="year-gallery hidden grid sm:grid-cols-2 gap-6">
+            <div class="premium-card p-4 relative">
+                <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
+                <div class="video-container">
+                    <iframe src="https://mega.nz/embed/UyxSnZRJ#nKsD_s9ps2gkiuEoJRGXX3QOYY6WlYuj3vfUdPzCLuo" loading="lazy" allowfullscreen></iframe>
+                </div>
+                <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२६ - व्हिडिओ १</p>
             </div>
             <div class="premium-card p-4 relative">
                 <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
                 <div class="video-container">
-                    <iframe src="https://drive.google.com/file/d/1IhWKYmikiHkEKB8oYMf6QHzfOb7ePaXG/preview" loading="lazy" allow="autoplay" allowfullscreen></iframe>
+                    <iframe src="https://mega.nz/embed/UmBSwZ6K#F2J8C5UCzjV1ptklsUZNJe3AN4fDfpc7Tsv6fOQ0yaQ" loading="lazy" allowfullscreen></iframe>
                 </div>
-                <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">आगमन सोहळा २०२४ - भाग ३</p>
+                <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२६ - व्हिडिओ २</p>
+            </div>
+            <div class="premium-card p-4 relative">
+                <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
+                <div class="video-container">
+                    <iframe src="https://mega.nz/embed/YyQFFL6L#sEKOakESBs0JUzXjZUu5oCsb0KYrrqvOaThsUSj8Uw0" loading="lazy" allowfullscreen></iframe>
+                </div>
+                <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२६ - व्हिडिओ ३</p>
+            </div>
+            <div class="premium-card p-4 relative">
+                <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
+                <div class="video-container">
+                    <iframe src="https://mega.nz/embed/xiwQCaga#4f36TNwTuAALfsZGts5cMLSSuqi_3sIWbBrm0-WxuWA" loading="lazy" allowfullscreen></iframe>
+                </div>
+                <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२६ - व्हिडिओ ४</p>
+            </div>
+            <div class="premium-card p-4 relative sm:col-span-2 max-w-xl mx-auto w-full">
+                <div class="corner-accent tl"></div><div class="corner-accent tr"></div>
+                <div class="video-container">
+                    <iframe src="https://mega.nz/embed/l3JUCA5Y#Adfi4reB017cTLeRquO-erzjVyWllcygumbZQu8VWwc" loading="lazy" allowfullscreen></iframe>
+                </div>
+                <p class="text-xs text-amber-400/80 font-medium tracking-wide mt-3 text-center marathi-font">उत्सव २०२६ - व्हिडिओ ५</p>
             </div>
         </div>
 
